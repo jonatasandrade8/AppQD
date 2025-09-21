@@ -100,7 +100,7 @@ nav a:hover, nav a.active {
 
 /* Main - Mobile First */
 main {
-    padding: 15px 0; /* Padding menor para mobile */
+    
     max-width: 100%;
     margin: 0 auto;
 }
