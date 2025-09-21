@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Câmera - Qdelícia Frutas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    
+    
+    <div class="menu-overlay"></div>
+
+    <header id="cabecalho-principal">
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+        </div>
+        <h1>Qdelícia Frutas</h1>
+        <p>Área do Promotor - Registros</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="caixas.html">Caixas</a>
+        <a href="camera.html" class="active">Câmera</a>
+    </nav>
+    
+    <main class="camera-page-container">
+        <div class="camera-app-container">
+            <div class="user-config">
+                <div class="config-group">
+                    <label for="watermark-text">Digite o texto que acompanhará a foto:</label>
+                    <input type="text" id="watermark-text" placeholder="Ex: Qualidade, Estoque, Avaria etc...">
+                </div>
+                <div class="permission-buttons">
+                    <button class="permission-btn camera-permission" id="request-camera">
+                        <i class="fas fa-camera"></i> Permitir Câmera
+                    </button>
+                    <button class="permission-btn reload-btn" id="reload-page">
+                        <i class="fas fa-sync-alt"></i> Recarregar
+                    </button>
+                </div>
+            </div>
+
+            <div class="camera-container">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="hidden-canvas" style="display:none;"></canvas>
+                <div class="watermark-live">
+                    <span id="date-time"></span>
+                    <span id="text-watermark"></span>
+                </div>
+                <div class="controls">
+                    <button id="shutter-btn" class="btn-circle"></button>
+                    <button id="record-btn" class="btn-circle-video"><i class="fas fa-video"></i></button>
+                </div>
+                <div id="countdown" class="countdown"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn download-btn" id="download-all" disabled>
+                    <i class="fas fa-download"></i> Baixar Mídia
+                </button>
+                <button class="action-btn share-btn" id="share-all" disabled>
+                    <i class="fas fa-share-alt"></i> Compartilhar Mídia
+                </button>
+            </div>
+        </div>
+
+        <div class="gallery">
+            <h2>Mídias Recentes</h2>
+            <div class="photo-list" id="media-list">
+                <div class="photo-item placeholder">
+                    <img src="https://via.placeholder.com/150x120?text=Nenhuma+mídia" alt="Nenhuma mídia capturada">
+                    <div class="photo-info">Tire uma foto ou grave um vídeo</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+    </footer>
+
+    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
