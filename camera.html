@@ -27,57 +27,55 @@
         <a href="camera.html" class="active">Câmera</a>
     </nav>
     
-    <main class="camera-page-container">
-        <div class="camera-app-container">
-            <div class="user-config">
-                <div class="config-group">
-                    <label for="watermark-text">Digite o texto que acompanhará a foto:</label>
-                    <input type="text" id="watermark-text" placeholder="Ex: Qualidade, Estoque, Avaria etc...">
-                </div>
-                <div class="permission-buttons">
-                    <button class="permission-btn camera-permission" id="request-camera">
-                        <i class="fas fa-camera"></i> Permitir Câmera
-                    </button>
-                    <button class="permission-btn reload-btn" id="reload-page">
-                        <i class="fas fa-sync-alt"></i> Recarregar
-                    </button>
-                </div>
-            </div>
+    <div class="user-config">
+      <div class="config-group">
+        <label for="share-text">Insira o texto que aparecerá como mensagem nas fotos compartilhadas:</label>
+        <input type="text" id="share-text" placeholder="Digite o texto para compartilhar">
+      </div>
+      <div class="permission-buttons">
+        <button class="permission-btn camera-permission" id="request-camera">
+          <i class="fas fa-camera"></i> Permitir Câmera
+        </button>
+        <button class="permission-btn reload-btn" id="reload-page">
+          <i class="fas fa-sync-alt"></i> Recarregar
+        </button>
+      </div>
+    </div>
 
-            <div class="camera-container">
-                <video id="video" autoplay playsinline></video>
-                <canvas id="hidden-canvas" style="display:none;"></canvas>
-                <div class="watermark-live">
-                    <span id="date-time"></span>
-                    <span id="text-watermark"></span>
-                </div>
-                <div class="controls">
-                    <button id="shutter-btn" class="btn-circle"></button>
-                    <button id="record-btn" class="btn-circle-video"><i class="fas fa-video"></i></button>
-                </div>
-                <div id="countdown" class="countdown"></div>
-            </div>
+    <div class="camera-container">
+      <video id="video" autoplay playsinline></video>
+      <div class="watermark">
+        <i class="fas fa-clock"></i> <span id="date-time">--/--/---- --:--:--</span>
+      </div>
+      <div class="controls">
+        <button id="switch-btn" class="btn-circle"><i class="fas fa-sync-alt"></i></button>
+        <button id="shutter-btn" class="btn-circle"></button>
+      </div>
+    </div>
 
-            <div class="action-buttons">
-                <button class="action-btn download-btn" id="download-all" disabled>
-                    <i class="fas fa-download"></i> Baixar Mídia
-                </button>
-                <button class="action-btn share-btn" id="share-all" disabled>
-                    <i class="fas fa-share-alt"></i> Compartilhar Mídia
-                </button>
-            </div>
+    <div class="info-panel">
+      <p><i class="fas fa-clock"></i> <span id="date-time-old">--/--/---- --:--:--</span></p>
+    </div>
+
+    <div class="action-buttons">
+      <button class="action-btn download-btn" id="download-all" disabled>
+        <i class="fas fa-download"></i> Baixar Tudo
+      </button>
+      <button class="compartilhar-btn" id="share-all" disabled>
+        <i class="fab fa-whatsapp"></i> Compartilhar
+      </button>
+    </div>
+
+    <div class="gallery">
+      <h2>Fotos Recentes</h2>
+      <div class="photo-list" id="photo-list">
+        <div class="photo-item">
+          <img src="https://via.placeholder.com/150x120?text=Nenhuma+foto" alt="placeholder">
+          <div class="photo-info">Tire uma foto para começar</div>
         </div>
-
-        <div class="gallery">
-            <h2>Mídias Recentes</h2>
-            <div class="photo-list" id="media-list">
-                <div class="photo-item placeholder">
-                    <img src="https://via.placeholder.com/150x120?text=Nenhuma+mídia" alt="Nenhuma mídia capturada">
-                    <div class="photo-info">Tire uma foto ou grave um vídeo</div>
-                </div>
-            </div>
-        </div>
-    </main>
+      </div>
+    </div>
+  </div>
     
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
