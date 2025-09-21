@@ -31,138 +31,115 @@ body {
     background-color: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.6;
-    font-size: 16px;
+    font-size: 14px; /* Mobile first - tamanho menor */
 }
 
-/* ===================== UTILITÁRIOS ===================== */
+/* ===================== MOBILE FIRST - LAYOUT GERAL ===================== */
 .container {
-    max-width: var(--max-width);
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 15px; /* Padding menor para mobile */
 }
 
-.titulos {
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-.titulos h2, .titulos h3 {
-    color: var(--primary-color);
-    margin-bottom: 10px;
-}
-
-.titulos p, .titulos ul {
-    font-size: 1.1rem;
-    color: var(--text-dark);
-}
-
-.btn-primary {
-    display: inline-block;
-    background: var(--gradient);
-    color: var(--white);
-    padding: 12px 25px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: var(--transition);
-}
-
-.btn-primary:hover {
-    box-shadow: 0 4px 15px var(--shadow-strong);
-    transform: translateY(-2px);
-}
-
-/* ===================== LAYOUT GERAL ===================== */
+/* Header - Mobile First */
 header {
     background: var(--gradient);
     color: var(--white);
     text-align: center;
-    padding: 20px 0;
+    padding: 15px 0; /* Padding menor para mobile */
     position: relative;
     box-shadow: 0 2px 10px var(--shadow);
 }
 
 .logo-placeholder {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .logo-placeholder img {
-    max-width: 150px;
+    max-width: 100px; /* Menor para mobile */
     height: auto;
     border-radius: 50%;
 }
 
 header h1 {
-    font-size: 2.5rem;
+    font-size: 1.8rem; /* Menor para mobile */
     margin: 0;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 header p {
-    font-size: 1.2rem;
+    font-size: 1rem; /* Menor para mobile */
     margin-top: 5px;
     opacity: 0.9;
 }
 
+/* Navegação - Mobile First */
 nav {
     background: var(--primary-color);
     text-align: center;
-    padding: 10px 0;
+    padding: 8px 0;
+    overflow-x: auto; /* Permite scroll horizontal se necessário */
+    white-space: nowrap;
 }
 
 nav a {
     color: var(--white);
     text-decoration: none;
-    padding: 10px 20px;
-    margin: 0 5px;
+    padding: 8px 12px; /* Padding menor para mobile */
+    margin: 0 2px;
     font-weight: bold;
+    font-size: 0.9rem; /* Fonte menor para mobile */
     transition: background-color 0.3s;
+    display: inline-block;
+    border-radius: var(--border-radius);
 }
 
 nav a:hover, nav a.active {
     background-color: var(--secondary-color);
-    border-radius: var(--border-radius);
 }
 
+/* Main - Mobile First */
 main {
-    padding: 20px 0;
-    max-width: var(--max-width);
+    padding: 15px 0; /* Padding menor para mobile */
+    max-width: 100%;
     margin: 0 auto;
 }
 
 section {
     background-color: var(--white);
-    padding: 30px;
-    margin-bottom: 20px;
+    padding: 20px 15px; /* Padding menor para mobile */
+    margin-bottom: 15px;
     border-radius: var(--border-radius);
     box-shadow: 0 4px 10px var(--shadow);
 }
 
+/* Footer - Mobile First */
 footer {
     background-color: var(--text-dark);
     color: var(--bg-light);
     text-align: center;
-    padding: 20px 0;
-    font-size: 0.9rem;
+    padding: 15px 0;
+    font-size: 0.8rem; /* Menor para mobile */
 }
 
-/* ===================== CONTEÚDO ESPECÍFICO ===================== */
+/* ===================== BOTÕES FLUTUANTES - MOBILE FIRST ===================== */
 .whatsapp-btn {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 15px;
+    right: 15px;
     background-color: #25d366;
     color: white;
-    width: 60px;
-    height: 60px;
+    width: 50px; /* Menor para mobile */
+    height: 50px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1.5rem; /* Menor para mobile */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 100;
     transition: transform 0.3s;
+    text-decoration: none;
 }
 
 .whatsapp-btn:hover {
@@ -171,17 +148,17 @@ footer {
 
 .back-to-top {
     position: fixed;
-    bottom: 90px;
-    right: 20px;
+    bottom: 75px; /* Ajustado para mobile */
+    right: 15px;
     background: var(--primary-color);
     color: var(--white);
-    width: 40px;
-    height: 40px;
+    width: 35px; /* Menor para mobile */
+    height: 35px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1rem; /* Menor para mobile */
     cursor: pointer;
     opacity: 0;
     visibility: hidden;
@@ -193,50 +170,72 @@ footer {
     opacity: 1;
     visibility: visible;
 }
-.sistema-interativo{
-    text-align: center;
 
-}
-
-/* ===================== RESPONSIVIDADE ===================== */
-@media (max-width: 768px) {
-    nav a {
-        padding: 10px 10px;
-    }
-}
-/* ===================== ESTILOS DA APLICAÇÃO DA CÂMERA ===================== */
-.camera-page-container {
-    background: var(--bg-light);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Área de Configuração do Usuário */
-.user-config {
-    background: var(--white);
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 25px;
+/* ===================== CARROSSEL - MOBILE FIRST ===================== */
+.carousel-container {
+    position: relative;
     width: 100%;
-    max-width: 1400px;
-    box-shadow: 0 4px 15px var(--shadow);
-    animation: slideIn 0.6s ease;
+    max-width: 100%;
+    margin: 20px 0;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 10px var(--shadow);
 }
 
-@keyframes slideIn {
-    from { transform: translateX(-20px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+.carousel-slides {
+    display: flex;
+    transition: transform 0.5s ease;
+    width: 500%; /* 5 slides */
+}
+
+.carousel-slides .slide {
+    width: 20%; /* 100% / 5 slides */
+    height: 200px; /* Altura menor para mobile */
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    gap: 8px;
+}
+
+.carousel-dots .dot {
+    width: 8px; /* Menor para mobile */
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(93, 63, 211, 0.3);
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.carousel-dots .dot.active {
+    background-color: var(--primary-color);
+}
+
+/* ===================== ESTILOS DA CÂMERA - MOBILE FIRST ===================== */
+.camera-page {
+    padding: 10px;
+    background: var(--bg-light);
+}
+
+.camera-wrapper {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px var(--shadow);
+}
+
+/* Configuração do usuário - Mobile First */
+.user-config {
+    padding: 15px;
+    background: var(--bg-light);
+    border-bottom: 1px solid #eee;
 }
 
 .config-group {
@@ -248,363 +247,508 @@ footer {
     margin-bottom: 8px;
     color: var(--text-dark);
     font-weight: 500;
+    font-size: 0.9rem;
 }
 
-#share-text {
+.config-group input {
     width: 100%;
     padding: 12px;
     border: 2px solid var(--primary-color);
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition: all 0.3s;
 }
 
-#share-text:focus {
+.config-group input:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(57,255,20,0.2);
+    box-shadow: 0 0 0 3px rgba(57,255,20,0.1);
 }
 
 .permission-buttons {
     display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
+    flex-direction: column; /* Stack vertical para mobile */
+    gap: 10px;
 }
 
 .permission-btn {
-    flex: 1;
-    min-width: 140px;
+    width: 100%;
     padding: 12px;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     gap: 8px;
-    transition: all 0.3s;
-    background: var(--gradient);
     color: var(--white);
+    transition: 0.3s;
+    font-size: 0.9rem;
 }
 
-.camera-app-container {
-    background: var(--white);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(93,63,211,0.15),
-                0 2px 8px 0 var(--accent-color);
-    width: 100%;
-    max-width: 500px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 30px;
-    border: 2px solid var(--primary-color);
-    position: relative;
-    transform: translateY(0);
-    transition: all 0.3s ease;
+.camera-permission {
+    background: var(--primary-color);
+}
+.camera-permission:hover {
+    background: var(--secondary-color);
 }
 
-.camera-app-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 40px 0 rgba(93,63,211,0.25),
-                0 4px 12px 0 var(--accent-color);
+.reload-btn {
+    background: var(--accent-color);
+}
+.reload-btn:hover {
+    background: #0f1de6;
 }
 
-.camera-app-container:hover {
-    box-shadow: 0 12px 40px 0 rgba(93,63,211,0.25), 0 2px 12px 0 var(--accent-color);
-}
-
+/* Área da Câmera - Mobile First */
 .camera-container {
     position: relative;
     background: #000;
-    height: 340px;
-    border-bottom: 3px solid var(--primary-color);
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 0 0 4px var(--accent-color), 0 4px 20px var(--shadow-strong);
+    height: 250px; /* Altura menor para mobile */
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 #video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 18px 18px 0 0;
-    box-shadow: 0 0 0 2px var(--secondary-color);
-    transition: box-shadow 0.3s;
 }
 
-.watermark-live {
-    top: 18px;
-    left: 18px;
-    background: linear-gradient(90deg, var(--primary-color) 60%, var(--accent-color) 100%);
+.watermark {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
     color: var(--white);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    opacity: 0.92;
-    box-shadow: 0 2px 8px var(--shadow);
-    border: 1.5px solid var(--accent-color);
-    letter-spacing: 0.5px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem; /* Menor para mobile */
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(4px);
 }
 
 .controls {
     position: absolute;
-    bottom: 18px;
+    bottom: 50px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 22px;
-    z-index: 2;
+    gap: 15px; /* Gap menor para mobile */
+    z-index: 20;
 }
 
-.btn-circle, .btn-circle-video {
-    width: 68px;
-    height: 68px;
+.btn-circle {
+    width: 50px; /* Menor para mobile */
+    height: 50px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     border: none;
     cursor: pointer;
-    font-size: 1.5rem;
-    box-shadow: 0 4px 16px rgba(57,255,20,0.15), 0 2px 8px var(--shadow-strong);
-    transition: 0.2s, box-shadow 0.3s;
-    outline: 2px solid transparent;
+    font-size: 1rem; /* Menor para mobile */
+    background: var(--white);
+    transition: transform 0.2s;
 }
 
-.btn-circle:focus, .btn-circle-video:focus {
-    outline: 2px solid var(--accent-color);
+.btn-circle:active {
+    transform: scale(0.95);
 }
 
 #shutter-btn {
-    background: radial-gradient(circle at 60% 40%, var(--accent-color) 60%, var(--primary-color) 100%);
-    border: 5px solid var(--white);
-    box-shadow: 0 0 0 4px var(--accent-color), 0 2px 8px var(--shadow-strong);
-    /* animation: pulse 1.5s infinite; */
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 4px var(--accent-color), 0 2px 8px var(--shadow-strong);}
-    50% { box-shadow: 0 0 0 12px rgba(57,255,20,0.25), 0 2px 8px var(--shadow-strong);}
-    100% { box-shadow: 0 0 0 4px var(--accent-color), 0 2px 8px var(--shadow-strong);}
-}
-
-.btn-circle:hover, .btn-circle-video:hover {
-    background: var(--secondary-color);
-    color: var(--accent-color);
-    box-shadow: 0 0 0 8px var(--accent-color), 0 4px 16px var(--shadow-strong);
-}
-
-.btn-circle-video {
-    background-color: #f44336;
+    width: 56px; /* Menor para mobile */
+    height: 56px;
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 0 0 2px var(--white);
+    background: var(--accent-color);
     color: var(--white);
-    border: 4px solid var(--white);
-    box-shadow: 0 0 0 4px #f44336, 0 2px 8px var(--shadow-strong);
 }
 
-.btn-circle-video:hover {
-    background-color: #d32f2f;
-    color: var(--accent-color);
-    box-shadow: 0 0 0 8px #f44336, 0 4px 16px var(--shadow-strong);
+#switch-btn {
+    background: rgba(255,255,255,0.9);
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
 }
 
-.countdown {
-    top: 18px;
-    right: 18px;
-    background: linear-gradient(90deg, var(--accent-color) 60%, var(--primary-color) 100%);
-    color: var(--white);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    display: none;
-    box-shadow: 0 2px 8px var(--shadow);
-    border: 1.5px solid var(--primary-color);
-    opacity: 0.95;
-    position: absolute;
-    left: 50%;
-    bottom: 18px;
-    transform: translateX(-50%);
-    opacity: 0.95;
-}
-
+/* Botões de Ação - Mobile First */
 .action-buttons {
     display: flex;
-    gap: 15px;
-    padding: 20px;
-    background: linear-gradient(
-        to bottom,
-        var(--white) 0%,
-        var(--bg-light) 100%
-    );
-    flex-wrap: wrap;
-    justify-content: center;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
+    flex-direction: column; /* Stack vertical para mobile */
+    gap: 10px;
+    padding: 15px;
+    background: var(--bg-light);
 }
 
-.action-btn, .compartilhar-btn {
-    min-width: 150px;
-    padding: 14px 20px;
+.action-btn {
+    width: 100%;
+    padding: 12px;
     border: none;
-    border-radius: 12px;
-    font-weight: 700;
+    border-radius: 8px;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     color: var(--white);
-    transition: all 0.3s;
-    background: var(--gradient);
-    box-shadow: 0 4px 15px var(--shadow);
-    position: relative;
-    overflow: hidden;
+    transition: 0.3s;
+    font-size: 0.9rem;
 }
 
-.action-btn::before, .compartilhar-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
+.action-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.download-btn {
+    background: var(--primary-color);
+}
+.download-btn:hover:not(:disabled) {
+    background: var(--secondary-color);
+}
+
+.whatsapp-btn.action-btn {
+    background: #25d366;
+    position: static;
     width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        45deg,
-        transparent 0%,
-        rgba(255,255,255,0.2) 50%,
-        transparent 100%
-    );
-    transform: translateX(-100%);
-    transition: transform 0.6s;
-    opacity: 0.98;
+    height: auto;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+.whatsapp-btn.action-btn:hover:not(:disabled) {
+    background: #128c7e;
 }
 
-.action-btn:hover::before, .compartilhar-btn:hover::before {
-    transform: translateX(100%);
+/* Galeria - Mobile First */
+.gallery {
+    padding: 15px;
+    background: var(--white);
 }
 
-.action-btn:hover {
-    background: var(--accent-color);
+.gallery h2 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
     color: var(--primary-color);
-    box-shadow: 0 4px 16px var(--shadow-strong);
+    text-align: center;
 }
 
-@media (max-width: 600px) {
-    .camera-app-container {
-        max-width: 98vw;
-        border-radius: 10px;
-    }
-    .camera-container {
-        height: 220px;
-        border-radius: 10px 10px 0 0;
-    }
-    #video {
-        border-radius: 8px 8px 0 0;
-    }
-    .controls {
-        gap: 12px;
-        bottom: 10px;
-    }
-    .btn-circle, .btn-circle-video {
-        width: 48px;
-        height: 48px;
-        font-size: 1.1rem;
-    }
-    #shutter-btn { border-width: 3px; }
-    .countdown {
-        left: 50%;
-        bottom: 50px;
-        top: auto;
-        right: auto;
-        transform: translateX(-50%);
-        padding: 6px 12px;
-        font-size: 1rem;
-        border-radius: 7px;
-    }
-    .watermark, .watermark-live {
-        left: 50%;
-        bottom: 10px;
-        top: auto;
-        right: auto;
-        transform: translateX(-50%);
-        padding: 6px 10px;
-        font-size: 0.85rem;
-        border-radius: 6px;
-    }
+.photo-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Menor para mobile */
+    gap: 10px;
+    padding: 5px;
 }
 
-/* ===================== CARROSSEL ===================== */
-.carousel-container {
-    width: 100%;
-    max-width: 2000px;
-    margin-bottom: 40px;
-    position: relative;
-    /* Remove a altura fixa aqui para torná-la responsiva */
-    height: auto; 
+.photo-item {
+    border-radius: 8px;
     overflow: hidden;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 15px var(--shadow-strong);
-    padding-top: 40%; /* Proporção de aspecto 16:9 (altura/largura = 9/16 = 0.5625 = 56.25%) */
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background: var(--bg-light);
+    transition: transform 0.3s;
 }
 
-.carousel-slides {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-    width: 150%;
+.photo-item:hover {
+    transform: translateY(-2px);
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100px; /* Altura menor para mobile */
+    object-fit: cover;
+}
+
+.photo-info {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    color: var(--white);
+    padding: 4px;
+    font-size: 0.7rem; /* Menor para mobile */
+    text-align: center;
 }
 
-.slide {
-    width: calc(100% / 3);
-    height: 100%;
-    display: block;
-    object-fit: cover; 
+/* ===================== UTILITÁRIOS ===================== */
+.titulos {
+    margin-bottom: 20px; /* Menor para mobile */
+    text-align: center;
 }
 
-.carousel-dots {
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
+.titulos h2, .titulos h3 {
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    font-size: 1.2rem; /* Menor para mobile */
 }
 
-.dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    transition: background-color 0.3s;
+.titulos p, .titulos ul {
+    font-size: 1rem; /* Menor para mobile */
+    color: var(--text-dark);
 }
 
-.dot.active {
-    background-color: var(--white);
-    border: 2px solid var(--primary-color);
+.btn-primary {
+    display: inline-block;
+    background: var(--gradient);
+    color: var(--white);
+    padding: 10px 20px; /* Menor para mobile */
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem; /* Menor para mobile */
+    transition: var(--transition);
 }
 
+.btn-primary:hover {
+    box-shadow: 0 4px 15px var(--shadow-strong);
+    transform: translateY(-2px);
+}
 
-/* ===================== MEDIA QUERIES PARA RESPONSIVIDADE ===================== */
-@media (max-width: 768px) {
-    .carousel-container {
-        padding-top: 56.25%; /* Proporção de aspecto 16:9 para mobile */
+.sistema-interativo {
+    text-align: center;
+}
+
+/* ===================== TABLET - MIN-WIDTH: 768px ===================== */
+@media (min-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+
+    .container {
+        padding: 0 20px;
+    }
+
+    header {
+        padding: 20px 0;
+    }
+
+    .logo-placeholder img {
+        max-width: 130px;
+    }
+
+    header h1 {
+        font-size: 2.2rem;
+    }
+
+    header p {
+        font-size: 1.1rem;
+    }
+
+    nav {
+        padding: 10px 0;
+    }
+
+    nav a {
+        padding: 10px 15px;
+        margin: 0 3px;
+        font-size: 1rem;
+    }
+
+    main {
+        padding: 20px 0;
+    }
+
+    section {
+        padding: 25px 20px;
+        margin-bottom: 20px;
+    }
+
+    .whatsapp-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 1.8rem;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .back-to-top {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+        bottom: 85px;
+    }
+
+    .carousel-slides .slide {
+        height: 250px;
+    }
+
+    .carousel-dots .dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    .camera-container {
+        height: 300px;
+    }
+
+    .watermark {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+
+    .controls {
+        gap: 18px;
+    }
+
+    .btn-circle {
+        width: 55px;
+        height: 55px;
+        font-size: 1.1rem;
+    }
+
+    #shutter-btn {
+        width: 62px;
+        height: 62px;
+        border-width: 4px;
+    }
+
+    .permission-buttons {
+        flex-direction: row;
+    }
+
+    .action-buttons {
+        flex-direction: row;
+    }
+
+    .photo-list {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+    }
+
+    .photo-item img {
+        height: 120px;
+    }
+
+    .photo-info {
+        font-size: 0.75rem;
+        padding: 6px;
+    }
+
+    .titulos {
+        margin-bottom: 25px;
+    }
+
+    .titulos h2, .titulos h3 {
+        font-size: 1.4rem;
+    }
+
+    .titulos p, .titulos ul {
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+        padding: 12px 25px;
+        font-size: 1rem;
     }
 }
 
-@media (max-width: 480px) {
-    .carousel-container {
-        padding-top: 75%; /* Proporção 4:3 para telas muito pequenas */
+/* ===================== DESKTOP - MIN-WIDTH: 1024px ===================== */
+@media (min-width: 1024px) {
+    .container {
+        max-width: var(--max-width);
+    }
+
+    header {
+        padding: 25px 0;
+    }
+
+    .logo-placeholder img {
+        max-width: 150px;
+    }
+
+    header h1 {
+        font-size: 2.5rem;
+    }
+
+    header p {
+        font-size: 1.2rem;
+    }
+
+    nav a {
+        padding: 10px 20px;
+        margin: 0 5px;
+    }
+
+    main {
+        max-width: var(--max-width);
+    }
+
+    section {
+        padding: 30px;
+    }
+
+    .whatsapp-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
+
+    .back-to-top {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        bottom: 90px;
+    }
+
+    .carousel-slides .slide {
+        height: 300px;
+    }
+
+    .camera-wrapper {
+        max-width: 480px;
+    }
+
+    .camera-container {
+        height: 320px;
+    }
+
+    .controls {
+        gap: 20px;
+    }
+
+    .btn-circle {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+    }
+
+    #shutter-btn {
+        width: 68px;
+        height: 68px;
+    }
+
+    .photo-list {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .titulos {
+        margin-bottom: 30px;
+    }
+
+    .titulos h2, .titulos h3 {
+        font-size: 1.5rem;
     }
 }
+
+/* ===================== LARGE DESKTOP - MIN-WIDTH: 1440px ===================== */
+@media (min-width: 1440px) {
+    .camera-wrapper {
+        max-width: 500px;
+    }
+
+    .camera-container {
+        height: 340px;
+    }
+
+    .carousel-slides .slide {
+        height: 350px;
+    }
+}
+
