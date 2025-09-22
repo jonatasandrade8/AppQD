@@ -180,6 +180,8 @@ footer {
     overflow: hidden;
     border-radius: var(--border-radius);
     box-shadow: 0 4px 10px var(--shadow);
+    /* Adicione um fundo para as áreas vazias se a imagem não preencher */
+    background-color: black; 
 }
 
 .carousel-slides {
@@ -190,29 +192,12 @@ footer {
 
 .carousel-slides .slide {
     width: 20%; /* 100% / 5 slides */
-    height: 200px; /* Altura menor para mobile */
-    object-fit: cover;
+    height: 300px; /* Altura menor para mobile */
+    /* Mude de 'cover' para 'contain' */
+    object-fit: contain; 
     flex-shrink: 0;
-}
-
-.carousel-dots {
-    display: flex;
-    justify-content: center;
-    padding: 10px 0;
-    gap: 8px;
-}
-
-.carousel-dots .dot {
-    width: 8px; /* Menor para mobile */
-    height: 8px;
-    border-radius: 50%;
-    background-color: rgba(93, 63, 211, 0.3);
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.carousel-dots .dot.active {
-    background-color: var(--primary-color);
+    /* Adicione um fundo para o próprio slide, se precisar de um */
+    background-color: var(--text-dark); 
 }
 
 /* ===================== ESTILOS DA CÂMERA - MOBILE FIRST ===================== */
