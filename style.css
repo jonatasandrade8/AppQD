@@ -97,7 +97,6 @@ nav a {
 nav a:hover, nav a.active {
     background-color: var(--secondary-color);
 }
-
 /* Main - Mobile First */
 main {
     
@@ -109,10 +108,17 @@ section {
     background-color: var(--white);
     padding: 20px 15px; /* Padding menor para mobile */
     margin-bottom: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
     border-radius: var(--border-radius);
     box-shadow: 0 4px 10px var(--shadow);
+    text-align: center;
 }
-
+ul{
+    text-align: center;
+    margin-left: 20px;
+    margin-top: 10px;
+}
 /* Footer - Mobile First */
 footer {
     background-color: var(--text-dark);
@@ -177,6 +183,8 @@ footer {
     width: 100%;
     max-width: 100%;
     margin: 20px 0;
+    margin-right: 15px;
+    margin-left: 15px;
     overflow: hidden;
     border-radius: var(--border-radius);
     box-shadow: 0 4px 10px var(--shadow);
