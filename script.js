@@ -1,4 +1,4 @@
-// ================= MENU E BOTÃO TOPO (código original) =================
+// ================= MENU E BOTÃO TOPO =================
 const menuToggle = document.querySelector('.menu-toggle');
 const sideMenu = document.querySelector('.side-menu');
 const menuOverlay = document.querySelector('.menu-overlay');
@@ -36,6 +36,7 @@ const cameraContainer = document.querySelector('.camera-container');
 const video = document.getElementById('video');
 const shutterBtn = document.getElementById('shutter-btn');
 const switchBtn = document.getElementById('switch-btn');
+const backBtn = document.getElementById('back-btn');
 const controls = document.querySelector('.controls');
 const dateTimeElement = document.getElementById('date-time');
 const photoList = document.getElementById('photo-list');
@@ -84,6 +85,7 @@ async function requestCameraPermission() {
         requestCameraBtn.innerHTML = '<i class="fas fa-check"></i> Câmera Ativa';
         requestCameraBtn.style.background = '#4caf50';
         controls.style.display = 'flex';
+        backBtn.style.display = 'block';
 
     } catch (err) {
         console.error("Erro ao acessar câmera:", err);
@@ -92,6 +94,7 @@ async function requestCameraPermission() {
         requestCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Permitir Câmera';
         requestCameraBtn.style.background = 'var(--primary-color)';
         controls.style.display = 'none';
+        backBtn.style.display = 'none';
     }
 }
 
@@ -163,16 +166,38 @@ function updateGallery() {
     }
 }
 
-// Recarregar a página
-function reloadPage() {
+// Função para sair da tela cheia e parar a câmera
+function exitFullscreenAndStopCamera() {
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+    }
+  
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
     }
+  
+    requestCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Permitir Câmera';
+    requestCameraBtn.style.background = 'var(--primary-color)';
+    controls.style.display = 'none';
+    backBtn.style.display = 'none';
+}
+
+// Recarregar a página
+function reloadPage() {
+    exitFullscreenAndStopCamera();
     window.location.reload(true);
 }
 
 // Event listeners
 shutterBtn.addEventListener("click", capturePhoto);
+backBtn.addEventListener("click", exitFullscreenAndStopCamera);
 
 switchBtn.addEventListener("click", () => {
     usingFrontCamera = !usingFrontCamera;
@@ -223,6 +248,7 @@ shareAllBtn.addEventListener("click", () => {
 // Inicialização
 window.addEventListener("load", () => {
     updateDateTime();
-    controls.style.display = 'none'; // Esconde os controles até a câmera ser ligada
-    updateGallery(); // Garante que a mensagem de "nenhuma foto" apareça
+    controls.style.display = 'none';
+    backBtn.style.display = 'none';
+    updateGallery();
 });
