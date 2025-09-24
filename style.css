@@ -97,9 +97,9 @@ nav a {
 nav a:hover, nav a.active {
     background-color: var(--secondary-color);
 }
+
 /* Main - Mobile First */
 main {
-    
     max-width: 100%;
     margin: 0 auto;
 }
@@ -119,6 +119,7 @@ ul{
     margin-left: 20px;
     margin-top: 10px;
 }
+
 /* Footer - Mobile First */
 footer {
     background-color: var(--text-dark);
@@ -180,14 +181,13 @@ footer {
 /* ===================== CARROSSEL - MOBILE FIRST ===================== */
 .carousel-container {
     position: relative;
-     width: 100%;
-    margin: 20px 15px; /* Use a propriedade abreviada para margens */
+    width: 100%;
+    margin: 20px auto;
     max-width: 100%;
     overflow: hidden;
     border-radius: var(--border-radius);
     box-shadow: 0 4px 10px var(--shadow);
     background-color: black;
-    /* A solução está aqui: */
     box-sizing: border-box;
 }
 
@@ -200,10 +200,8 @@ footer {
 .carousel-slides .slide {
     width: 20%; /* 100% / 5 slides */
     height: 300px; /* Altura menor para mobile */
-    /* Mude de 'cover' para 'contain' */
     object-fit: contain; 
     flex-shrink: 0;
-    /* Adicione um fundo para o próprio slide, se precisar de um */
     background-color: var(--text-dark); 
 }
 
@@ -367,6 +365,20 @@ footer {
     background: rgba(255,255,255,0.9);
     color: var(--primary-color);
     border: 2px solid var(--primary-color);
+}
+
+/* Estilo para o botão de voltar */
+.back-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 30;
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--primary-color);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.8);
 }
 
 /* Botões de Ação - Mobile First */
@@ -567,6 +579,10 @@ footer {
         bottom: 85px;
     }
 
+    .carousel-container {
+        margin: 20px auto; /* Centraliza no tablet */
+    }
+
     .carousel-slides .slide {
         height: 250px;
     }
@@ -689,8 +705,16 @@ footer {
         bottom: 90px;
     }
 
+    .carousel-container {
+        margin: 20px auto; /* Centraliza no desktop */
+    }
+
     .carousel-slides .slide {
         height: 300px;
+    }
+
+    .photo-list {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
 
     .camera-wrapper {
@@ -716,10 +740,6 @@ footer {
         height: 68px;
     }
 
-    .photo-list {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
-
     .titulos {
         margin-bottom: 30px;
     }
@@ -743,4 +763,3 @@ footer {
         height: 350px;
     }
 }
-
