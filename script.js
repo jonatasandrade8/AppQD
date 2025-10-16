@@ -342,7 +342,7 @@ if (shareAllBtn && navigator.share) {
         navigator.share({
             files,
             title: "Fotos Qdelícia Frutas",
-            text: "Fotos de comprovação do trabalho. Seguem em anexo.",
+            text: "Minhas fotos. Seguem em anexo.",
         }).catch((error) => {
             if (error.name !== 'AbortError') {
                 alert(`Erro ao compartilhar: ${error.message}`);
