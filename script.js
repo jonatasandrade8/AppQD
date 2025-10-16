@@ -254,8 +254,7 @@ function updateGalleryView() {
     if (photos.length === 0) {
         photoList.innerHTML = `
             <div class="photo-item">
-                <img src="https://via.placeholder.com/150x120?text=Nenhuma+foto" alt="placeholder">
-                <div class="photo-info">Tire uma foto para começar</div>
+                <div class="photo-info">Galeria de fotos Vazia || Tire uma foto para começar!</div>
             </div>
         `;
         return;
@@ -332,7 +331,7 @@ if (shareAllBtn && navigator.share) {
         navigator.share({
             files,
             title: "Fotos Qdelícia Frutas",
-            text: "Fotos de comprovação do trabalho. Seguem em anexo.",
+            text: " Agícola Qdelícia Frutas|| Fotos",
         }).catch((error) => {
             if (error.name !== 'AbortError') {
                 alert(`Erro ao compartilhar: ${error.message}`);
