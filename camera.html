@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="./style.css">
     <style>
         /* ===================== ESTILOS DA CÂMERA (TELA CHEIA NATIVA) ===================== */
-        /* ZERA MARGINS/PADDING e força fundo preto para simular ambiente nativo */
         body {
             padding: 0 !important;
             margin: 0 !important;
@@ -16,7 +15,6 @@
             overflow: hidden !important;
         }
 
-        /* Container que ocupa toda a tela */
         .camera-fullscreen-container {
             position: fixed; 
             top: 0;
@@ -24,126 +22,124 @@
             width: 100vw;
             height: 100vh;
             background: #000;
-            z-index: 900;
-            display: flex; /* Garante que o vídeo se alinhe */
+            z-index: 9999;
+            display: flex;
             flex-direction: column;
         }
 
-        /* Vídeo da Câmera (Preenche o espaço e mantém aspecto) */
         #video {
             flex-grow: 1;
             width: 100%;
             height: 100%;
             object-fit: cover; 
-            transition: filter 0.1s; 
+            transition: filter 0.1s;
         }
         
-        /* Controles Superiores (Voltar) - Flutuante */
         .camera-top-controls {
             position: absolute;
             top: 15px;
             left: 15px;
-            z-index: 999;
+            z-index: 10000;
         }
         
         .back-btn, #switch-btn {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(0, 0, 0, 0.5);
             color: #fff;
-            border: none;
-            width: 40px;
-            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             font-size: 1.2rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px); 
+            backdrop-filter: blur(10px);
             cursor: pointer;
             transition: 0.2s;
         }
 
-        /* Watermark (Data/Hora - Canto Superior Direito) */
+        .back-btn:active, #switch-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         .watermark {
             position: absolute;
             top: 15px;
             right: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 12px;
+            border-radius: 8px;
             color: #fff;
-            font-size: 0.8rem;
-            z-index: 999;
+            font-size: 0.85rem;
+            z-index: 10000;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Barra de Controles Inferior */
         .camera-bottom-controls {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 120px; /* Altura fixa para os controles */
-            background: rgba(0, 0, 0, 0.6); 
+            min-height: 140px;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.5) 70%, transparent 100%);
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
-            z-index: 999;
+            z-index: 10000;
         }
 
-        /* Botão Capturar (Shutter) - Centralizado */
         #shutter-btn {
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             border-radius: 50%;
             background: #fff;
-            border: 8px solid rgba(255, 255, 255, 0.5); 
+            border: 6px solid rgba(255, 255, 255, 0.4); 
             cursor: pointer;
             transition: 0.1s;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
+        
         #shutter-btn:active {
-            transform: scale(0.9);
+            transform: translateX(-50%) scale(0.85);
             border-width: 4px;
         }
 
-        /* Botão de Compartilhar (WhatsApp) */
-        #share-all {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #25d366; 
-            color: #fff;
+        .camera-controls-left {
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 1.8rem;
-            border: none;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        #share-all:disabled {
-            background: #128c7e;
-            opacity: 0.5;
-            cursor: not-allowed;
+            gap: 15px;
         }
 
-        /* Pré-visualização da Última Foto e Contador */
-        .photo-preview-group {
+        .photo-preview-wrapper {
+            position: relative;
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-right: 20px; /* Espaço entre o grupo e o shutter */
         }
         
         #last-photo-preview {
             width: 60px;
             height: 60px;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid #fff;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        #last-photo-preview:active {
+            transform: scale(0.95);
         }
         
         #last-photo-preview img {
@@ -154,58 +150,134 @@
 
         #photo-count {
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 6px 12px;
+            border-radius: 20px;
             opacity: 0; 
             transition: opacity 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .photo-count-visible {
             opacity: 1 !important;
         }
         
-        /* Botão para Trocar Câmera (Posicionado na lateral dos controles) */
-        #switch-btn {
-            position: relative;
-            margin-left: -50px; /* Ajuste para centralizar visualmente */
+        .camera-controls-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        /* Esconde elementos padrões da aplicação */
-        .menu-overlay, .side-menu, main, footer, header {
+        #switch-btn {
+            width: 45px;
+            height: 45px;
+        }
+
+        #share-all {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #25d366; 
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.6rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        #share-all:disabled {
+            background: #128c7e;
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        #share-all:not(:disabled):active {
+            transform: scale(0.9);
+        }
+
+        .menu-overlay, .side-menu, main, footer, header#cabecalho-principal {
+            display: none !important;
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            color: white;
+            gap: 15px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
             display: none !important;
         }
     </style>
 </head>
 <body>
     <div class="camera-fullscreen-container">
-        <video id="video" autoplay playsinline></video>
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>Inicializando câmera...</p>
+        </div>
+
+        <video id="video" autoplay playsinline muted></video>
 
         <div class="camera-top-controls">
-            <a href="index.html" class="back-btn" aria-label="Voltar à tela inicial"><i class="fas fa-arrow-left"></i></a>
+            <a href="index.html" class="back-btn" aria-label="Voltar à tela inicial">
+                <i class="fas fa-arrow-left"></i>
+            </a>
         </div>
         
         <div class="watermark">
-          <i class="fas fa-clock"></i> <span id="date-time">--/--/---- --:--:--</span>
+            <i class="fas fa-clock"></i> 
+            <span id="date-time">--/--/---- --:--:--</span>
         </div>
         
         <div class="camera-bottom-controls">
-            
-            <div class="photo-preview-group">
-                <div id="last-photo-preview">
-                    <img src="https://via.placeholder.com/60x60?text=0" alt="Prévia da última foto" style="opacity: 0.3;">
+            <div class="camera-controls-left">
+                <div class="photo-preview-wrapper">
+                    <div id="last-photo-preview">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Crect fill='%23333' width='60' height='60'/%3E%3C/svg%3E" alt="Prévia da última foto">
+                    </div>
+                    <span id="photo-count">0</span>
                 </div>
-                <span id="photo-count">0</span>
             </div>
             
             <button id="shutter-btn" aria-label="Capturar Foto"></button>
             
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <button id="switch-btn" aria-label="Trocar Câmera"><i class="fas fa-sync-alt"></i></button>
+            <div class="camera-controls-right">
+                <button id="switch-btn" aria-label="Trocar Câmera">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
 
-                <button id="share-all" disabled aria-label="Compartilhar todas as fotos via WhatsApp">
+                <button id="share-all" disabled aria-label="Compartilhar fotos via WhatsApp">
                     <i class="fab fa-whatsapp"></i>
                 </button>
             </div>

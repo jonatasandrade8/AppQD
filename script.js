@@ -1,15 +1,12 @@
 // ================= MENU HAMBÚRGUER (MOBILE) / SIDEBAR (DESKTOP) =================
 
-// Seleciona todos os elementos com a classe .menu-toggle (o de abrir e o de fechar)
 const menuToggleButtons = document.querySelectorAll('.menu-toggle');
 const sideMenu = document.querySelector('.side-menu');
 const menuOverlay = document.querySelector('.menu-overlay');
 
 if (sideMenu && menuOverlay) {
-    // Adiciona o listener de clique para todos os botões de toggle
     menuToggleButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Apenas no mobile, ativamos a classe 'active'
             if (window.innerWidth < 1024) { 
                 sideMenu.classList.toggle('active');
                 menuOverlay.classList.toggle('active');
@@ -17,7 +14,6 @@ if (sideMenu && menuOverlay) {
         });
     });
 
-    // Fecha o menu ao clicar no overlay (apenas no mobile)
     menuOverlay.addEventListener('click', () => {
         if (window.innerWidth < 1024) {
             sideMenu.classList.remove('active');
@@ -45,23 +41,19 @@ if (backToTop) {
 
 
 // ==================== FUNCIONALIDADES DO CARROSSEL ====================
-// Verifica se a página possui o carrossel (apenas no index.html)
 if (document.querySelector('.carousel-slides')) {
     const carouselSlides = document.querySelector('.carousel-slides');
-    const dotsContainer = document.querySelector('.carousel-dots');
     const slides = document.querySelectorAll('.carousel-slides .slide');
     const dots = document.querySelectorAll('.carousel-dots .dot');
     
     let currentIndex = 0;
     const totalSlides = slides.length;
-    const slideDuration = 4000; // 4 segundos
+    const slideDuration = 4000;
 
     function updateCarousel() {
-        // Move o slide
         const offset = -currentIndex * 100;
         carouselSlides.style.transform = `translateX(${offset}%)`;
 
-        // Atualiza os dots
         dots.forEach((dot, index) => {
             dot.classList.toggle('active', index === currentIndex);
         });
@@ -72,13 +64,10 @@ if (document.querySelector('.carousel-slides')) {
         updateCarousel();
     }
 
-    // Inicializa o carrossel
     updateCarousel();
 
-    // Adiciona o controle de intervalo
     let interval = setInterval(goToNextSlide, slideDuration);
 
-    // Reinicia o intervalo ao interagir com os dots
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
             clearInterval(interval);
@@ -90,15 +79,14 @@ if (document.querySelector('.carousel-slides')) {
 }
 
 
-// ==================== FUNCIONALIDADES DA CÂMERA E VÍDEO (REVISADO) ====================
-// Verifica se estamos na página da câmera antes de inicializar
+// ==================== FUNCIONALIDADES DA CÂMERA E VÍDEO ====================
 if (document.getElementById('video')) {
     const video = document.getElementById('video');
     const shutterBtn = document.getElementById('shutter-btn');
     const switchBtn = document.getElementById('switch-btn');
     const dateTimeElement = document.getElementById('date-time');
+    const loadingOverlay = document.getElementById('loading-overlay');
     
-    // Elementos para a nova UI Full Screen
     const lastPhotoPreview = document.getElementById('last-photo-preview');
     const photoCountElement = document.getElementById('photo-count');
     const shareAllBtn = document.getElementById('share-all');
@@ -106,77 +94,96 @@ if (document.getElementById('video')) {
 
     let currentStream = null;
     let usingFrontCamera = false;
-    let photos = []; // Array para armazenar os DataURLs das fotos
+    let photos = [];
     let hasCameraPermission = false;
 
-    // Função principal para solicitar e iniciar o feed da câmera
+    // Função para solicitar e iniciar o feed da câmera
     async function requestCameraPermission() {
         if (currentStream) {
             currentStream.getTracks().forEach(track => track.stop());
         }
 
         try {
-            // Configurações para forçar a câmera traseira ('environment') por padrão
+            loadingOverlay.classList.remove('hidden');
+            
             const constraints = {
                 video: {
                     facingMode: usingFrontCamera ? "user" : "environment",
-                    width: { ideal: 4096 }, // Pedido de alta qualidade
-                    height: { ideal: 2160 }
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
                 },
                 audio: false
             };
 
             currentStream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = currentStream;
+            
+            // Aguarda o vídeo estar pronto
+            await new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    video.play();
+                    resolve();
+                };
+            });
+            
             hasCameraPermission = true;
-
-            // Espelhamento para a câmera frontal (Selfie)
             video.style.transform = usingFrontCamera ? 'scaleX(-1)' : 'scaleX(1)';
+            loadingOverlay.classList.add('hidden');
             
         } catch (err) {
             console.error("Erro ao acessar câmera:", err);
-            // Mensagem de erro robusta
-            alert("Não foi possível acessar a câmera. Verifique as permissões (HTTPS necessário) e se há câmeras disponíveis.");
-            video.style.backgroundColor = '#333';
+            loadingOverlay.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff4444;"></i>
+                <p style="text-align: center; padding: 0 20px;">
+                    Não foi possível acessar a câmera.<br>
+                    Verifique as permissões do navegador.
+                </p>
+                <a href="index.html" style="margin-top: 20px; padding: 10px 20px; background: white; color: black; border-radius: 5px; text-decoration: none;">
+                    Voltar
+                </a>
+            `;
             hasCameraPermission = false;
         }
     }
 
-    // Atualiza data e hora no watermark
+    // Atualiza data e hora
     function updateDateTime() {
         const now = new Date();
-        dateTimeElement.textContent = now.toLocaleString('pt-BR'); 
+        const options = { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit'
+        };
+        dateTimeElement.textContent = now.toLocaleString('pt-BR', options);
     }
     
-    // Atualiza o contador de fotos e o preview
+    // Atualiza o contador de fotos e preview
     function updateGalleryUI(newPhotoDataURL) {
-        // Armazena a nova foto
         photos.unshift(newPhotoDataURL); 
 
-        // Atualiza o contador de fotos
         photoCountElement.textContent = photos.length;
         photoCountElement.classList.add('photo-count-visible'); 
         
-        // Atualiza a pré-visualização 
         lastPhotoPreview.innerHTML = `<img src="${newPhotoDataURL}" alt="Prévia da última foto tirada">`;
         
-        // Habilita o botão de compartilhamento
         if (photos.length > 0) {
             shareAllBtn.disabled = false;
         }
     }
 
-
-    // Capturar foto e adicionar marca d'água
+    // Capturar foto com marca d'água
     function capturePhoto() {
-        if (!hasCameraPermission) {
-            alert("Câmera não iniciada.");
+        if (!hasCameraPermission || video.readyState !== video.HAVE_ENOUGH_DATA) {
+            console.warn("Câmera não está pronta");
             return;
         }
         
-        // Efeito visual de flash na tela
-        video.style.filter = 'brightness(2.0)';
-        setTimeout(() => { video.style.filter = 'brightness(1.0)'; }, 100);
+        // Efeito de flash
+        video.style.filter = 'brightness(1.5)';
+        setTimeout(() => { video.style.filter = 'brightness(1.0)'; }, 150);
 
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
@@ -184,33 +191,42 @@ if (document.getElementById('video')) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         
-        // Aplica correção de espelhamento ANTES de desenhar
+        // Corrige espelhamento para câmera frontal
         if (usingFrontCamera) {
-             ctx.translate(canvas.width, 0);
-             ctx.scale(-1, 1);
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
         }
 
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        // Reseta a transformação ANTES de escrever a marca d'água
+        // Reseta transformação
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         
-        // Adiciona a marca d'água
-        const now = new Date().toLocaleString('pt-BR');
-        const watermarkText = `Qdelícia Frutas | ${now}`;
-        ctx.font = "bold 40px sans-serif"; 
-        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        // Adiciona marca d'água
+        const now = new Date();
+        const watermarkText = `Qdelícia Frutas | ${now.toLocaleString('pt-BR')}`;
+        
+        const fontSize = Math.max(canvas.width / 30, 24);
+        ctx.font = `bold ${fontSize}px sans-serif`; 
+        ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
         ctx.textAlign = "center";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-        ctx.shadowBlur = 5;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
         
-        // Desenha a marca d'água no centro inferior
-        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 40);
+        const padding = canvas.height * 0.05;
+        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - padding);
         
-        // Gera o DataURL final (JPEG)
-        const finalPhotoDataURL = canvas.toDataURL('image/jpeg', 0.9);
+        // Gera DataURL final
+        const finalPhotoDataURL = canvas.toDataURL('image/jpeg', 0.92);
         
         updateGalleryUI(finalPhotoDataURL);
+        
+        // Feedback sonoro (vibração)
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
     }
     
     // Trocar Câmera
@@ -224,41 +240,80 @@ if (document.getElementById('video')) {
     // Event Listener do Obturador
     shutterBtn.addEventListener('click', capturePhoto);
 
-    // Lógica para Compartilhar no WhatsApp (usando API Nativa)
+    // Compartilhar no WhatsApp
     shareAllBtn.addEventListener("click", async () => {
-        if (navigator.share) {
-            const filesToShare = photos.slice(0, 5); 
+        if (!navigator.share && !navigator.canShare) {
+            alert("Compartilhamento não suportado neste dispositivo/navegador.");
+            return;
+        }
 
+        const maxPhotos = 10;
+        const filesToShare = photos.slice(0, maxPhotos);
+
+        try {
             // Converte DataURLs para objetos File
-            const files = filesToShare.map((img, i) => {
-                const byteString = atob(img.split(",")[1]);
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-                for (let j = 0; j < byteString.length; j++) ia[j] = byteString.charCodeAt(j);
-                return new File([ab], `registro_qdelicia_${i + 1}.jpg`, { type: "image/jpeg" });
-            });
+            const files = await Promise.all(
+                filesToShare.map(async (img, i) => {
+                    const response = await fetch(img);
+                    const blob = await response.blob();
+                    return new File([blob], `qdelicia_${Date.now()}_${i + 1}.jpg`, { type: "image/jpeg" });
+                })
+            );
             
             const shareText = shareTextInput.value || "Registro de fotos tiradas para Qdelícia Frutas.";
 
-            try {
-                // Tenta compartilhar
-                await navigator.share({ 
-                    files: files, 
-                    title: "Registro Qdelícia Frutas", 
-                    text: shareText 
-                });
-            } catch (error) {
-                console.error("Erro no compartilhamento:", error);
-                if (error.name !== 'AbortError') { 
-                    alert("Não foi possível compartilhar. O dispositivo pode não suportar ou o número de arquivos é muito grande. Tente compartilhar menos fotos.");
-                }
+            const shareData = { 
+                files: files, 
+                title: "Registro Qdelícia Frutas", 
+                text: shareText 
+            };
+
+            if (navigator.canShare && !navigator.canShare(shareData)) {
+                throw new Error("Não é possível compartilhar estes arquivos");
             }
-        } else {
-            alert("Compartilhamento nativo não suportado neste dispositivo.");
+
+            await navigator.share(shareData);
+            
+        } catch (error) {
+            console.error("Erro no compartilhamento:", error);
+            if (error.name !== 'AbortError') { 
+                alert(`Erro ao compartilhar: ${error.message}\n\nTente compartilhar menos fotos ou use outro método.`);
+            }
         }
     });
 
-    // Inicia a atualização da data/hora e a câmera automaticamente
-    setInterval(updateDateTime, 1000); 
-    window.addEventListener('load', requestCameraPermission);
+    // Visualizar galeria ao clicar no preview
+    lastPhotoPreview.addEventListener('click', () => {
+        if (photos.length > 0) {
+            const win = window.open();
+            win.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Galeria - Qdelícia Frutas</title>
+                    <style>
+                        body { margin: 0; padding: 20px; background: #000; }
+                        img { width: 100%; max-width: 800px; display: block; margin: 20px auto; border-radius: 10px; }
+                        .back { position: fixed; top: 20px; left: 20px; background: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; color: black; }
+                    </style>
+                </head>
+                <body>
+                    <a href="#" class="back" onclick="window.close(); return false;">Fechar</a>
+                    ${photos.map((photo, i) => `<img src="${photo}" alt="Foto ${i+1}">`).join('')}
+                </body>
+                </html>
+            `);
+        }
+    });
+
+    // Inicia
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+    
+    // Inicia câmera quando a página carregar
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', requestCameraPermission);
+    } else {
+        requestCameraPermission();
+    }
 }

@@ -6,13 +6,13 @@
 }
 
 :root {
-    --primary-color: #5d3fd3; /* Roxo principal */
-    --secondary-color: #8b5cf6; /* Roxo mais claro */
-    --accent-color: #39ff14; /* Verde neon para destaque */
-    --bg-light: #f3f0ff; /* Fundo claro com roxo */
-    --bg-main: #ffffff; /* Fundo do conteúdo principal */
+    --primary-color: #5d3fd3;
+    --secondary-color: #8b5cf6;
+    --accent-color: #39ff14;
+    --bg-light: #f3f0ff;
+    --bg-main: #ffffff;
     --white: #ffffff;
-    --text-dark: #2c0e5a; /* Roxo escuro para texto */
+    --text-dark: #2c0e5a;
     --shadow-light: rgba(0, 0, 0, 0.05);
     --shadow-strong: rgba(0, 0, 0, 0.15);
     --border-radius: 10px;
@@ -30,7 +30,7 @@ body {
     color: var(--text-dark);
     line-height: 1.6;
     min-height: 100vh;
-    padding-top: var(--header-height); /* Espaço para o header mobile */
+    padding-top: var(--header-height);
 }
 
 a {
@@ -63,9 +63,25 @@ header#cabecalho-principal {
 }
 
 .header-title {
-    flex-grow: 1; 
-    text-align: center;
-    margin-right: 25px; /* Compensa o ícone do menu para centralizar o título */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
+    justify-content: center;
+    margin-right: 2.5rem;
+}
+
+.header-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.header-title > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .header-title h1 {
@@ -79,9 +95,10 @@ header#cabecalho-principal {
     font-size: 0.7rem;
     font-weight: 300;
     opacity: 0.9;
+    margin: 0;
 }
 
-/* Botão do Menu Hambúrguer (Abre/Fecha) */
+/* Botão do Menu Hambúrguer */
 .menu-toggle {
     background: transparent;
     color: var(--white);
@@ -102,16 +119,16 @@ header#cabecalho-principal {
     height: 100vh;
     background-color: var(--bg-main);
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
-    transform: translateX(-100%); /* Escondido */
+    transform: translateX(-100%);
     transition: transform 0.4s cubic-bezier(0.7, 0, 0.3, 1); 
-    z-index: 2000; /* Acima de tudo */
+    z-index: 2000;
     padding: 20px 0;
     display: flex;
     flex-direction: column;
 }
 
 .side-menu.active {
-    transform: translateX(0); /* Mostra o menu */
+    transform: translateX(0);
 }
 
 .side-menu-header {
@@ -126,6 +143,11 @@ header#cabecalho-principal {
     max-width: 60px;
     height: auto;
     border-radius: 50%;
+}
+
+.side-menu-header-title h1 {
+    font-size: 1.1rem;
+    color: var(--text-dark);
 }
 
 .side-menu a {
@@ -187,7 +209,7 @@ h1:not(.header-title h1), h2 {
     margin-bottom: 15px;
 }
 
-/* Formulários Iframe (seção de conteúdo) */
+/* Formulários Iframe */
 iframe {
     border-radius: var(--border-radius);
     box-shadow: 0 2px 10px var(--shadow-light);
@@ -195,22 +217,20 @@ iframe {
 
 /* ===================== ESTRUTURA DESKTOP (SIDEBAR DASHBOARD) ===================== */
 @media (min-width: 1024px) {
-    /* Reseta o Padding do Body e Define o Grid */
     body {
         padding-top: 0;
         display: grid;
-        grid-template-columns: 250px 1fr; /* Sidebar fixo e Conteúdo */
+        grid-template-columns: 250px 1fr;
+        grid-template-rows: 1fr auto;
     }
     
-    /* Side Menu (Sidebar Fixo) */
     .side-menu {
-        position: fixed; /* Fixa o Sidebar */
-        transform: translateX(0); /* Sempre visível */
+        position: fixed;
+        transform: translateX(0);
         width: 250px;
         box-shadow: 2px 0 8px var(--shadow-strong);
         z-index: 100;
         padding-top: 0;
-        /* Estilo para um sidebar de dashboard */
         background-color: var(--text-dark);
         color: var(--white);
     }
@@ -234,8 +254,13 @@ iframe {
         border-bottom: none;
     }
 
+    .side-menu-header-title h1 {
+        color: var(--white);
+        font-size: 1.2rem;
+    }
+
     .side-menu-header .close-btn {
-        display: none; /* Não precisamos do botão fechar no desktop */
+        display: none;
     }
     
     .side-menu-logo {
@@ -243,20 +268,23 @@ iframe {
         border-radius: 0;
     }
 
-    /* Header e Overlay Mobile Inúteis no Desktop */
     header#cabecalho-principal, .menu-overlay {
         display: none;
     }
 
-    /* Conteúdo Principal (Ocupa o restante da tela) */
     main {
         padding: 30px;
-        grid-column: 2 / 3; /* Posiciona no segundo grid */
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+    }
+    
+    footer {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
     }
 }
 
-
-/* ===================== COMPONENTES REUSÁVEIS (MOBILE & DESKTOP) ===================== */
+/* ===================== COMPONENTES REUSÁVEIS ===================== */
 
 /* Carrossel */
 .carousel-container {
@@ -274,7 +302,7 @@ iframe {
 
 .carousel-slides .slide {
     min-width: 100%;
-    height: 200px; /* Altura padrão mobile */
+    height: 200px;
     object-fit: cover;
     display: block;
 }
@@ -304,7 +332,7 @@ iframe {
 
 @media (min-width: 768px) {
     .carousel-slides .slide {
-        height: 350px; /* Aumenta a altura no desktop */
+        height: 350px;
     }
 }
 
@@ -336,6 +364,10 @@ footer {
     transition: transform 0.3s;
 }
 
+.whatsapp-btn:hover {
+    transform: scale(1.1);
+}
+
 .back-to-top {
     position: fixed;
     bottom: 80px;
@@ -360,4 +392,8 @@ footer {
 .back-to-top.show {
     opacity: 1;
     visibility: visible;
+}
+
+.back-to-top:hover {
+    transform: scale(1.1);
 }
