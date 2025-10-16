@@ -1,4 +1,4 @@
-// ================= MENU HAMBÚRGUER (Funcionalidade Preservada) =================
+// ================= MENU HAMBÚRGUER (Refatorado para Side Menu) =================
 const menuToggle = document.querySelector('.menu-toggle');
 const sideMenu = document.querySelector('.side-menu');
 const menuOverlay = document.querySelector('.menu-overlay');
@@ -9,9 +9,17 @@ if (menuToggle && sideMenu && menuOverlay) {
         menuOverlay.classList.toggle('active');
     });
 
+    // Fecha o menu ao clicar no overlay ou em um link
     menuOverlay.addEventListener('click', () => {
         sideMenu.classList.remove('active');
         menuOverlay.classList.remove('active');
+    });
+    
+    sideMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            sideMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        });
     });
 }
 
@@ -54,10 +62,8 @@ if (carouselSlides && slides.length > 0) {
         updateCarousel();
     }
 
-    // Rola o carrossel a cada 3 segundos
     setInterval(nextSlide, 3000);
 
-    // Adiciona funcionalidade aos pontos de navegação
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
             currentIndex = index;
@@ -65,12 +71,11 @@ if (carouselSlides && slides.length > 0) {
         });
     });
     
-    // Inicia o carrossel
     updateCarousel();
 }
 
 
-// ==================== FUNCIONALIDADES DA CÂMERA E VÍDEO (Refatorado) ====================
+// ==================== FUNCIONALIDADES DA CÂMERA E VÍDEO (Refatorado o Contador) ====================
 
 // Elementos da Interface
 const openCameraBtn = document.getElementById('open-camera-btn');
@@ -100,11 +105,10 @@ async function requestCameraPermission() {
     }
 
     try {
-        // Preferência por câmera traseira (environment) para fotos de trabalho
         const constraints = {
             video: {
                 facingMode: usingFrontCamera ? "user" : "environment",
-                width: { ideal: 4096 }, // Alta resolução preferencial
+                width: { ideal: 4096 }, 
                 height: { ideal: 2160 }
             },
             audio: false
@@ -158,7 +162,6 @@ function closeCameraFullscreen() {
     if (openCameraBtn) {
         openCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Abrir Câmera em Fullscreen';
     }
-    // Tenta obter a permissão novamente, mas sem abrir, para atualizar o status do botão
     requestCameraPermission(); 
 }
 
@@ -172,16 +175,16 @@ function updateDateTime() {
         dateTimeElement.textContent = now.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
     }
 }
-// Atualiza a cada segundo
 setInterval(updateDateTime, 1000); 
 
 
 /**
- * @description Atualiza o contador de fotos na tela.
+ * @description Atualiza o contador de fotos na tela (apenas o número).
  */
 function updatePhotoCounter() {
     if (photoCountElement) {
-        photoCountElement.textContent = `${photos.length} Fotos Tiradas`;
+        // Mostra apenas o número, conforme solicitado
+        photoCountElement.textContent = photos.length;
     }
 }
 
@@ -197,12 +200,10 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // Usa dimensões reais do vídeo para máxima qualidade
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Obtém a data e hora atual no momento da captura
     const nowText = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
     
     // --- Aplicação da Marca D'água (Texto) ---
@@ -226,18 +227,15 @@ function capturePhoto() {
     ctx.fillStyle = '#FFFFFF'; 
     ctx.fillText(nowText, x, y - padding);
 
-    // Converte o canvas para DataURL (JPEG para melhor compressão)
     const dataURL = canvas.toDataURL('image/jpeg', 0.8);
     
-    photos.unshift(dataURL); // Adiciona no início
+    photos.unshift(dataURL); 
     updatePhotoCounter();
     
-    // Limita a galeria a 10 fotos para evitar sobrecarga de memória
     if (photos.length > 10) {
         photos.pop(); 
     }
 
-    // Atualiza a visualização da galeria
     updateGalleryView();
 }
 
@@ -249,13 +247,11 @@ function updateGalleryView() {
 
     photoList.innerHTML = '';
     
-    // Desabilita/Habilita botões de ação (Baixar/Compartilhar)
     const isDisabled = photos.length === 0;
     if(downloadAllBtn) downloadAllBtn.disabled = isDisabled;
     if(shareAllBtn) shareAllBtn.disabled = isDisabled;
 
     if (photos.length === 0) {
-        // Se não houver fotos, mostra o placeholder
         photoList.innerHTML = `
             <div class="photo-item">
                 <img src="https://via.placeholder.com/150x120?text=Nenhuma+foto" alt="placeholder">
@@ -265,7 +261,6 @@ function updateGalleryView() {
         return;
     }
 
-    // Cria o HTML para cada foto
     photos.forEach((photoURL, index) => {
         const photoItem = document.createElement('div');
         photoItem.className = 'photo-item';
@@ -289,29 +284,24 @@ function switchCamera() {
 
 // ==================== EVENT LISTENERS ====================
 
-// 1. Botão para Abrir a Câmera em Fullscreen
 if (openCameraBtn) {
     openCameraBtn.addEventListener('click', openCameraFullscreen);
-    // Tenta obter a permissão ao carregar, mas não abre a câmera
     requestCameraPermission(); 
 }
 
-// 2. Botão de Voltar/Fechar Câmera
 if (backToGalleryBtn) {
     backToGalleryBtn.addEventListener('click', closeCameraFullscreen);
 }
 
-// 3. Botão do Shutter (Tirar Foto)
 if (shutterBtn) {
     shutterBtn.addEventListener('click', capturePhoto);
 }
 
-// 4. Botão de Trocar Câmera
 if (switchBtn) {
     switchBtn.addEventListener('click', switchCamera);
 }
 
-// 5. Botão Baixar Todas (Funcionalidade Preservada)
+// Botão Baixar Todas (Funcionalidade Preservada)
 if (downloadAllBtn) {
     downloadAllBtn.addEventListener("click", () => {
         photos.forEach((img, i) => {
@@ -326,7 +316,7 @@ if (downloadAllBtn) {
     });
 }
 
-// 6. Botão Compartilhar Todas (Funcionalidade Preservada - apenas 3 fotos)
+// Botão Compartilhar Todas (Funcionalidade Preservada)
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
         const files = photos.slice(0, 3).map((img, i) => {
@@ -342,7 +332,7 @@ if (shareAllBtn && navigator.share) {
         navigator.share({
             files,
             title: "Fotos Qdelícia Frutas",
-            text: "Minhas fotos. Seguem em anexo.",
+            text: "Fotos de comprovação do trabalho. Seguem em anexo.",
         }).catch((error) => {
             if (error.name !== 'AbortError') {
                 alert(`Erro ao compartilhar: ${error.message}`);

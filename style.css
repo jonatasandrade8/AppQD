@@ -9,8 +9,8 @@
     /* Cores e Variáveis */
     --primary-color: #5d3fd3; /* Roxo principal */
     --secondary-color: #8b5cf6; /* Roxo mais claro */
-    --tertiary-color: #a78bfa; 
-    --accent-color: #39ff14; /* Verde neon para destaque */
+    --tertiary-color: #a78bfa; /* Roxo ainda mais claro */
+    --accent-color: #39ff14; /* Verde neon para destaque (mantido para outros elementos) */
     --bg-light: #f3f0ff; /* Fundo claro com roxo */
     --white: #ffffff;
     --text-dark: #2c0e5a; /* Roxo escuro para texto */
@@ -34,6 +34,12 @@ body {
 }
 
 /* ===================== MOBILE FIRST - LAYOUT GERAL (APP LOOK) ===================== */
+
+/* O Menu Horizontal é escondido no mobile e substituído pelo Hamburger/Side Menu */
+nav {
+    display: none; 
+}
+
 /* Header */
 header {
     background: var(--gradient);
@@ -66,30 +72,68 @@ header p {
     opacity: 0.9;
 }
 
-/* Navegação */
-nav {
-    background: var(--primary-color);
-    text-align: center;
-    padding: 8px 0;
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
-nav a {
+/* Menu Hamburger (Toggle Button) */
+.menu-toggle {
+    display: block; 
+    position: absolute;
+    top: 25px;
+    left: 15px;
+    background: none;
+    border: none;
     color: var(--white);
-    text-decoration: none;
-    padding: 8px 12px;
-    margin: 0 2px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
-    display: inline-block;
-    border-radius: var(--border-radius);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 100;
 }
 
-nav a:hover, nav a.active {
-    background-color: var(--secondary-color);
+/* Menu Lateral (Side Menu - App Navigation) */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Inicialmente fora da tela */
+    width: 250px;
+    height: 100%;
+    background-color: var(--text-dark); /* Fundo escuro */
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    transition: left 0.3s ease;
+    padding-top: 70px; /* Espaço para não colidir com a barra superior do mobile */
+    display: flex;
+    flex-direction: column;
 }
+
+.side-menu.active {
+    left: 0;
+}
+
+.side-menu a {
+    padding: 15px 20px;
+    color: var(--bg-light);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.side-menu a:hover, .side-menu a.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 98;
+    display: none;
+}
+.menu-overlay.active {
+    display: block;
+}
+
 
 /* Main Content */
 main {
@@ -122,7 +166,8 @@ footer {
     font-size: 0.8rem;
 }
 
-/* ===================== BOTÕES FLUTUANTES ===================== */
+/* ===================== BOTÕES FLUTUANTES (Preservado) ===================== */
+/* ... (Estilos de whatsapp-btn e back-to-top) ... */
 .whatsapp-btn {
     position: fixed;
     bottom: 15px;
@@ -167,7 +212,8 @@ footer {
     visibility: visible;
 }
 
-/* ===================== CARROSSEL ===================== */
+/* ===================== CARROSSEL (Preservado) ===================== */
+/* ... (Estilos do Carrossel) ... */
 .carousel-container {
     position: relative;
     width: 100%;
@@ -224,11 +270,10 @@ footer {
 /* ===================== ESTILOS DA CÂMERA (Mobile/Fullscreen) ===================== */
 
 .camera-page {
-    padding: 0; /* Remove padding na página para o fullscreen */
+    padding: 0; 
     background: var(--bg-light);
 }
 
-/* Estilo para o botão de iniciar a câmera */
 .start-camera-section {
     display: flex;
     justify-content: center;
@@ -253,7 +298,7 @@ footer {
     gap: 10px;
 }
 
-/* Contêiner da Câmera em Fullscreen */
+/* Contêiner da Câmera em Fullscreen (Preservado) */
 .fullscreen-camera-container {
     position: fixed;
     top: 0;
@@ -262,7 +307,7 @@ footer {
     height: 100%;
     background: #000;
     z-index: 9999;
-    display: none; /* Inicialmente oculto */
+    display: none; 
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -296,13 +341,13 @@ footer {
 #video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Preenche a tela */
+    object-fit: cover; 
 }
 
-/* Marca d'água */
+/* Marca d'água (Preservado) */
 .watermark {
     position: absolute;
-    top: 15px; /* Posição no topo no modo fullscreen */
+    top: 15px; 
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.7);
@@ -318,26 +363,26 @@ footer {
     backdrop-filter: blur(4px);
 }
 
-/* Contador de Fotos */
+/* Contador de Fotos (Refinado para Badge Discreto no Canto) */
 #photo-count {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: var(--accent-color);
+    /* Estilo modificado para ser um badge, e não um botão */
+    background: rgba(255, 255, 255, 0.8); 
     color: var(--text-dark);
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 6px 10px;
+    border-radius: 4px;
     font-weight: bold;
     font-size: 1rem;
+    min-width: 35px; /* Garante que é visível mesmo com 1 dígito */
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     z-index: 10;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    gap: 5px;
 }
 
 
-/* Controles */
+/* Controles (Preservado) */
 .controls {
     position: absolute;
     bottom: 50px;
@@ -379,7 +424,7 @@ footer {
     border: 2px solid var(--primary-color);
 }
 
-/* Botão de Voltar/Fechar Câmera (Fullscreen) */
+/* Botão de Voltar/Fechar Câmera (Preservado) */
 #back-to-gallery-btn {
     position: absolute;
     top: 15px;
@@ -400,7 +445,7 @@ footer {
 }
 
 
-/* Galeria */
+/* Galeria (Preservado) */
 .gallery {
     padding: 15px;
     background: var(--white);
@@ -430,10 +475,10 @@ footer {
     object-fit: cover;
 }
 
-/* Botões de Ação na Galeria */
+/* Botões de Ação na Galeria (Preservado) */
 .action-buttons {
     display: flex;
-    flex-direction: column; /* Stack vertical para mobile (padrão app) */
+    flex-direction: column; 
     gap: 10px;
     padding-bottom: 15px;
 }
@@ -469,6 +514,11 @@ footer {
     body {
         font-size: 16px;
     }
+    
+    /* Esconde o menu Hamburger no desktop e mostra a navegação horizontal */
+    .menu-toggle, .side-menu, .menu-overlay {
+        display: none !important; 
+    }
 
     header {
         padding: 20px 0;
@@ -485,14 +535,16 @@ footer {
     header p {
         font-size: 1.2rem;
     }
-
+    
+    /* Nav horizontal reaparece */
     nav {
-        display: flex;
+        display: flex; 
         justify-content: center;
         padding: 10px 0;
     }
 
     nav a {
+        display: inline-block;
         padding: 10px 20px;
         margin: 0 5px;
         font-size: 1rem;
@@ -507,7 +559,7 @@ footer {
     section {
         padding: 30px;
         margin: 20px auto;
-        max-width: 800px; /* Limita a largura para melhor leitura */
+        max-width: 800px; 
     }
 
     /* Carrossel */
