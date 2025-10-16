@@ -4,56 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Área do Promotor - Todas as informações num só lugar.">
+    <meta name="author" content="Qdelícia Frutas">
     <title>Home - Qdelícia Frutas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
-    <div class="menu-overlay"></div> 
-
-    <nav class="side-menu">
-        <div class="side-menu-header">
-            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas" class="side-menu-logo"> 
-            <div class="header-title">
-                <h1>Qdelícia Frutas</h1>
-            </div>
-            <button class="menu-toggle close-btn" aria-label="Fechar Menu"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <a href="index.html" class="active"><i class="fas fa-home"></i> Início</a>
-        <a href="estoque.html"><i class="fas fa-boxes"></i> Estoque</a>
-        <a href="caixas.html"><i class="fas fa-truck-loading"></i> Caixas</a>
-        <a href="vendas.html"><i class="fas fa-chart-line"></i> Vendas</a>
-        <a href="avarias.html"><i class="fas fa-exclamation-triangle"></i> Avarias</a>
-        <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
-    </nav>
+    
+    <div class="menu-overlay"></div>
 
     <header id="cabecalho-principal">
-        <button class="menu-toggle open-btn" aria-label="Abrir Menu">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="header-title">
-            <h1>Qdelícia Frutas</h1>
-            <p>Página Inicial</p>
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
         </div>
-            <div class="menu-toggle" style="visibility: hidden; width: 2.5rem;"></div> 
+        <h1>Qdelícia Frutas</h1>
+        <p>Página Inicial</p>
     </header>
+    
+    <nav>
+        <a href="index.html" class="active">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="caixas.html">Caixas</a>
+        <a href="vendas.html">Vendas</a>
+        <a href="avarias.html">Avarias</a>
+        <a href="camera.html">Câmera</a>
+    </nav>
     
     <main>
        
         <section>
-            <h1>Bem-vindo à Área do Promotor</h1>
-            <p>Seu centro de informações e registro diário.</p>
+            <h1>Bem vindo à Área do Promotor</h1>
+                     
+        
+        </section>
+        <section class ="missao" >
+            <h2>Nossa Missão:</h2>
+            <ul >
+                <li>Ter foco no atendimento ao cliente;</li>
+                <li>Estar sempre disposto a ouvir e entender o cliente;</li>
+                <li>Tornar a experiência do cliente cada vez melhor e única;</li>
+                <li>Buscar sempre melhorar a cada dia.</li>
+            </ul>
         </section>
         
         <div class="carousel-container">
             <div class="carousel-slides">
-                <img src="./images/01.jpg" alt="Exposição de Frutas 1" class="slide">
-                <img src="./images/02.jpg" alt="Exposição de Frutas 2" class="slide">
-                <img src="./images/03.jpg" alt="Exposição de Frutas 3" class="slide">
-                <img src="./images/04.jpg" alt="Exposição de Frutas 4" class="slide">
-                <img src="./images/05.jpg" alt="Exposição de Frutas 5" class="slide">
+                <img src="./images/01.jpg" alt="foto" class="slide">
+                <img src="./images/02.jpg" alt="foto" class="slide">
+                <img src="./images/03.jpg" alt="foto" class="slide">
+                <img src="./images/04.jpg" alt="foto" class="slide">
+                <img src="./images/05.jpg" alt="foto" class="slide">
+                
             </div>
             <div class="carousel-dots">
                 <span class="dot active"></span>
@@ -66,10 +68,10 @@
         <section>
             <h2>Nossa rotina diária:</h2>
             <ul>
-                <li><i class="fas fa-check-circle" style="color: var(--primary-color);"></i> Manter pontos de venda sempre limpos e organizados;</li>
-                <li><i class="fas fa-check-circle" style="color: var(--primary-color);"></i> Manter boa comunicação com líderes e equipe;</li>
-                <li><i class="fas fa-check-circle" style="color: var(--primary-color);"></i> Estar atento aos canais de comunicação;</li>
-                <li><i class="fas fa-check-circle" style="color: var(--primary-color);"></i> Informar diariamente estoques, avarias e qualidade.</li>
+                <li>Manter pontos de venda sempre limpos e organizados;</li>
+                <li>Manter boa comunicação com líderes e equipe;</li>
+                <li>Estar atento aos canais de comunicação;</li>
+                <li>Informar diariamente estoques, avarias e qualidade.</li>
             </ul>
         </section>
     </main>
@@ -78,14 +80,14 @@
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
     </footer>
 
-    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank" aria-label="Falar no WhatsApp">
+    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <div class="back-to-top" aria-label="Voltar ao Topo">
+    <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
-
+    
     <script src="script.js"></script>
 </body>
 </html>
