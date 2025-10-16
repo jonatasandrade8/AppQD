@@ -31,6 +31,7 @@ body {
     line-height: 1.6;
     min-height: 100vh;
     padding-top: var(--header-height); /* Espaço para o header mobile */
+    padding-bottom: 100px; /* Margem inferior para botões fixos e footer */
 }
 
 a {
@@ -198,6 +199,7 @@ iframe {
     /* Reseta o Padding do Body e Define o Grid */
     body {
         padding-top: 0;
+        padding-bottom: 0; /* Remove o padding-bottom no desktop */
         display: grid;
         grid-template-columns: 250px 1fr; /* Sidebar fixo e Conteúdo */
     }
@@ -252,6 +254,12 @@ iframe {
     main {
         padding: 30px;
         grid-column: 2 / 3; /* Posiciona no segundo grid */
+    }
+
+    footer {
+        position: static; /* Volta o footer para o fluxo normal no desktop */
+        display: block;
+        margin-top: 20px;
     }
 }
 
@@ -361,3 +369,209 @@ footer {
     opacity: 1;
     visibility: visible;
 }
+
+/* ===================== ESTILOS DA CÂMERA ===================== */
+.camera-fullscreen-container {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+}
+
+#video {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    transition: filter 0.1s; 
+}
+
+.camera-top-controls {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 999;
+}
+
+.back-btn, #switch-btn, #record-video-btn {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px); 
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.watermark {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 0.8rem;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.camera-bottom-controls {
+    position: absolute;
+    bottom: 20px; /* Aumenta a margem inferior */
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: rgba(0, 0, 0, 0.6); 
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 999;
+}
+
+#shutter-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #fff;
+    border: 8px solid rgba(255, 255, 255, 0.5); 
+    cursor: pointer;
+    transition: 0.1s;
+}
+
+#shutter-btn.recording {
+    background: red;
+    border-color: rgba(255, 0, 0, 0.5);
+}
+
+#shutter-btn:active {
+    transform: scale(0.9);
+    border-width: 4px;
+}
+
+#share-all {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #25d366; 
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#share-all:disabled {
+    background: #128c7e;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.photo-preview-group {
+    position: absolute;
+    bottom: 160px; /* Ajusta a posição para cima */
+    left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 999;
+}
+
+#last-photo-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid #fff;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+#last-photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#photo-count {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+#video-timer {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    z-index: 999;
+    display: none; /* Inicialmente escondido */
+}
+
+.menu-overlay, .side-menu, main, footer, header {
+    display: none !important;
+}
+
+	@media (min-width: 1024px) {
+	    .camera-fullscreen-container {
+	        position: relative;
+	        width: 100%;
+	        height: auto;
+	        max-width: 800px;
+	        margin: 30px auto;
+	        border-radius: var(--border-radius);
+	        overflow: hidden;
+	        min-height: 600px; /* Garante uma altura mínima para o desktop */
+	    }
+	
+	    #video {
+	        height: 600px;
+	    }
+	
+	    .camera-bottom-controls {
+	        bottom: 0;
+	        position: relative; /* Remove o absolute para o desktop */
+	        height: 100px; /* Ajusta a altura */
+	    }
+	
+	    .photo-preview-group {
+	        bottom: 140px;
+	    }
+	
+	    .menu-overlay, .side-menu, header {
+	        display: block !important; /* Mostra os elementos de dashboard no desktop */
+	    }
+	
+	    main {
+	        display: block !important;
+	        padding: 30px;
+	    }
+	
+	    .camera-fullscreen-container {
+	        margin-top: 0;
+	    }
+	}

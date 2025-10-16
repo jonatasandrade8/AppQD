@@ -95,6 +95,7 @@ if (document.querySelector('.carousel-slides')) {
 if (document.getElementById('video')) {
     const video = document.getElementById('video');
     const shutterBtn = document.getElementById('shutter-btn');
+    const recordVideoBtn = document.getElementById('record-video-btn'); // Novo botão de vídeo
     const videoTimerElement = document.getElementById('video-timer');
     const switchBtn = document.getElementById('switch-btn');
     const dateTimeElement = document.getElementById('date-time');
@@ -107,7 +108,7 @@ if (document.getElementById('video')) {
 
     let currentStream = null;
     let usingFrontCamera = false;
-    let photos = []; // Array para armazenar os DataURLs das fotos
+    let photos = []; // Array para armazenar os DataURLs das fotos/vídeos
     let videoChunks = []; // Array para armazenar os pedaços do vídeo
     let mediaRecorder;
     let isRecording = false;
@@ -164,27 +165,31 @@ if (document.getElementById('video')) {
     }
     
     // Atualiza o contador de fotos e o preview
-    function updateGalleryUI(newPhotoDataURL) {
-        // Armazena a nova foto
-        photos.unshift(newPhotoDataURL); 
+    function updateGalleryUI(newMediaURL, isVideo = false) {
+        // Armazena a nova mídia
+        photos.unshift(newMediaURL); 
 
         // Atualiza o contador de fotos
         photoCountElement.textContent = photos.length;
         photoCountElement.classList.add('photo-count-visible'); 
         
         // Atualiza a pré-visualização 
-        lastPhotoPreview.innerHTML = `<img src="${newPhotoDataURL}" alt="Prévia da última foto tirada">`;
+        if (isVideo) {
+            lastPhotoPreview.innerHTML = `<i class="fas fa-video" style="font-size: 2rem; color: white; margin: 1rem;"></i>`;
+        } else {
+            lastPhotoPreview.innerHTML = `<img src="${newMediaURL}" alt="Prévia da última foto tirada">`;
+        }
         
         // Habilita o botão de compartilhamento
-        if (photos.length > 0 || videoChunks.length > 0) {
+        if (photos.length > 0) {
             shareAllBtn.disabled = false;
         }
     }
 
     // Capturar foto e adicionar marca d'água
     function capturePhoto() {
-        if (!hasCameraPermission) {
-            alert("Câmera não iniciada.");
+        if (!hasCameraPermission || isRecording) {
+            alert("Câmera não iniciada ou gravação em andamento.");
             return;
         }
         
@@ -211,8 +216,8 @@ if (document.getElementById('video')) {
         
         // Adiciona a marca d'água
         const now = new Date().toLocaleString('pt-BR');
-        const watermarkText = `Agrícola Qdelícia Frutas || ${now}`;
-        ctx.font = "bold 60px sans-serif"; 
+        const watermarkText = `Qdelícia Frutas | ${now}`;
+        ctx.font = "bold 40px sans-serif"; 
         ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
         ctx.textAlign = "center";
         ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
@@ -224,7 +229,7 @@ if (document.getElementById('video')) {
         // Gera o DataURL final (JPEG)
         const finalPhotoDataURL = canvas.toDataURL('image/jpeg', 0.9);
         
-        updateGalleryUI(finalPhotoDataURL);
+        updateGalleryUI(finalPhotoDataURL, false);
     }
 
     // Lógica de Gravação de Vídeo
@@ -233,7 +238,7 @@ if (document.getElementById('video')) {
 
         isRecording = true;
         videoChunks = [];
-        shutterBtn.classList.add('recording');
+        recordVideoBtn.classList.add('recording');
         videoTimerElement.style.display = 'block';
         
         mediaRecorder.start();
@@ -260,7 +265,7 @@ if (document.getElementById('video')) {
         isRecording = false;
         clearInterval(recordingTimer);
         mediaRecorder.stop();
-        shutterBtn.classList.remove('recording');
+        recordVideoBtn.classList.remove('recording');
         videoTimerElement.style.display = 'none';
     }
 
@@ -269,42 +274,17 @@ if (document.getElementById('video')) {
         const videoURL = URL.createObjectURL(videoBlob);
         
         // Adiciona o vídeo ao array de fotos/mídias para compartilhamento
-        photos.unshift(videoURL); 
-        
-        // Atualiza o preview com um ícone de vídeo (simulação)
-        lastPhotoPreview.innerHTML = `<i class="fas fa-video" style="font-size: 2rem; color: white; margin: 1rem;"></i>`;
-        
-        // Atualiza o contador (pode ser ajustado para contar fotos e vídeos separadamente)
-        photoCountElement.textContent = photos.length;
-        photoCountElement.classList.add('photo-count-visible'); 
-        
-        shareAllBtn.disabled = false;
+        updateGalleryUI(videoURL, true);
     }
 
-    // Altera a função do botão de captura para suportar foto e vídeo
-    shutterBtn.addEventListener('click', () => {
+    // Event Listeners
+    shutterBtn.addEventListener('click', capturePhoto);
+    recordVideoBtn.addEventListener('click', () => {
         if (isRecording) {
             stopRecording();
         } else {
-            capturePhoto();
+            startRecording();
         }
-    });
-
-    // Adiciona um listener para iniciar a gravação com um toque longo (simulação com mousedown/mouseup)
-    let pressTimer;
-    shutterBtn.addEventListener('mousedown', () => {
-        pressTimer = setTimeout(startRecording, 500); // Inicia gravação após 500ms
-    });
-    shutterBtn.addEventListener('mouseup', () => {
-        clearTimeout(pressTimer);
-        if (isRecording) {
-            // Se já estiver gravando, o click acima já chamou stopRecording
-        } else {
-            // Se não estiver gravando, o click acima já chamou capturePhoto
-        }
-    });
-    shutterBtn.addEventListener('mouseleave', () => {
-        clearTimeout(pressTimer);
     });
 
     // Trocar Câmera
