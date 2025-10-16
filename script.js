@@ -1,4 +1,5 @@
-// ================= MENU HAMBÚRGUER =================
+// ================= MENU HAMBÚRGUER (MOBILE) / SIDEBAR (DESKTOP) =================
+
 // Seleciona todos os elementos com a classe .menu-toggle (o de abrir e o de fechar)
 const menuToggleButtons = document.querySelectorAll('.menu-toggle');
 const sideMenu = document.querySelector('.side-menu');
@@ -8,15 +9,20 @@ if (sideMenu && menuOverlay) {
     // Adiciona o listener de clique para todos os botões de toggle
     menuToggleButtons.forEach(button => {
         button.addEventListener('click', () => {
-            sideMenu.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
+            // Apenas no mobile, ativamos a classe 'active'
+            if (window.innerWidth < 1024) { 
+                sideMenu.classList.toggle('active');
+                menuOverlay.classList.toggle('active');
+            }
         });
     });
 
-    // Fecha o menu ao clicar no overlay
+    // Fecha o menu ao clicar no overlay (apenas no mobile)
     menuOverlay.addEventListener('click', () => {
-        sideMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
+        if (window.innerWidth < 1024) {
+            sideMenu.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        }
     });
 }
 
@@ -72,7 +78,7 @@ if (document.querySelector('.carousel-slides')) {
     // Adiciona o controle de intervalo
     let interval = setInterval(goToNextSlide, slideDuration);
 
-    // Reinicia o intervalo ao interagir com os dots (evita pular slides)
+    // Reinicia o intervalo ao interagir com os dots
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
             clearInterval(interval);
@@ -92,7 +98,7 @@ if (document.getElementById('video')) {
     const switchBtn = document.getElementById('switch-btn');
     const dateTimeElement = document.getElementById('date-time');
     
-    // NOVOS ELEMENTOS para o novo layout de tela cheia
+    // Elementos para a nova UI Full Screen
     const lastPhotoPreview = document.getElementById('last-photo-preview');
     const photoCountElement = document.getElementById('photo-count');
     const shareAllBtn = document.getElementById('share-all');
@@ -105,13 +111,12 @@ if (document.getElementById('video')) {
 
     // Função principal para solicitar e iniciar o feed da câmera
     async function requestCameraPermission() {
-        // Para a stream anterior, se houver
         if (currentStream) {
             currentStream.getTracks().forEach(track => track.stop());
         }
 
         try {
-            // Configurações para obter a câmera traseira em alta resolução (preferencialmente)
+            // Configurações para forçar a câmera traseira ('environment') por padrão
             const constraints = {
                 video: {
                     facingMode: usingFrontCamera ? "user" : "environment",
@@ -126,15 +131,12 @@ if (document.getElementById('video')) {
             hasCameraPermission = true;
 
             // Espelhamento para a câmera frontal (Selfie)
-            if (usingFrontCamera) {
-                video.style.transform = 'scaleX(-1)';
-            } else {
-                video.style.transform = 'scaleX(1)';
-            }
+            video.style.transform = usingFrontCamera ? 'scaleX(-1)' : 'scaleX(1)';
+            
         } catch (err) {
             console.error("Erro ao acessar câmera:", err);
-            // Mensagem amigável ao usuário
-            alert("Não foi possível acessar a câmera. Verifique as permissões do seu navegador/dispositivo.");
+            // Mensagem de erro robusta
+            alert("Não foi possível acessar a câmera. Verifique as permissões (HTTPS necessário) e se há câmeras disponíveis.");
             video.style.backgroundColor = '#333';
             hasCameraPermission = false;
         }
@@ -143,22 +145,20 @@ if (document.getElementById('video')) {
     // Atualiza data e hora no watermark
     function updateDateTime() {
         const now = new Date();
-        // Formato brasileiro
         dateTimeElement.textContent = now.toLocaleString('pt-BR'); 
     }
     
     // Atualiza o contador de fotos e o preview
     function updateGalleryUI(newPhotoDataURL) {
-        // Armazena a nova foto no início do array (mais recente)
+        // Armazena a nova foto
         photos.unshift(newPhotoDataURL); 
 
         // Atualiza o contador de fotos
         photoCountElement.textContent = photos.length;
-        photoCountElement.classList.add('photo-count-visible'); // Torna o contador visível
+        photoCountElement.classList.add('photo-count-visible'); 
         
-        // Atualiza a pré-visualização (o quadrado no canto da tela)
+        // Atualiza a pré-visualização 
         lastPhotoPreview.innerHTML = `<img src="${newPhotoDataURL}" alt="Prévia da última foto tirada">`;
-        lastPhotoPreview.querySelector('img').style.opacity = '1';
         
         // Habilita o botão de compartilhamento
         if (photos.length > 0) {
@@ -170,7 +170,7 @@ if (document.getElementById('video')) {
     // Capturar foto e adicionar marca d'água
     function capturePhoto() {
         if (!hasCameraPermission) {
-            alert("Permissão de câmera não concedida. Por favor, recarregue a página e permita o acesso.");
+            alert("Câmera não iniciada.");
             return;
         }
         
@@ -184,7 +184,7 @@ if (document.getElementById('video')) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         
-        // Correção de espelhamento para câmera frontal
+        // Aplica correção de espelhamento ANTES de desenhar
         if (usingFrontCamera) {
              ctx.translate(canvas.width, 0);
              ctx.scale(-1, 1);
@@ -192,24 +192,22 @@ if (document.getElementById('video')) {
 
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        // Se houver espelhamento, volta ao normal antes de escrever
-        if (usingFrontCamera) {
-             ctx.setTransform(1, 0, 0, 1, 0, 0);
-        }
+        // Reseta a transformação ANTES de escrever a marca d'água
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         
-        // Adiciona a marca d'água (data e hora) na imagem capturada
+        // Adiciona a marca d'água
         const now = new Date().toLocaleString('pt-BR');
         const watermarkText = `Qdelícia Frutas | ${now}`;
-        ctx.font = "bold 40px sans-serif"; // Fonte e tamanho para alta resolução
+        ctx.font = "bold 40px sans-serif"; 
         ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
         ctx.textAlign = "center";
         ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
         ctx.shadowBlur = 5;
         
-        // Desenha a marca d'água no centro inferior da foto
+        // Desenha a marca d'água no centro inferior
         ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 40);
         
-        // Gera o DataURL final (JPEG 90% de qualidade)
+        // Gera o DataURL final (JPEG)
         const finalPhotoDataURL = canvas.toDataURL('image/jpeg', 0.9);
         
         updateGalleryUI(finalPhotoDataURL);
@@ -229,7 +227,6 @@ if (document.getElementById('video')) {
     // Lógica para Compartilhar no WhatsApp (usando API Nativa)
     shareAllBtn.addEventListener("click", async () => {
         if (navigator.share) {
-            // Limita o número de arquivos para evitar falhas em alguns sistemas (Ex: 3-5 fotos)
             const filesToShare = photos.slice(0, 5); 
 
             // Converte DataURLs para objetos File
@@ -238,7 +235,6 @@ if (document.getElementById('video')) {
                 const ab = new ArrayBuffer(byteString.length);
                 const ia = new Uint8Array(ab);
                 for (let j = 0; j < byteString.length; j++) ia[j] = byteString.charCodeAt(j);
-                // Nome do arquivo com índice e data (opcionalmente)
                 return new File([ab], `registro_qdelicia_${i + 1}.jpg`, { type: "image/jpeg" });
             });
             
@@ -253,7 +249,7 @@ if (document.getElementById('video')) {
                 });
             } catch (error) {
                 console.error("Erro no compartilhamento:", error);
-                if (error.name !== 'AbortError') { // Ignora se o usuário cancelar
+                if (error.name !== 'AbortError') { 
                     alert("Não foi possível compartilhar. O dispositivo pode não suportar ou o número de arquivos é muito grande. Tente compartilhar menos fotos.");
                 }
             }

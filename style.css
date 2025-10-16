@@ -6,20 +6,18 @@
 }
 
 :root {
-    --primary-color: #5d3fd3; /* Roxo */
+    --primary-color: #5d3fd3; /* Roxo principal */
     --secondary-color: #8b5cf6; /* Roxo mais claro */
-    --tertiary-color: #a78bfa; /* Roxo ainda mais claro */
-    --accent-color: #39ff14; /* Verde neon */
+    --accent-color: #39ff14; /* Verde neon para destaque */
     --bg-light: #f3f0ff; /* Fundo claro com roxo */
+    --bg-main: #ffffff; /* Fundo do conteúdo principal */
     --white: #ffffff;
     --text-dark: #2c0e5a; /* Roxo escuro para texto */
-    --text-light: #5d3fd3;
-    --shadow: rgba(0, 0, 0, 0.1);
-    --shadow-strong: rgba(0, 0, 0, 0.2);
-    --border-radius: 8px;
+    --shadow-light: rgba(0, 0, 0, 0.05);
+    --shadow-strong: rgba(0, 0, 0, 0.15);
+    --border-radius: 10px;
     --transition: all 0.3s ease;
-    --max-width: 1200px;
-    --gradient: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    --header-height: 60px;
 }
 
 html {
@@ -27,12 +25,12 @@ html {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.6;
     min-height: 100vh;
-    padding-top: 60px; /* Garante que o conteúdo não fique escondido sob o cabeçalho sticky */
+    padding-top: var(--header-height); /* Espaço para o header mobile */
 }
 
 a {
@@ -45,76 +43,68 @@ a:hover {
     color: var(--secondary-color);
 }
 
-/* ===================== NOVO: MENU HAMBÚRGUER (DESIGN MOBILE) ===================== */
+/* ===================== ESTRUTURA MOBILE (DEFAULT) ===================== */
 
-/* Header Principal - Agora com Flexbox para incluir o botão de menu */
+/* Header Mobile (Fixo no topo) */
 header#cabecalho-principal {
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Alinha o botão de menu à esquerda */
-    padding: 15px; 
-    background: var(--gradient);
+    justify-content: space-between;
+    padding: 0 15px; 
+    height: var(--header-height);
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     color: var(--white);
-    position: fixed; /* fixo para simular o cabeçalho de app */
+    position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 100; 
+    z-index: 1000; 
     box-shadow: 0 4px 12px var(--shadow-strong);
 }
 
-.header-content {
-    flex-grow: 1; /* Centraliza o conteúdo (logo, título) no espaço restante */
+.header-title {
+    flex-grow: 1; 
     text-align: center;
+    margin-right: 25px; /* Compensa o ícone do menu para centralizar o título */
 }
 
-.logo-placeholder {
-    display: none; /* Escondido no mobile para economizar espaço */
-}
-
-header h1 {
-    font-size: 1.4rem;
+.header-title h1 {
+    font-size: 1.2rem;
     font-weight: 700;
     margin: 0;
+    line-height: 1;
 }
 
-header p {
-    font-size: 0.8rem;
+.header-title p {
+    font-size: 0.7rem;
     font-weight: 300;
-    margin: 0;
     opacity: 0.9;
 }
 
-
-/* Botão do Menu - Aberto */
+/* Botão do Menu Hambúrguer (Abre/Fecha) */
 .menu-toggle {
     background: transparent;
     color: var(--white);
     border: none;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     cursor: pointer;
-    padding: 0 10px; 
-    z-index: 101; 
+    padding: 10px; 
     transition: var(--transition);
 }
-/* Botão 'X' dentro do Side-Menu */
-.menu-toggle.close-btn { 
-    color: var(--text-dark);
-}
 
-/* Menu Lateral (Side Menu) - Estilo de deslizar de App */
+/* Menu Lateral (Side Menu - MOBILE) */
 .side-menu {
     position: fixed;
     top: 0;
     left: 0;
-    width: 75vw; 
+    width: 80vw; 
     max-width: 300px;
     height: 100vh;
-    background-color: var(--white);
+    background-color: var(--bg-main);
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
-    transform: translateX(-100%); /* Escondido por padrão */
+    transform: translateX(-100%); /* Escondido */
     transition: transform 0.4s cubic-bezier(0.7, 0, 0.3, 1); 
-    z-index: 200; 
+    z-index: 2000; /* Acima de tudo */
     padding: 20px 0;
     display: flex;
     flex-direction: column;
@@ -140,7 +130,6 @@ header p {
 
 .side-menu a {
     color: var(--text-dark);
-    text-decoration: none;
     padding: 15px 20px;
     font-size: 1.1rem;
     font-weight: 500;
@@ -148,7 +137,7 @@ header p {
     align-items: center;
     gap: 15px;
     transition: var(--transition);
-    border-left: 5px solid transparent; /* Indicador visual de página ativa */
+    border-left: 5px solid transparent; 
 }
 
 .side-menu a:hover, .side-menu a.active {
@@ -170,7 +159,7 @@ header p {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 150;
+    z-index: 1500;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.4s;
@@ -181,60 +170,100 @@ header p {
     visibility: visible;
 }
 
-/* Esconde a nav antiga */
-nav:not(.side-menu) { 
-    display: none; 
-} 
-
-/* ===================== LAYOUT E SEÇÕES ===================== */
 main {
     padding: 20px;
-    max-width: var(--max-width);
-    margin: 0 auto;
 }
 
 section {
-    background-color: var(--white);
+    background-color: var(--bg-main);
     padding: 20px;
     margin-bottom: 20px;
-    border-radius: 12px; /* Cantos mais arredondados para visual de app */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
+    border-radius: var(--border-radius); 
+    box-shadow: 0 4px 15px var(--shadow-light); 
 }
 
-h1 {
-    font-size: 1.6rem;
+h1:not(.header-title h1), h2 {
     color: var(--primary-color);
-    margin-bottom: 10px;
-}
-
-h2 {
-    font-size: 1.3rem;
-    color: var(--text-dark);
-    border-bottom: 2px solid var(--bg-light);
-    padding-bottom: 5px;
     margin-bottom: 15px;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
+/* Formulários Iframe (seção de conteúdo) */
+iframe {
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 10px var(--shadow-light);
 }
 
-ul li {
-    padding: 8px 0;
-    border-bottom: 1px dashed var(--bg-light);
+/* ===================== ESTRUTURA DESKTOP (SIDEBAR DASHBOARD) ===================== */
+@media (min-width: 1024px) {
+    /* Reseta o Padding do Body e Define o Grid */
+    body {
+        padding-top: 0;
+        display: grid;
+        grid-template-columns: 250px 1fr; /* Sidebar fixo e Conteúdo */
+    }
+    
+    /* Side Menu (Sidebar Fixo) */
+    .side-menu {
+        position: fixed; /* Fixa o Sidebar */
+        transform: translateX(0); /* Sempre visível */
+        width: 250px;
+        box-shadow: 2px 0 8px var(--shadow-strong);
+        z-index: 100;
+        padding-top: 0;
+        /* Estilo para um sidebar de dashboard */
+        background-color: var(--text-dark);
+        color: var(--white);
+    }
+    
+    .side-menu a {
+        color: var(--white);
+        border-left: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 18px 20px;
+    }
+    
+    .side-menu a:hover, .side-menu a.active {
+        background-color: var(--secondary-color);
+        border-left-color: var(--accent-color);
+        color: var(--white);
+    }
+
+    .side-menu-header {
+        background: var(--primary-color);
+        padding: 20px;
+        border-bottom: none;
+    }
+
+    .side-menu-header .close-btn {
+        display: none; /* Não precisamos do botão fechar no desktop */
+    }
+    
+    .side-menu-logo {
+        max-width: 40px;
+        border-radius: 0;
+    }
+
+    /* Header e Overlay Mobile Inúteis no Desktop */
+    header#cabecalho-principal, .menu-overlay {
+        display: none;
+    }
+
+    /* Conteúdo Principal (Ocupa o restante da tela) */
+    main {
+        padding: 30px;
+        grid-column: 2 / 3; /* Posiciona no segundo grid */
+    }
 }
 
-ul li:last-child {
-    border-bottom: none;
-}
 
-/* ===================== CARROSSEL ===================== */
+/* ===================== COMPONENTES REUSÁVEIS (MOBILE & DESKTOP) ===================== */
+
+/* Carrossel */
 .carousel-container {
     overflow: hidden;
     position: relative;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px var(--shadow);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 10px var(--shadow-strong);
     margin: 20px 0;
 }
 
@@ -245,7 +274,7 @@ ul li:last-child {
 
 .carousel-slides .slide {
     min-width: 100%;
-    height: 200px;
+    height: 200px; /* Altura padrão mobile */
     object-fit: cover;
     display: block;
 }
@@ -257,24 +286,29 @@ ul li:last-child {
     transform: translateX(-50%);
     display: flex;
     gap: 8px;
+    z-index: 10;
 }
 
 .dot {
     width: 10px;
     height: 10px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.6);
     border-radius: 50%;
     cursor: pointer;
     transition: var(--transition);
 }
 
 .dot.active {
-    background: var(--white);
+    background: var(--accent-color);
 }
 
+@media (min-width: 768px) {
+    .carousel-slides .slide {
+        height: 350px; /* Aumenta a altura no desktop */
+    }
+}
 
-/* ===================== RODAPÉ E BOTÕES FIXOS ===================== */
-
+/* Rodapé e Botões Fixos */
 footer {
     text-align: center;
     padding: 15px;
@@ -284,7 +318,6 @@ footer {
     margin-top: 20px;
 }
 
-/* Botão Fixo WhatsApp */
 .whatsapp-btn {
     position: fixed;
     bottom: 20px;
@@ -303,11 +336,6 @@ footer {
     transition: transform 0.3s;
 }
 
-.whatsapp-btn:hover {
-    transform: scale(1.1);
-}
-
-/* Botão Voltar ao Topo */
 .back-to-top {
     position: fixed;
     bottom: 80px;
@@ -332,80 +360,4 @@ footer {
 .back-to-top.show {
     opacity: 1;
     visibility: visible;
-}
-
-/* ===================== MEDIA QUERIES (Desktop) ===================== */
-@media (min-width: 768px) {
-    body {
-        padding-top: 80px; /* Ajuste para o cabeçalho maior */
-    }
-
-    header#cabecalho-principal {
-        padding: 20px 40px;
-    }
-    
-    .logo-placeholder {
-        display: block; /* Volta a mostrar a logo no desktop */
-        margin-right: 20px;
-    }
-
-    .logo-placeholder img {
-        max-width: 50px; 
-    }
-
-    .menu-toggle.open-btn {
-        display: none; /* Esconde o botão de abrir o menu no desktop */
-    }
-
-    .header-content {
-        text-align: left;
-        flex-grow: 0; /* Desabilita o flex-grow */
-        margin-right: auto;
-    }
-
-    header h1 {
-        font-size: 2.0rem;
-    }
-
-    header p {
-        font-size: 1.0rem;
-    }
-
-    /* Navegação horizontal no desktop */
-    nav:not(.side-menu) {
-        display: flex;
-        justify-content: center;
-        background-color: var(--white);
-        padding: 10px 0;
-        box-shadow: 0 2px 5px var(--shadow);
-    }
-
-    nav a {
-        padding: 10px 20px;
-        margin: 0 5px;
-        border-radius: var(--border-radius);
-    }
-    
-    /* Esconde o menu lateral no desktop */
-    .side-menu, .menu-overlay {
-        display: none !important;
-    }
-
-    main {
-        padding: 30px;
-    }
-
-    section {
-        padding: 30px;
-    }
-
-    .carousel-slides .slide {
-        height: 350px;
-    }
-
-    .whatsapp-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 2rem;
-    }
 }

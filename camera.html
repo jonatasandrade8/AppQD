@@ -8,15 +8,15 @@
     <link rel="stylesheet" href="./style.css">
     <style>
         /* ===================== ESTILOS DA CÂMERA (TELA CHEIA NATIVA) ===================== */
-        /* Força o body para tela cheia e fundo preto, sem scroll */
+        /* ZERA MARGINS/PADDING e força fundo preto para simular ambiente nativo */
         body {
-            padding: 0;
-            margin: 0;
-            background-color: #000;
-            overflow: hidden;
+            padding: 0 !important;
+            margin: 0 !important;
+            background-color: #000 !important;
+            overflow: hidden !important;
         }
 
-        /* Ocupa toda a viewport (o view finder da câmera) */
+        /* Container que ocupa toda a tela */
         .camera-fullscreen-container {
             position: fixed; 
             top: 0;
@@ -25,26 +25,29 @@
             height: 100vh;
             background: #000;
             z-index: 900;
+            display: flex; /* Garante que o vídeo se alinhe */
+            flex-direction: column;
         }
 
-        /* Vídeo da Câmera (Preenche a tela) */
+        /* Vídeo da Câmera (Preenche o espaço e mantém aspecto) */
         #video {
+            flex-grow: 1;
             width: 100%;
             height: 100%;
             object-fit: cover; 
-            transition: filter 0.1s; /* Efeito visual de flash ao capturar */
+            transition: filter 0.1s; 
         }
         
-        /* Controles Superiores (Voltar) */
+        /* Controles Superiores (Voltar) - Flutuante */
         .camera-top-controls {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 15px;
+            left: 15px;
             z-index: 999;
         }
         
-        .back-btn {
-            background: rgba(255, 255, 255, 0.2);
+        .back-btn, #switch-btn {
+            background: rgba(255, 255, 255, 0.25);
             color: #fff;
             border: none;
             width: 40px;
@@ -54,19 +57,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px); /* Efeito de vidro fosco */
+            backdrop-filter: blur(5px); 
             cursor: pointer;
             transition: 0.2s;
-        }
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.4);
         }
 
         /* Watermark (Data/Hora - Canto Superior Direito) */
         .watermark {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             background: rgba(0, 0, 0, 0.5);
             padding: 5px 10px;
             border-radius: 5px;
@@ -78,21 +78,21 @@
             gap: 5px;
         }
 
-        /* Controles Inferiores (Barra de Captura) */
+        /* Barra de Controles Inferior */
         .camera-bottom-controls {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: rgba(0, 0, 0, 0.4); 
-            padding: 20px 0;
+            height: 120px; /* Altura fixa para os controles */
+            background: rgba(0, 0, 0, 0.6); 
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 999;
         }
 
-        /* Botão Capturar (Shutter) - Centralizado e Grande */
+        /* Botão Capturar (Shutter) - Centralizado */
         #shutter-btn {
             width: 80px;
             height: 80px;
@@ -101,19 +101,18 @@
             border: 8px solid rgba(255, 255, 255, 0.5); 
             cursor: pointer;
             transition: 0.1s;
-            box-shadow: 0 0 15px rgba(0,0,0,0.7);
         }
         #shutter-btn:active {
             transform: scale(0.9);
             border-width: 4px;
         }
 
-        /* Botão de Compartilhar (WhatsApp) - Canto Direito */
+        /* Botão de Compartilhar (WhatsApp) */
         #share-all {
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: #25d366; /* Cor WhatsApp */
+            background: #25d366; 
             color: #fff;
             display: flex;
             justify-content: center;
@@ -121,7 +120,6 @@
             font-size: 1.8rem;
             border: none;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
             transition: 0.2s;
         }
         #share-all:disabled {
@@ -130,21 +128,15 @@
             cursor: not-allowed;
         }
 
-        /* Pré-visualização da Última Foto e Contador (Canto Esquerdo) */
-        .photo-preview-container {
-            /* Usado para posicionar o preview corretamente no flexbox inferior */
-            position: relative;
+        /* Pré-visualização da Última Foto e Contador */
+        .photo-preview-group {
             display: flex;
             align-items: center;
             gap: 10px;
-            width: 60px; /* Largura mínima para o preview */
-            height: 60px;
-            margin-right: auto; /* Empurra o resto para a direita no flexbox */
-            padding-left: 20px; /* Espaçamento da lateral */
+            margin-right: 20px; /* Espaço entre o grupo e o shutter */
         }
-
+        
         #last-photo-preview {
-            position: absolute;
             width: 60px;
             height: 60px;
             border-radius: 8px;
@@ -152,7 +144,6 @@
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid #fff;
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
-            left: 20px; /* Alinha na borda do container */
         }
         
         #last-photo-preview img {
@@ -162,36 +153,28 @@
         }
 
         #photo-count {
-            position: absolute;
-            left: 80px; /* Posiciona o contador à direita do preview */
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             background: rgba(0, 0, 0, 0.5);
             padding: 5px 10px;
             border-radius: 5px;
-            min-width: 30px; 
-            text-align: center;
-            backdrop-filter: blur(3px);
-            opacity: 0; /* Escondido por padrão */
+            opacity: 0; 
             transition: opacity 0.3s;
         }
         
-        /* Mostra o contador se houver fotos */
         .photo-count-visible {
             opacity: 1 !important;
         }
-
-        /* Botão para Trocar Câmera (Posicionado sutilmente acima da barra de controles) */
+        
+        /* Botão para Trocar Câmera (Posicionado na lateral dos controles) */
         #switch-btn {
-            position: absolute;
-            right: 120px; /* Posiciona entre o botão de compartilhar e o obturador */
-            bottom: 30px;
-            z-index: 1000;
+            position: relative;
+            margin-left: -50px; /* Ajuste para centralizar visualmente */
         }
 
-        /* Garante que elementos de outras páginas sejam escondidos */
-        .user-config, .action-buttons, .gallery, footer, header {
+        /* Esconde elementos padrões da aplicação */
+        .menu-overlay, .side-menu, main, footer, header {
             display: none !important;
         }
     </style>
@@ -210,21 +193,22 @@
         
         <div class="camera-bottom-controls">
             
-            <div class="photo-preview-container">
+            <div class="photo-preview-group">
                 <div id="last-photo-preview">
                     <img src="https://via.placeholder.com/60x60?text=0" alt="Prévia da última foto" style="opacity: 0.3;">
                 </div>
                 <span id="photo-count">0</span>
             </div>
-
-            <button id="shutter-btn" aria-label="Capturar Foto"></button>
-
-            <button id="share-all" disabled aria-label="Compartilhar todas as fotos via WhatsApp">
-                <i class="fab fa-whatsapp"></i>
-            </button>
             
-            <button id="switch-btn" class="back-btn" aria-label="Trocar Câmera"><i class="fas fa-sync-alt"></i></button>
+            <button id="shutter-btn" aria-label="Capturar Foto"></button>
+            
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button id="switch-btn" aria-label="Trocar Câmera"><i class="fas fa-sync-alt"></i></button>
 
+                <button id="share-all" disabled aria-label="Compartilhar todas as fotos via WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </button>
+            </div>
         </div>
     </div>
     
