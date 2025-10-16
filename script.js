@@ -90,8 +90,7 @@ if (document.querySelector('.carousel-slides')) {
 }
 
 
-
-
+// ==================== FUNCIONALIDADES DA CÂMERA E VÍDEO (REVISADO) ====================
 // Verifica se estamos na página da câmera antes de inicializar
 if (document.getElementById('video')) {
     const video = document.getElementById('video');
@@ -180,6 +179,52 @@ if (document.getElementById('video')) {
         if (photos.length > 0 || videoChunks.length > 0) {
             shareAllBtn.disabled = false;
         }
+    }
+
+    // Capturar foto e adicionar marca d'água
+    function capturePhoto() {
+        if (!hasCameraPermission) {
+            alert("Câmera não iniciada.");
+            return;
+        }
+        
+        // Efeito visual de flash na tela
+        video.style.filter = 'brightness(2.0)';
+        setTimeout(() => { video.style.filter = 'brightness(1.0)'; }, 100);
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Aplica correção de espelhamento ANTES de desenhar
+        if (usingFrontCamera) {
+             ctx.translate(canvas.width, 0);
+             ctx.scale(-1, 1);
+        }
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Reseta a transformação ANTES de escrever a marca d'água
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        
+        // Adiciona a marca d'água
+        const now = new Date().toLocaleString('pt-BR');
+        const watermarkText = `Qdelícia Frutas | ${now}`;
+        ctx.font = "bold 40px sans-serif"; 
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.textAlign = "center";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+        ctx.shadowBlur = 5;
+        
+        // Desenha a marca d'água no centro inferior
+        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 40);
+        
+        // Gera o DataURL final (JPEG)
+        const finalPhotoDataURL = canvas.toDataURL('image/jpeg', 0.9);
+        
+        updateGalleryUI(finalPhotoDataURL);
     }
 
     // Lógica de Gravação de Vídeo
@@ -316,59 +361,3 @@ if (document.getElementById('video')) {
     setInterval(updateDateTime, 1000); 
     window.addEventListener('load', requestCameraPermission);
 }
-
-
-    // Capturar foto e adicionar marca d'água
-    function capturePhoto() {
-        if (!hasCameraPermission) {
-            alert("Câmera não iniciada.");
-            return;
-        }
-        
-        // Efeito visual de flash na tela
-        video.style.filter = 'brightness(2.0)';
-        setTimeout(() => { video.style.filter = 'brightness(1.0)'; }, 100);
-
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        // Aplica correção de espelhamento ANTES de desenhar
-        if (usingFrontCamera) {
-             ctx.translate(canvas.width, 0);
-             ctx.scale(-1, 1);
-        }
-
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Reseta a transformação ANTES de escrever a marca d'água
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        
-        // Adiciona a marca d'água
-        const now = new Date().toLocaleString('pt-BR');
-        const watermarkText = `Qdelícia Frutas | ${now}`;
-        ctx.font = "bold 40px sans-serif"; 
-        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-        ctx.textAlign = "center";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-        ctx.shadowBlur = 5;
-        
-        // Desenha a marca d'água no centro inferior
-        ctx.fillText(watermarkText, canvas.width / 2, canvas.height - 40);
-        
-        // Gera o DataURL final (JPEG)
-        const finalPhotoDataURL = canvas.toDataURL('image/jpeg', 0.9);
-        
-        updateGalleryUI(finalPhotoDataURL);
-    }
-    
-    // Trocar Câmera
-    switchBtn.addEventListener('click', () => {
-        usingFrontCamera = !usingFrontCamera;
-        if (hasCameraPermission) {
-            requestCameraPermission();
-        }
-    });
-
