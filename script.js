@@ -211,8 +211,8 @@ if (document.getElementById('video')) {
         
         // Adiciona a marca d'água
         const now = new Date().toLocaleString('pt-BR');
-        const watermarkText = `Qdelícia Frutas | ${now}`;
-        ctx.font = "bold 40px sans-serif"; 
+        const watermarkText = `Agrícola Qdelícia Frutas || ${now}`;
+        ctx.font = "bold 60px sans-serif"; 
         ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
         ctx.textAlign = "center";
         ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
