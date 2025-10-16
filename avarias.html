@@ -10,28 +10,35 @@
 </head>
 <body>
     
-    
-    
     <div class="menu-overlay"></div>
    
-    <header id="cabecalho-principal">
-        <div class="logo-placeholder">
-            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
+    <nav class="side-menu">
+        <div class="side-menu-header">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas" class="side-menu-logo"> 
+            <button class="menu-toggle close-btn" aria-label="Fechar Menu"><i class="fas fa-times"></i></button>
         </div>
-        <h1>Qdelícia Frutas</h1>
-        <p>Registro Avarias</p>
+        <a href="index.html"><i class="fas fa-home"></i> Início</a>
+        <a href="estoque.html"><i class="fas fa-boxes"></i> Estoque</a>
+        <a href="caixas.html"><i class="fas fa-truck-loading"></i> Caixas</a>
+        <a href="vendas.html"><i class="fas fa-chart-line"></i> Vendas</a>
+        <a href="avarias.html" class="active"><i class="fas fa-exclamation-triangle"></i> Avarias</a>
+        <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
+    </nav>
+
+    <header id="cabecalho-principal">
+        <button class="menu-toggle open-btn" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="header-content">
+            <div class="logo-placeholder">
+                <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
+            </div>
+            <h1>Qdelícia Frutas</h1>
+            <p>Registro Avarias</p>
+        </div>
+        <div style="width: 1.8rem; padding: 0 10px;"></div> 
     </header>
 
-    <!-- Menu de Navegação -->
-    <nav>
-        <a href="index.html">Início</a>
-        <a href="estoque.html">Estoque</a>
-        <a href="caixas.html">Caixas</a>
-        <a href="vendas.html">Vendas</a>
-        <a href="avarias.html" class="active">Avarias</a>
-        <a href="camera.html">Câmera</a>
-        
-    </nav>
     <div>
         <iframe width="100%" height="480px" src="https://forms.office.com/r/DZn1hmAcjy?embed=true" frameborder="0" marginwidth="0" marginheight="0" style="border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
     </div>
@@ -44,10 +51,6 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <div class="back-to-top">
-        <i class="fas fa-arrow-up"></i>
-    </div>
-
-    <script src="./script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

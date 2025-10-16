@@ -31,146 +31,302 @@ body {
     background-color: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.6;
-    font-size: 14px; /* Mobile first - tamanho menor */
+    min-height: 100vh;
+    padding-top: 60px; /* Garante que o conteúdo não fique escondido sob o cabeçalho sticky */
 }
 
-/* ===================== MOBILE FIRST - LAYOUT GERAL ===================== */
-.container {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 0 15px; /* Padding menor para mobile */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition);
 }
 
-/* Header - Mobile First */
-header {
+a:hover {
+    color: var(--secondary-color);
+}
+
+/* ===================== NOVO: MENU HAMBÚRGUER (DESIGN MOBILE) ===================== */
+
+/* Header Principal - Agora com Flexbox para incluir o botão de menu */
+header#cabecalho-principal {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alinha o botão de menu à esquerda */
+    padding: 15px; 
     background: var(--gradient);
     color: var(--white);
+    position: fixed; /* fixo para simular o cabeçalho de app */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100; 
+    box-shadow: 0 4px 12px var(--shadow-strong);
+}
+
+.header-content {
+    flex-grow: 1; /* Centraliza o conteúdo (logo, título) no espaço restante */
     text-align: center;
-    padding: 15px 0; /* Padding menor para mobile */
-    position: relative;
-    box-shadow: 0 2px 10px var(--shadow);
 }
 
 .logo-placeholder {
-    margin-bottom: 8px;
+    display: none; /* Escondido no mobile para economizar espaço */
 }
 
-.logo-placeholder img {
-    max-width: 100px; /* Menor para mobile */
+header h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+header p {
+    font-size: 0.8rem;
+    font-weight: 300;
+    margin: 0;
+    opacity: 0.9;
+}
+
+
+/* Botão do Menu - Aberto */
+.menu-toggle {
+    background: transparent;
+    color: var(--white);
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0 10px; 
+    z-index: 101; 
+    transition: var(--transition);
+}
+/* Botão 'X' dentro do Side-Menu */
+.menu-toggle.close-btn { 
+    color: var(--text-dark);
+}
+
+/* Menu Lateral (Side Menu) - Estilo de deslizar de App */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 75vw; 
+    max-width: 300px;
+    height: 100vh;
+    background-color: var(--white);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
+    transform: translateX(-100%); /* Escondido por padrão */
+    transition: transform 0.4s cubic-bezier(0.7, 0, 0.3, 1); 
+    z-index: 200; 
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.side-menu.active {
+    transform: translateX(0); /* Mostra o menu */
+}
+
+.side-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px 20px 20px;
+    border-bottom: 1px solid var(--bg-light);
+}
+
+.side-menu-logo {
+    max-width: 60px;
     height: auto;
     border-radius: 50%;
 }
 
-header h1 {
-    font-size: 1.8rem; /* Menor para mobile */
-    margin: 0;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-header p {
-    font-size: 1rem; /* Menor para mobile */
-    margin-top: 5px;
-    opacity: 0.9;
-}
-
-/* Navegação - Mobile First */
-nav {
-    background: var(--primary-color);
-    text-align: center;
-    padding: 8px 0;
-    overflow-x: auto; /* Permite scroll horizontal se necessário */
-    white-space: nowrap;
-}
-
-nav a {
-    color: var(--white);
+.side-menu a {
+    color: var(--text-dark);
     text-decoration: none;
-    padding: 8px 12px; /* Padding menor para mobile */
-    margin: 0 2px;
-    font-weight: bold;
-    font-size: 0.9rem; /* Fonte menor para mobile */
-    transition: background-color 0.3s;
-    display: inline-block;
-    border-radius: var(--border-radius);
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: var(--transition);
+    border-left: 5px solid transparent; /* Indicador visual de página ativa */
 }
 
-nav a:hover, nav a.active {
-    background-color: var(--secondary-color);
+.side-menu a:hover, .side-menu a.active {
+    background-color: var(--bg-light);
+    border-left-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
-/* Main - Mobile First */
+.side-menu a i {
+    font-size: 1.2rem;
+    width: 25px; 
+}
+
+/* Overlay do Menu */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 150;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s;
+}
+
+.menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Esconde a nav antiga */
+nav:not(.side-menu) { 
+    display: none; 
+} 
+
+/* ===================== LAYOUT E SEÇÕES ===================== */
 main {
-    max-width: 100%;
+    padding: 20px;
+    max-width: var(--max-width);
     margin: 0 auto;
 }
 
 section {
     background-color: var(--white);
-    padding: 20px 15px; /* Padding menor para mobile */
-    margin-bottom: 15px;
-    margin-left: 15px;
-    margin-right: 15px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 10px var(--shadow);
-    text-align: center;
-}
-ul{
-    text-align: center;
-    margin-left: 20px;
-    margin-top: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px; /* Cantos mais arredondados para visual de app */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
 }
 
-/* Footer - Mobile First */
+h1 {
+    font-size: 1.6rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    border-bottom: 2px solid var(--bg-light);
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--bg-light);
+}
+
+ul li:last-child {
+    border-bottom: none;
+}
+
+/* ===================== CARROSSEL ===================== */
+.carousel-container {
+    overflow: hidden;
+    position: relative;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px var(--shadow);
+    margin: 20px 0;
+}
+
+.carousel-slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slides .slide {
+    min-width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.carousel-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dot.active {
+    background: var(--white);
+}
+
+
+/* ===================== RODAPÉ E BOTÕES FIXOS ===================== */
+
 footer {
+    text-align: center;
+    padding: 15px;
     background-color: var(--text-dark);
     color: var(--bg-light);
-    text-align: center;
-    padding: 15px 0;
-    font-size: 0.8rem; /* Menor para mobile */
+    font-size: 0.8rem;
+    margin-top: 20px;
 }
 
-/* ===================== BOTÕES FLUTUANTES - MOBILE FIRST ===================== */
+/* Botão Fixo WhatsApp */
 .whatsapp-btn {
     position: fixed;
-    bottom: 15px;
-    right: 15px;
-    background-color: #25d366;
-    color: white;
-    width: 50px; /* Menor para mobile */
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
     height: 50px;
+    background: #25d366;
+    color: var(--white);
     border-radius: 50%;
     display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 1.5rem; /* Menor para mobile */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 100;
+    align-items: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 50;
     transition: transform 0.3s;
-    text-decoration: none;
 }
 
 .whatsapp-btn:hover {
     transform: scale(1.1);
 }
 
+/* Botão Voltar ao Topo */
 .back-to-top {
     position: fixed;
-    bottom: 75px; /* Ajustado para mobile */
-    right: 15px;
+    bottom: 80px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
     background: var(--primary-color);
     color: var(--white);
-    width: 35px; /* Menor para mobile */
-    height: 35px;
     border-radius: 50%;
     display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 1rem; /* Menor para mobile */
-    cursor: pointer;
+    align-items: center;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-    z-index: 99;
+    transition: var(--transition);
+    z-index: 49;
+    cursor: pointer;
 }
 
 .back-to-top.show {
@@ -178,588 +334,78 @@ footer {
     visibility: visible;
 }
 
-/* ===================== CARROSSEL - MOBILE FIRST ===================== */
-.carousel-container {
-    position: relative;
-    width: 100%;
-    margin: 20px auto;
-    max-width: 100%;
-    overflow: hidden;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 10px var(--shadow);
-    background-color: black;
-    box-sizing: border-box;
-}
-
-.carousel-slides {
-    display: flex;
-    transition: transform 0.5s ease;
-    width: 500%; /* 5 slides */
-}
-
-.carousel-slides .slide {
-    width: 20%; /* 100% / 5 slides */
-    height: 300px; /* Altura menor para mobile */
-    object-fit: contain; 
-    flex-shrink: 0;
-    background-color: var(--text-dark); 
-}
-
-/* ===================== ESTILOS DA CÂMERA - MOBILE FIRST ===================== */
-.camera-page {
-    padding: 10px;
-    background: var(--bg-light);
-}
-
-.camera-wrapper {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    background: var(--white);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px var(--shadow);
-}
-
-/* Configuração do usuário - Mobile First */
-.user-config {
-    padding: 15px;
-    background: var(--bg-light);
-    border-bottom: 1px solid #eee;
-}
-
-.config-group {
-    margin-bottom: 15px;
-}
-
-.config-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-dark);
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.config-group input {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid var(--primary-color);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    transition: all 0.3s;
-}
-
-.config-group input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(57,255,20,0.1);
-}
-
-.permission-buttons {
-    display: flex;
-    flex-direction: column; /* Stack vertical para mobile */
-    gap: 10px;
-}
-
-.permission-btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    color: var(--white);
-    transition: 0.3s;
-    font-size: 0.9rem;
-}
-
-.camera-permission {
-    background: var(--primary-color);
-}
-.camera-permission:hover {
-    background: var(--secondary-color);
-}
-
-.reload-btn {
-    background: var(--accent-color);
-}
-.reload-btn:hover {
-    background: #0f1de6;
-}
-
-/* Área da Câmera - Mobile First */
-.camera-container {
-    position: relative;
-    background: #000;
-    height: 250px; /* Altura menor para mobile */
-    overflow: hidden;
-}
-
-#video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.watermark {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: var(--white);
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.8rem; /* Menor para mobile */
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(4px);
-}
-
-.controls {
-    position: absolute;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Gap menor para mobile */
-    z-index: 20;
-}
-
-.btn-circle {
-    width: 50px; /* Menor para mobile */
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem; /* Menor para mobile */
-    background: var(--white);
-    transition: transform 0.2s;
-}
-
-.btn-circle:active {
-    transform: scale(0.95);
-}
-
-#shutter-btn {
-    width: 56px; /* Menor para mobile */
-    height: 56px;
-    border: 3px solid var(--primary-color);
-    box-shadow: 0 0 0 2px var(--white);
-    background: var(--accent-color);
-    color: var(--white);
-}
-
-#switch-btn {
-    background: rgba(255,255,255,0.9);
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-}
-
-/* Estilo para o botão de voltar */
-.back-btn {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    z-index: 30;
-    background: rgba(255, 255, 255, 0.5);
-    color: var(--primary-color);
-}
-
-.back-btn:hover {
-    background: rgba(255, 255, 255, 0.8);
-}
-
-/* Botões de Ação - Mobile First */
-.action-buttons {
-    display: flex;
-    flex-direction: column; /* Stack vertical para mobile */
-    gap: 10px;
-    padding: 15px;
-    background: var(--bg-light);
-}
-
-.action-btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    color: var(--white);
-    transition: 0.3s;
-    font-size: 0.9rem;
-}
-
-.action-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.download-btn {
-    background: var(--primary-color);
-}
-.download-btn:hover:not(:disabled) {
-    background: var(--secondary-color);
-}
-
-.whatsapp-btn.action-btn {
-    background: #25d366;
-    position: static;
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    font-size: 0.9rem;
-}
-.whatsapp-btn.action-btn:hover:not(:disabled) {
-    background: #128c7e;
-}
-
-/* Galeria - Mobile First */
-.gallery {
-    padding: 15px;
-    background: var(--white);
-}
-
-.gallery h2 {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    color: var(--primary-color);
-    text-align: center;
-}
-
-.photo-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Menor para mobile */
-    gap: 10px;
-    padding: 5px;
-}
-
-.photo-item {
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    background: var(--bg-light);
-    transition: transform 0.3s;
-}
-
-.photo-item:hover {
-    transform: translateY(-2px);
-}
-
-.photo-item img {
-    width: 100%;
-    height: 100px; /* Altura menor para mobile */
-    object-fit: cover;
-}
-
-.photo-info {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0,0,0,0.7);
-    color: var(--white);
-    padding: 4px;
-    font-size: 0.7rem; /* Menor para mobile */
-    text-align: center;
-}
-
-/* ===================== UTILITÁRIOS ===================== */
-.titulos {
-    margin-bottom: 20px; /* Menor para mobile */
-    text-align: center;
-}
-
-.titulos h2, .titulos h3 {
-    color: var(--primary-color);
-    margin-bottom: 8px;
-    font-size: 1.2rem; /* Menor para mobile */
-}
-
-.titulos p, .titulos ul {
-    font-size: 1rem; /* Menor para mobile */
-    color: var(--text-dark);
-}
-
-.btn-primary {
-    display: inline-block;
-    background: var(--gradient);
-    color: var(--white);
-    padding: 10px 20px; /* Menor para mobile */
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.9rem; /* Menor para mobile */
-    transition: var(--transition);
-}
-
-.btn-primary:hover {
-    box-shadow: 0 4px 15px var(--shadow-strong);
-    transform: translateY(-2px);
-}
-
-.sistema-interativo {
-    text-align: center;
-}
-
-/* ===================== TABLET - MIN-WIDTH: 768px ===================== */
+/* ===================== MEDIA QUERIES (Desktop) ===================== */
 @media (min-width: 768px) {
     body {
-        font-size: 16px;
+        padding-top: 80px; /* Ajuste para o cabeçalho maior */
     }
 
-    .container {
-        padding: 0 20px;
+    header#cabecalho-principal {
+        padding: 20px 40px;
     }
-
-    header {
-        padding: 20px 0;
+    
+    .logo-placeholder {
+        display: block; /* Volta a mostrar a logo no desktop */
+        margin-right: 20px;
     }
 
     .logo-placeholder img {
-        max-width: 130px;
+        max-width: 50px; 
+    }
+
+    .menu-toggle.open-btn {
+        display: none; /* Esconde o botão de abrir o menu no desktop */
+    }
+
+    .header-content {
+        text-align: left;
+        flex-grow: 0; /* Desabilita o flex-grow */
+        margin-right: auto;
     }
 
     header h1 {
-        font-size: 2.2rem;
+        font-size: 2.0rem;
     }
 
     header p {
-        font-size: 1.1rem;
+        font-size: 1.0rem;
     }
 
-    nav {
+    /* Navegação horizontal no desktop */
+    nav:not(.side-menu) {
+        display: flex;
+        justify-content: center;
+        background-color: var(--white);
         padding: 10px 0;
-    }
-
-    nav a {
-        padding: 10px 15px;
-        margin: 0 3px;
-        font-size: 1rem;
-    }
-
-    main {
-        padding: 20px 0;
-    }
-
-    section {
-        padding: 25px 20px;
-        margin-bottom: 20px;
-    }
-
-    .whatsapp-btn {
-        width: 55px;
-        height: 55px;
-        font-size: 1.8rem;
-        bottom: 20px;
-        right: 20px;
-    }
-
-    .back-to-top {
-        width: 38px;
-        height: 38px;
-        font-size: 1.1rem;
-        bottom: 85px;
-    }
-
-    .carousel-container {
-        margin: 20px auto; /* Centraliza no tablet */
-    }
-
-    .carousel-slides .slide {
-        height: 250px;
-    }
-
-    .carousel-dots .dot {
-        width: 10px;
-        height: 10px;
-    }
-
-    .camera-container {
-        height: 300px;
-    }
-
-    .watermark {
-        font-size: 0.9rem;
-        padding: 8px 15px;
-    }
-
-    .controls {
-        gap: 18px;
-    }
-
-    .btn-circle {
-        width: 55px;
-        height: 55px;
-        font-size: 1.1rem;
-    }
-
-    #shutter-btn {
-        width: 62px;
-        height: 62px;
-        border-width: 4px;
-    }
-
-    .permission-buttons {
-        flex-direction: row;
-    }
-
-    .action-buttons {
-        flex-direction: row;
-    }
-
-    .photo-list {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 12px;
-    }
-
-    .photo-item img {
-        height: 120px;
-    }
-
-    .photo-info {
-        font-size: 0.75rem;
-        padding: 6px;
-    }
-
-    .titulos {
-        margin-bottom: 25px;
-    }
-
-    .titulos h2, .titulos h3 {
-        font-size: 1.4rem;
-    }
-
-    .titulos p, .titulos ul {
-        font-size: 1.1rem;
-    }
-
-    .btn-primary {
-        padding: 12px 25px;
-        font-size: 1rem;
-    }
-}
-
-/* ===================== DESKTOP - MIN-WIDTH: 1024px ===================== */
-@media (min-width: 1024px) {
-    .container {
-        max-width: var(--max-width);
-    }
-
-    header {
-        padding: 25px 0;
-    }
-
-    .logo-placeholder img {
-        max-width: 150px;
-    }
-
-    header h1 {
-        font-size: 2.5rem;
-    }
-
-    header p {
-        font-size: 1.2rem;
+        box-shadow: 0 2px 5px var(--shadow);
     }
 
     nav a {
         padding: 10px 20px;
         margin: 0 5px;
+        border-radius: var(--border-radius);
+    }
+    
+    /* Esconde o menu lateral no desktop */
+    .side-menu, .menu-overlay {
+        display: none !important;
     }
 
     main {
-        max-width: var(--max-width);
+        padding: 30px;
     }
 
     section {
         padding: 30px;
     }
 
+    .carousel-slides .slide {
+        height: 350px;
+    }
+
     .whatsapp-btn {
         width: 60px;
         height: 60px;
         font-size: 2rem;
-    }
-
-    .back-to-top {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-        bottom: 90px;
-    }
-
-    .carousel-container {
-        margin: 20px auto; /* Centraliza no desktop */
-    }
-
-    .carousel-slides .slide {
-        height: 300px;
-    }
-
-    .photo-list {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
-
-    .camera-wrapper {
-        max-width: 480px;
-    }
-
-    .camera-container {
-        height: 320px;
-    }
-
-    .controls {
-        gap: 20px;
-    }
-
-    .btn-circle {
-        width: 60px;
-        height: 60px;
-        font-size: 1.2rem;
-    }
-
-    #shutter-btn {
-        width: 68px;
-        height: 68px;
-    }
-
-    .titulos {
-        margin-bottom: 30px;
-    }
-
-    .titulos h2, .titulos h3 {
-        font-size: 1.5rem;
-    }
-}
-
-/* ===================== LARGE DESKTOP - MIN-WIDTH: 1440px ===================== */
-@media (min-width: 1440px) {
-    .camera-wrapper {
-        max-width: 500px;
-    }
-
-    .camera-container {
-        height: 340px;
-    }
-
-    .carousel-slides .slide {
-        height: 350px;
     }
 }
