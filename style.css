@@ -265,7 +265,7 @@ footer {
 }
 
 
-/* ===================== ESTILOS PARA O CAMPO DE TEXTO DA MARCA D'ÁGUA (NOVO) ===================== */
+/* ===================== ESTILOS PARA AS CAIXAS DE SELEÇÃO DA MARCA D'ÁGUA (REVISADO) ===================== */
 
 .watermark-settings h2 {
     color: var(--primary-color);
@@ -276,10 +276,11 @@ footer {
 .input-group {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Alinha o label e o input à esquerda dentro do grupo */
+    align-items: flex-start; 
     width: 100%;
-    max-width: 350px; /* Limita a largura em mobile para melhor toque */
-    margin: 0 auto;
+    max-width: 350px; 
+    margin: 15px auto; /* Adiciona margem entre os grupos */
+    text-align: left;
 }
 
 .input-group label {
@@ -292,36 +293,66 @@ footer {
     font-size: 0.9rem;
 }
 
-#watermark-text-input {
+/* Estilo Base para as Caixas de Seleção */
+.input-group select {
+    appearance: none; /* Remove estilo nativo para personalização */
+    -webkit-appearance: none;
+    -moz-appearance: none;
     width: 100%;
-    padding: 12px;
+    padding: 12px 15px;
     border: 2px solid var(--tertiary-color);
     border-radius: var(--border-radius);
     font-size: 1rem;
     color: var(--text-dark);
+    background-color: var(--white);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%235d3fd3' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E"); /* Seta customizada */
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
 }
 
-#watermark-text-input:focus {
+/* Foco e Hover */
+.input-group select:hover {
+    border-color: var(--secondary-color);
+}
+.input-group select:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.2); /* Sombra suave do primário */
+    box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.2); 
 }
 
-#watermark-text-input::placeholder {
+/* Estilo para caixas de seleção DESABILITADAS */
+.input-group select:disabled {
+    cursor: not-allowed;
+    background-color: var(--bg-light); /* Cor de fundo mais clara para indicar desabilitação */
+    border-color: #ddd;
     color: #a0a0a0;
-    font-style: italic;
+    opacity: 0.8;
 }
+
+/* Estilo para o botão de acesso à câmera no estado desabilitado */
+#open-camera-btn[disabled] {
+    background-color: #aaa;
+    color: #eee;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+#open-camera-btn[disabled] i.fa-lock {
+    color: #555;
+}
+
 
 /* Linha separadora horizontal */
 hr {
     border: none;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
-    margin: 15px 0;
-    max-width: 90%;
     margin: 15px auto;
+    max-width: 90%;
 }
+
 
 /* ===================== ESTILOS DA CÂMERA (Mobile/Fullscreen) ===================== */
 
