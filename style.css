@@ -167,7 +167,6 @@ footer {
 }
 
 /* ===================== BOTÕES FLUTUANTES (Preservado) ===================== */
-/* ... (Estilos de whatsapp-btn e back-to-top) ... */
 .whatsapp-btn {
     position: fixed;
     bottom: 15px;
@@ -213,7 +212,6 @@ footer {
 }
 
 /* ===================== CARROSSEL (Preservado) ===================== */
-/* ... (Estilos do Carrossel) ... */
 .carousel-container {
     position: relative;
     width: 100%;
@@ -266,6 +264,64 @@ footer {
     border-radius: 4px;
 }
 
+
+/* ===================== ESTILOS PARA O CAMPO DE TEXTO DA MARCA D'ÁGUA (NOVO) ===================== */
+
+.watermark-settings h2 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinha o label e o input à esquerda dentro do grupo */
+    width: 100%;
+    max-width: 350px; /* Limita a largura em mobile para melhor toque */
+    margin: 0 auto;
+}
+
+.input-group label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+#watermark-text-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--tertiary-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#watermark-text-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.2); /* Sombra suave do primário */
+}
+
+#watermark-text-input::placeholder {
+    color: #a0a0a0;
+    font-style: italic;
+}
+
+/* Linha separadora horizontal */
+hr {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 15px 0;
+    max-width: 90%;
+    margin: 15px auto;
+}
 
 /* ===================== ESTILOS DA CÂMERA (Mobile/Fullscreen) ===================== */
 
@@ -560,6 +616,11 @@ footer {
         padding: 30px;
         margin: 20px auto;
         max-width: 800px; 
+    }
+
+    /* Estilos do Input em Desktop */
+    .input-group {
+        max-width: 450px; /* Aumenta a largura em desktop */
     }
 
     /* Carrossel */
