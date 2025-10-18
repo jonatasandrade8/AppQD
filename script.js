@@ -41,6 +41,7 @@ if (backToTop) {
 }
 
 // ==================== FUNCIONALIDADES DO CARROSSEL (Funcionalidade Preservada) ====================
+// Nota: O carrossel não está presente no HTML, mas a lógica foi mantida
 const carouselSlides = document.querySelector('.carousel-slides');
 const slides = document.querySelectorAll('.carousel-slides .slide');
 const dots = document.querySelectorAll('.carousel-dots .dot');
@@ -75,7 +76,7 @@ if (carouselSlides && slides.length > 0) {
 }
 
 
-// ==================== FUNCIONALIDADES DA CÂMERA E VÍDEO (Refatorado o Contador) ====================
+// ==================== FUNCIONALIDADES DA CÂMERA E VÍDEO ====================
 
 // Elementos da Interface
 const openCameraBtn = document.getElementById('open-camera-btn');
@@ -90,10 +91,18 @@ const downloadAllBtn = document.getElementById('download-all');
 const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
 
+// NOVO: Elemento de input de texto para o nome da loja/PDV
+const watermarkTextInput = document.getElementById('watermark-text-input'); 
+
 let currentStream = null;
 let usingFrontCamera = false;
 let photos = [];
 let hasCameraPermission = false;
+
+// NOVO: Carregar a imagem da logomarca para uso no Canvas
+const logoImage = new Image();
+logoImage.src = './images/logo-qdelicia.png'; // Verifique se o caminho está correto!
+logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca. Verifique o caminho.");
 
 
 /**
@@ -162,12 +171,13 @@ function closeCameraFullscreen() {
     if (openCameraBtn) {
         openCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Abrir Câmera em Fullscreen';
     }
+    // Re-solicita a permissão para que o botão volte a refletir o status
     requestCameraPermission(); 
 }
 
 
 /**
- * @description Atualiza a data e hora na marca d'água.
+ * @description Atualiza a data e hora na marca d'água em tempo real na tela.
  */
 function updateDateTime() {
     const now = new Date();
@@ -183,13 +193,12 @@ setInterval(updateDateTime, 1000);
  */
 function updatePhotoCounter() {
     if (photoCountElement) {
-        // Mostra apenas o número, conforme solicitado
         photoCountElement.textContent = photos.length;
     }
 }
 
 /**
- * @description Captura o frame atual do vídeo, aplica a marca d'água e salva.
+ * @description Captura o frame atual do vídeo, aplica a marca d'água (Logo, Texto, Data/Hora) e salva.
  */
 function capturePhoto() {
     if (!hasCameraPermission || !video || video.readyState < 2) {
@@ -197,6 +206,9 @@ function capturePhoto() {
         return;
     }
     
+    // Captura o texto adicional do input
+    const additionalText = watermarkTextInput ? watermarkTextInput.value.trim() : '';
+
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
@@ -206,27 +218,61 @@ function capturePhoto() {
 
     const nowText = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
     
-    // --- Aplicação da Marca D'água (Texto) ---
-    const fontSize = Math.max(20, Math.floor(canvas.height / 30));
-    const padding = Math.max(10, Math.floor(canvas.height / 100));
-    const x = canvas.width / 2;
-    const y = canvas.height - padding;
+    // --- Configurações Comuns de Estilo e Posição ---
+    const padding = Math.max(15, Math.floor(canvas.height / 80)); // Espaçamento interno
+    const textBaseColor = '#FFFFFF';
+    const bgColor = 'rgba(0, 0, 0, 0.7)';
+    const defaultFontSize = Math.max(20, Math.floor(canvas.height / 40)); 
+    let currentY = canvas.height - padding; // Ponto inicial no canto inferior direito
     
-    ctx.font = `${fontSize}px Arial, sans-serif`;
-    ctx.textAlign = 'center';
+    // --- 1. Aplicação da Marca D'água (Texto Data/Hora - Canto Inferior Direito) ---
+    ctx.font = `${defaultFontSize * 0.9}px Arial, sans-serif`; 
+    ctx.textAlign = 'right';
     ctx.textBaseline = 'bottom';
     
-    // Fundo da Marca D'água
-    const textMetrics = ctx.measureText(nowText);
-    const textWidth = textMetrics.width;
+    // Desenha Fundo
+    let textMetrics = ctx.measureText(nowText);
+    let textWidth = textMetrics.width;
+    let textHeight = defaultFontSize * 0.9;
     
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; 
-    ctx.fillRect(x - textWidth/2 - padding, y - fontSize - padding, textWidth + 2*padding, fontSize + 2*padding);
+    ctx.fillStyle = bgColor; 
+    // Ajusta a área do fundo para o texto Data/Hora
+    ctx.fillRect(canvas.width - textWidth - 2*padding, currentY - textHeight - 2*padding + padding, textWidth + 2*padding, textHeight + padding);
     
-    // Texto
-    ctx.fillStyle = '#FFFFFF'; 
-    ctx.fillText(nowText, x, y - padding);
+    // Desenha Texto
+    ctx.fillStyle = textBaseColor; 
+    ctx.fillText(nowText, canvas.width - padding, currentY - padding);
+    
+    currentY -= textHeight + padding; // Prepara a posição Y para o próximo elemento
+    
+    // --- 2. Aplicação da Marca D'água (Texto Adicional - Acima da Data/Hora) ---
+    if (additionalText) {
+        ctx.font = `${defaultFontSize}px Arial, sans-serif`; 
+        textMetrics = ctx.measureText(additionalText);
+        textWidth = textMetrics.width;
+        textHeight = defaultFontSize;
+        
+        // Desenha Fundo
+        ctx.fillStyle = bgColor; 
+        // Ajusta a área do fundo para o Texto Adicional
+        ctx.fillRect(canvas.width - textWidth - 2*padding, currentY - textHeight - 2*padding + padding, textWidth + 2*padding, textHeight + padding);
 
+        // Desenha Texto
+        ctx.fillStyle = textBaseColor; 
+        ctx.fillText(additionalText, canvas.width - padding, currentY - padding);
+    }
+    
+    // --- 3. Aplicação da Marca D'água (Logomarca - Canto Superior Esquerdo) ---
+    if (logoImage.complete && logoImage.naturalHeight !== 0) {
+        // Define a altura da logo como 10% da altura do vídeo
+        const logoHeight = Math.max(50, Math.floor(canvas.height / 10)); 
+        // Calcula a largura mantendo a proporção original
+        const logoWidth = (logoImage.naturalWidth / logoImage.naturalHeight) * logoHeight; 
+        
+        // Desenha a logo no canto superior esquerdo com padding
+        ctx.drawImage(logoImage, padding, padding, logoWidth, logoHeight);
+    }
+    
     const dataURL = canvas.toDataURL('image/jpeg', 0.8);
     
     photos.unshift(dataURL); 
@@ -285,6 +331,7 @@ function switchCamera() {
 
 if (openCameraBtn) {
     openCameraBtn.addEventListener('click', openCameraFullscreen);
+    // Tenta iniciar a câmera logo no carregamento para habilitar o botão
     requestCameraPermission(); 
 }
 
