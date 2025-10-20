@@ -568,7 +568,7 @@ if (shareAllBtn && navigator.share) {
         navigator.share({
             files,
             title: "Fotos Qdelícia Frutas",
-            text: " Agícola Qdelícia Frutas|| Fotos",
+            text: " || Agrícola Qdelícia Frutas ||",
         }).catch((error) => {
             if (error.name !== 'AbortError') {
                 alert(`Erro ao compartilhar: ${error.message}`);
