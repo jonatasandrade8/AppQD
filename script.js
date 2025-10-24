@@ -553,8 +553,19 @@ if (downloadAllBtn) {
     });
 }
 
+// ==================== EVENT LISTENERS ====================
+// ... (código anterior preservado) ...
+
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
+        
+        // RECUPERA OS VALORES ATUAIS DOS DROPDOWNS
+        const selectedRede = selectRede.value;
+        const selectedLoja = selectLoja.value;
+        
+        // CRIA O NOVO COMENTÁRIO/TEXTO PARA O WHATSAPP
+        const whatsappText = `|| Qdelícia Frutas || Rede: ${selectedRede} Loja: ${selectedLoja}`;
+        
         const files = photos.slice(0, 3).map((img, i) => {
             const byteString = atob(img.split(",")[1]);
             const ab = new ArrayBuffer(byteString.length);
@@ -568,7 +579,8 @@ if (shareAllBtn && navigator.share) {
         navigator.share({
             files,
             title: "Fotos Qdelícia Frutas",
-            text: " || Agrícola Qdelícia Frutas ||",
+            // <--- LINHA MODIFICADA AQUI: USANDO A NOVA VARIÁVEL whatsappText
+            text: whatsappText, 
         }).catch((error) => {
             if (error.name !== 'AbortError') {
                 alert(`Erro ao compartilhar: ${error.message}`);
