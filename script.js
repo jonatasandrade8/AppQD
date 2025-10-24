@@ -564,7 +564,7 @@ if (shareAllBtn && navigator.share) {
         const selectedLoja = selectLoja.value;
         
         // CRIA O NOVO COMENTÁRIO/TEXTO PARA O WHATSAPP
-        const whatsappText = `__🍍|Agrícola Qdelícia Frutas|🍌__\n___|Rede: ${selectedRede} || Loja: ${selectedLoja}|___`;
+        const whatsappText = `🍍|Agrícola Qdelícia Frutas|🍌\n|Rede: ${selectedRede} || Loja: ${selectedLoja}|`;
         
         const files = photos.slice(0, 3).map((img, i) => {
             const byteString = atob(img.split(",")[1]);
