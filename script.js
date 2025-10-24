@@ -15,7 +15,7 @@ const APP_DATA = {
         "Assaí": ["Maria Lacerda"],
         
     },
-    "Inacio": {
+    "Inácio": {
         "Atacadão": ["Prudente"],
         
     },
