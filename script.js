@@ -64,8 +64,7 @@ const APP_DATA = {
 };
 
 
-// ================= MENU HAMBÚRGUER e VOLTAR AO TOPO (Preservados) =================
-// ... (Código do Menu Hambúrguer)
+// ================= MENU HAMBÚRGUER e VOLTAR AO TOPO =================
 const menuToggle = document.querySelector('.menu-toggle');
 const sideMenu = document.querySelector('.side-menu');
 const menuOverlay = document.querySelector('.menu-overlay');
@@ -89,7 +88,7 @@ if (menuToggle && sideMenu && menuOverlay) {
     });
 }
 
-// ... (Código do Botão Voltar ao Topo)
+// Botão Voltar ao Topo
 const backToTop = document.querySelector('.back-to-top');
 
 if (backToTop) {
@@ -106,7 +105,7 @@ if (backToTop) {
     });
 }
 
-// ... (Código do Carrossel - Preservado)
+// Carrossel
 const carouselSlides = document.querySelector('.carousel-slides');
 const slides = document.querySelectorAll('.carousel-slides .slide');
 const dots = document.querySelectorAll('.carousel-dots .dot');
@@ -156,7 +155,7 @@ const downloadAllBtn = document.getElementById('download-all');
 const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
 
-// NOVOS ELEMENTOS: Dropdowns para Marca D'água
+// Elementos dos Dropdowns para Marca D'água
 const selectPromotor = document.getElementById('select-promotor'); 
 const selectRede = document.getElementById('select-rede'); 
 const selectLoja = document.getElementById('select-loja'); 
@@ -165,7 +164,7 @@ let currentStream = null;
 let usingFrontCamera = false;
 let photos = [];
 let hasCameraPermission = false;
-const localStorageKey = 'qdelicia_last_selection'; // Chave para persistência
+const localStorageKey = 'qdelicia_last_selection';
 
 // Carregar a imagem da logomarca
 const logoImage = new Image();
@@ -173,7 +172,7 @@ logoImage.src = './images/logo-qdelicia.png';
 logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca. Verifique o caminho.");
 
 
-// --- LÓGICA DE DROP DOWNS, PERSISTÊNCIA E VALIDAÇÃO ---
+// ==================== LÓGICA DE DROPDOWNS, PERSISTÊNCIA E VALIDAÇÃO ====================
 
 /**
  * @description Salva as seleções atuais no localStorage.
@@ -272,7 +271,6 @@ function checkCameraAccess() {
             openCameraBtn.disabled = false;
             openCameraBtn.innerHTML = '<i class="fas fa-video"></i> Câmera Pronta';
         } else if (isReady && !hasCameraPermission) {
-            // Acesso liberado, mas esperando a permissão da câmera
             openCameraBtn.disabled = true;
             openCameraBtn.innerHTML = '<i class="fas fa-video"></i> Aguardando Câmera...';
         } else {
@@ -282,7 +280,7 @@ function checkCameraAccess() {
     }
 }
 
-// EVENT LISTENERS para os Dropdowns
+// Event Listeners para os Dropdowns
 if (selectPromotor) {
     selectPromotor.addEventListener('change', () => {
         populateRede(selectPromotor.value);
@@ -300,7 +298,7 @@ if (selectLoja) {
 }
 
 
-// --- LÓGICA DA CÂMERA (requestCameraPermission agora chama checkCameraAccess) ---
+// ==================== LÓGICA DA CÂMERA ====================
 
 /**
  * @description Solicita permissão da câmera e inicia o stream com alta qualidade.
@@ -323,7 +321,7 @@ async function requestCameraPermission() {
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
         hasCameraPermission = true;
-        checkCameraAccess(); // Atualiza o botão
+        checkCameraAccess();
 
     } catch (err) {
         console.error("Erro ao acessar câmera:", err);
@@ -340,37 +338,44 @@ async function requestCameraPermission() {
     }
 }
 
-// ... (openCameraFullscreen e closeCameraFullscreen permanecem iguais) ...
+/**
+ * @description Abre a câmera em modo fullscreen.
+ */
 function openCameraFullscreen() {
     if (!fullscreenCameraContainer) return;
-    // ... (restante da função) ...
     fullscreenCameraContainer.classList.add('active');
     document.body.style.overflow = 'hidden';
     requestCameraPermission();
 }
 
+/**
+ * @description Fecha a câmera fullscreen.
+ */
 function closeCameraFullscreen() {
     if (!fullscreenCameraContainer) return;
-    // ... (restante da função) ...
     fullscreenCameraContainer.classList.remove('active');
     document.body.style.overflow = '';
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
     }
-    checkCameraAccess(); // Chama a verificação para resetar o status do botão
+    checkCameraAccess();
 }
 
-
-// ... (updateDateTime e updatePhotoCounter permanecem iguais) ...
+/**
+ * @description Atualiza a data e hora exibida na marca d'água.
+ */
 function updateDateTime() {
     const now = new Date();
     if (dateTimeElement) {
         dateTimeElement.textContent = now.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
     }
 }
-setInterval(updateDateTime, 1000); 
+setInterval(updateDateTime, 1000);
 
+/**
+ * @description Atualiza o contador de fotos.
+ */
 function updatePhotoCounter() {
     if (photoCountElement) {
         photoCountElement.textContent = photos.length;
@@ -378,7 +383,7 @@ function updatePhotoCounter() {
 }
 
 
-// --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ATUALIZADA ---
+// ==================== CAPTURA DE FOTO COM MARCA D'ÁGUA ====================
 
 /**
  * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva.
@@ -403,7 +408,6 @@ function capturePhoto() {
     // Linhas de texto a serem impressas no canto inferior direito, em ordem inversa de desenho (de baixo para cima)
     const watermarkLines = [dateText, lojaText, redeText, promotorText];
     
-
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
@@ -411,18 +415,16 @@ function capturePhoto() {
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    
-    // --- Configurações Comuns de Estilo e Posição ---
-    const padding = Math.max(15, Math.floor(canvas.height / 80)); // Espaçamento
+    // Configurações Comuns de Estilo e Posição
+    const padding = Math.max(15, Math.floor(canvas.height / 80));
     const textBaseColor = '#FFFFFF';
     const bgColor = 'rgba(0, 0, 0, 0.7)';
     const defaultFontSize = Math.max(20, Math.floor(canvas.height / 40)); 
-    let currentY = canvas.height - padding; // Ponto inicial (canto inferior)
     
     ctx.textAlign = 'right';
     ctx.textBaseline = 'bottom';
     
-    // --- 1. Aplicação da Marca D'água (Texto - Canto Inferior Direito) ---
+    // 1. Aplicação da Marca D'água (Texto - Canto Inferior Direito)
     ctx.font = `${defaultFontSize * 0.9}px Arial, sans-serif`;
     let totalHeight = 0;
     let maxWidth = 0;
@@ -430,32 +432,30 @@ function capturePhoto() {
     // Calcula a largura máxima e a altura total
     watermarkLines.forEach(line => {
         maxWidth = Math.max(maxWidth, ctx.measureText(line).width);
-        totalHeight += defaultFontSize * 0.9 + (padding / 2); // Altura da linha + espaço extra
+        totalHeight += defaultFontSize * 0.9 + (padding / 2);
     });
-    totalHeight -= (padding / 2); // Remove o último espaço extra
+    totalHeight -= (padding / 2);
 
     // Desenha o fundo único para todas as linhas
     ctx.fillStyle = bgColor; 
     ctx.fillRect(
-        canvas.width - maxWidth - 2*padding, // Posição X (começa da direita para a esquerda)
-        canvas.height - totalHeight - 2*padding, // Posição Y (de baixo para cima)
+        canvas.width - maxWidth - 2*padding,
+        canvas.height - totalHeight - 2*padding,
         maxWidth + 2*padding, 
         totalHeight + 2*padding
     );
 
     // Desenha as linhas de texto
     ctx.fillStyle = textBaseColor; 
-    let lineY = canvas.height - 2 * padding; // Posição inicial para o primeiro texto (dateText)
+    let lineY = canvas.height - 2 * padding;
 
-    // Percorre as linhas e desenha de baixo para cima
     for (let i = 0; i < watermarkLines.length; i++) {
         const line = watermarkLines[i];
         ctx.fillText(line, canvas.width - padding, lineY);
-        lineY -= (defaultFontSize * 0.9 + (padding / 2)); // Move para a linha acima
+        lineY -= (defaultFontSize * 0.9 + (padding / 2));
     }
 
-
-    // --- 2. Aplicação da Marca D'água (Logomarca - Canto Superior Esquerdo) ---
+    // 2. Aplicação da Marca D'água (Logomarca - Canto Superior Esquerdo)
     if (logoImage.complete && logoImage.naturalHeight !== 0) {
         const logoHeight = Math.max(50, Math.floor(canvas.height / 10)); 
         const logoWidth = (logoImage.naturalWidth / logoImage.naturalHeight) * logoHeight; 
@@ -475,10 +475,12 @@ function capturePhoto() {
     updateGalleryView();
 }
 
+
+// ==================== GALERIA DE FOTOS ====================
+
 /**
  * @description Atualiza o HTML da galeria com as fotos salvas.
  */
-// ... (updateGalleryView permanece igual) ...
 function updateGalleryView() {
     if (!photoList) return;
 
@@ -502,17 +504,43 @@ function updateGalleryView() {
         photoItem.className = 'photo-item';
         
         photoItem.innerHTML = `
+            <button class="delete-photo-btn" data-index="${index}" title="Remover foto">
+                <i class="fas fa-trash-alt"></i>
+            </button>
             <img src="${photoURL}" alt="Foto ${index + 1}">
             <div class="photo-info">Foto ${index + 1}</div>
         `;
         photoList.appendChild(photoItem);
     });
+    
+    // Adiciona event listeners aos botões de deletar
+    const deleteButtons = photoList.querySelectorAll('.delete-photo-btn');
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.currentTarget.getAttribute('data-index'));
+            deletePhoto(index);
+        });
+    });
+}
+
+/**
+ * @description Remove uma foto específica da galeria.
+ * @param {number} index - Índice da foto a ser removida.
+ */
+function deletePhoto(index) {
+    if (index >= 0 && index < photos.length) {
+        // Confirmação opcional antes de deletar
+        if (confirm('Deseja realmente remover esta foto?')) {
+            photos.splice(index, 1);
+            updatePhotoCounter();
+            updateGalleryView();
+        }
+    }
 }
 
 /**
  * @description Alterna entre as câmeras frontal e traseira.
  */
-// ... (switchCamera permanece igual) ...
 function switchCamera() {
     usingFrontCamera = !usingFrontCamera;
     requestCameraPermission();
@@ -538,7 +566,7 @@ if (switchBtn) {
     switchBtn.addEventListener('click', switchCamera);
 }
 
-// ... (Botões Baixar Todas e Compartilhar Todas - Preservados) ...
+// Botão Baixar Todas as Fotos
 if (downloadAllBtn) {
     downloadAllBtn.addEventListener("click", () => {
         photos.forEach((img, i) => {
@@ -553,17 +581,14 @@ if (downloadAllBtn) {
     });
 }
 
-// ==================== EVENT LISTENERS ====================
-// ... (código anterior preservado) ...
-
+// Botão Compartilhar Todas as Fotos
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
-        
-        // RECUPERA OS VALORES ATUAIS DOS DROPDOWNS
+        // Recupera os valores atuais dos dropdowns
         const selectedRede = selectRede.value;
         const selectedLoja = selectLoja.value;
         
-        // CRIA O NOVO COMENTÁRIO/TEXTO PARA O WHATSAPP
+        // Cria o texto para o WhatsApp
         const whatsappText = `🍍|Agrícola Qdelícia Frutas|🍌\n|Rede: ${selectedRede} || Loja: ${selectedLoja}|`;
         
         const files = photos.slice(0, 3).map((img, i) => {
@@ -579,7 +604,6 @@ if (shareAllBtn && navigator.share) {
         navigator.share({
             files,
             title: "Fotos Qdelícia Frutas",
-            // <--- LINHA MODIFICADA AQUI: USANDO A NOVA VARIÁVEL whatsappText
             text: whatsappText, 
         }).catch((error) => {
             if (error.name !== 'AbortError') {
@@ -592,6 +616,9 @@ if (shareAllBtn && navigator.share) {
         alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manualmente.");
     });
 }
+
+
+// ==================== INICIALIZAÇÃO ====================
 
 // Inicializa a galeria e os dropdowns ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
