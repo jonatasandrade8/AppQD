@@ -675,48 +675,60 @@ hr {
     .start-camera-section {
         min-height: 400px; 
     }
-    /* Botão de remover foto */
+ /* ======================================================
+   ESTILOS PARA BOTÕES DE FOTO INDIVIDUAL (NOVO)
+   ====================================================== */
+
+/* O container da foto (já deve existir, mas garantindo a posição) */
 .photo-item {
     position: relative;
+    overflow: hidden; /* Para os botões não vazarem */
 }
 
-.delete-photo-btn {
+/* Container para os botões (inspirado no camera_geral.html) */
+.photo-controls {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(220, 53, 69, 0.9);
+    top: 8px; /* Distância do topo */
+    right: 8px; /* Distância da direita */
+    display: flex;
+    flex-direction: column; /* Empilha os botões verticalmente */
+    gap: 8px; /* Espaçamento entre os botões */
+    z-index: 5; /* Garante que fiquem acima da info e da imagem */
+}
+
+/* Estilo base para os botões de ícone (inspirado no camera_geral.html) */
+.icon-btn {
+    background-color: rgba(0, 0, 0, 0.6);
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    border-radius: 50%; /* Botões redondos */
+    width: 35px; /* Ajustado para 35px (igual ao delete-btn antigo) */
+    height: 35px; /* Ajustado para 35px */
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 16px;
-    z-index: 10;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    font-size: 14px; /* Tamanho do ícone */
+    transition: background-color 0.2s ease;
 }
 
-.delete-photo-btn:hover {
-    background-color: rgba(200, 35, 51, 1);
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+.icon-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
-.delete-photo-btn:active {
-    transform: scale(0.95);
+/* Variação de cor para o botão de remover (lixeira) */
+.icon-btn.remove-single-btn {
+    background-color: rgba(220, 53, 69, 0.8); /* Vermelho (cor do 'delete-btn' antigo) */
+}
+.icon-btn.remove-single-btn:hover {
+    background-color: rgba(220, 53, 69, 1);
 }
 
-.delete-photo-btn i {
-    pointer-events: none;
+/* Variação de cor para o botão de download */
+.icon-btn.download-single-btn {
+    background-color: rgba(0, 123, 255, 0.8); /* Azul */
 }
-    
-    .gallery {
-        max-width: 800px;
-        margin: 20px auto;
-        padding: 20px;
-    }
+.icon-btn.download-single-btn:hover {
+    background-color: rgba(0, 123, 255, 1);
 }
+
