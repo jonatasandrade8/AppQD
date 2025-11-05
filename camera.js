@@ -113,14 +113,14 @@ function saveSelection() {
 }
 
 /**
- * @description Salva as fotos no localStorage.
+ * @description Salva as fotos no localStorage. (NOVO)
  */
 function savePhotos() {
     localStorage.setItem(localStoragePhotosKey, JSON.stringify(photos));
 }
 
 /**
- * @description Carrega as seleções do localStorage e preenche os dropdowns.
+ * @description Carrega as seleções do localStorage e preenche os dropdowns. (ATUALIZADO)
  */
 function loadAndPopulateDropdowns() {
     // 1. Preenche o Promotor
@@ -145,7 +145,7 @@ function loadAndPopulateDropdowns() {
         }
     }
     
-    // Carrega as fotos salvas
+    // Carrega as fotos salvas (NOVO)
     const savedPhotos = JSON.parse(localStorage.getItem(localStoragePhotosKey));
     if (savedPhotos) {
         photos = savedPhotos;
@@ -157,7 +157,6 @@ function loadAndPopulateDropdowns() {
 
 /**
  * @description Preenche as opções de Rede com base no Promotor selecionado.
- * @param {string} promotor - O nome do promotor selecionado.
  */
 function populateRede(promotor) {
     selectRede.innerHTML = '<option value="" disabled selected>Selecione a Rede</option>';
@@ -179,8 +178,6 @@ function populateRede(promotor) {
 
 /**
  * @description Preenche as opções de Loja com base na Rede e Promotor selecionados.
- * @param {string} promotor - O nome do promotor.
- * @param {string} rede - O nome da rede selecionada.
  */
 function populateLoja(promotor, rede) {
     selectLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
@@ -207,14 +204,14 @@ function checkCameraAccess() {
     if (openCameraBtn) {
         if (isReady && hasCameraPermission) {
             openCameraBtn.disabled = false;
-            openCameraBtn.innerHTML = '<i class="fas fa-video"></i> Câmera Pronta';
+            openCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Abrir Câmera'; // Ícone atualizado
         } else if (isReady && !hasCameraPermission) {
             // Acesso liberado, mas esperando a permissão da câmera
             openCameraBtn.disabled = true;
             openCameraBtn.innerHTML = '<i class="fas fa-video"></i> Aguardando Câmera...';
         } else {
             openCameraBtn.disabled = true;
-            openCameraBtn.innerHTML = '<i class="fas fa-lock"></i> Preencha as Informações Acima';
+            openCameraBtn.innerHTML = '<i class="fas fa-lock"></i> Preencha as Informações';
         }
     }
 }
@@ -314,7 +311,7 @@ function updatePhotoCounter() {
 // --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ATUALIZADA ---
 
 /**
- * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva.
+ * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva. (ATUALIZADO)
  */
 function capturePhoto() {
     if (!selectPromotor.value || !selectRede.value || !selectLoja.value) {
@@ -398,19 +395,14 @@ function capturePhoto() {
     const dataURL = canvas.toDataURL('image/jpeg', 0.8);
     
     photos.unshift(dataURL); // Adiciona a nova foto no início
-    savePhotos(); // Salva as fotos no localStorage
+    savePhotos(); // Salva as fotos no localStorage (NOVO)
     updatePhotoCounter();
     
-    // Não remove mais as fotos antigas aqui, o limite será gerenciado visualmente ou no save/load
-    // if (photos.length > 10) {
-    //     photos.pop(); 
-    // }
-
     updateGalleryView();
 }
 
 /**
- * @description Remove uma foto específica da galeria pelo seu índice.
+ * @description Remove uma foto específica da galeria pelo seu índice. (NOVO)
  * @param {number} index - O índice da foto a ser removida.
  */
 function removePhoto(index) {
@@ -423,7 +415,7 @@ function removePhoto(index) {
 }
 
 /**
- * @description Atualiza o HTML da galeria com as fotos salvas.
+ * @description Atualiza o HTML da galeria com as fotos salvas. (ATUALIZADO)
  */
 function updateGalleryView() {
     if (!photoList) return;
@@ -447,15 +439,18 @@ function updateGalleryView() {
         const photoItem = document.createElement('div');
         photoItem.className = 'photo-item';
         
+        // HTML ATUALIZADO COM O BOTÃO LIXEIRA
         photoItem.innerHTML = `
             <img src="${photoURL}" alt="Foto ${index + 1}">
-            <button class="delete-photo-btn" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
+            <button class="delete-photo-btn" data-index="${index}">
+                <i class="fas fa-trash-alt"></i>
+            </button>
             <div class="photo-info">Foto ${index + 1}</div>
         `;
         photoList.appendChild(photoItem);
     });
 
-    // Adiciona event listeners para os botões de lixeira
+    // Adiciona event listeners para os botões de lixeira (NOVO)
     document.querySelectorAll('.delete-photo-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             const indexToRemove = parseInt(event.currentTarget.dataset.index);
