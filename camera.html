@@ -6,7 +6,62 @@
     <meta name="description" content="Página de Câmera para Registro de Fotos - Qdelícia Frutas">
     <title>Câmera - Qdelícia Frutas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="./style.css"> 
+    <link rel="stylesheet" href="./style.css">
+    <style>
+    
+    .photo-item {
+    position: relative;
+    overflow: hidden; /* Para os botões não vazarem */
+    }
+
+    /* Container para os botões (inspirado no camera_geral.html) */
+    .photo-controls {
+    position: absolute;
+    top: 8px; /* Distância do topo */
+    right: 8px; /* Distância da direita */
+    display: flex;
+    flex-direction: column; /* Empilha os botões verticalmente */
+    gap: 8px; /* Espaçamento entre os botões */
+    z-index: 5; /* Garante que fiquem acima da info e da imagem */
+    }
+
+    /* Estilo base para os botões de ícone (inspirado no camera_geral.html) */
+    .icon-btn {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%; /* Botões redondos */
+    width: 35px; 
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px; /* Tamanho do ícone */
+    transition: background-color 0.2s ease;
+}
+
+.icon-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Variação de cor para o botão de remover (lixeira) */
+.icon-btn.remove-single-btn {
+    background-color: rgba(220, 53, 69, 0.8); /* Vermelho */
+}
+.icon-btn.remove-single-btn:hover {
+    background-color: rgba(220, 53, 69, 1);
+}
+
+/* Variação de cor para o botão de download */
+.icon-btn.download-single-btn {
+    background-color: rgba(0, 123, 255, 0.8); /* Azul */
+}
+.icon-btn.download-single-btn:hover {
+    background-color: rgba(0, 123, 255, 1);
+}
+
+    </style>
 </head>
 <body class="camera-page">
     
