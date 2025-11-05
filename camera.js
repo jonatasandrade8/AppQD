@@ -232,20 +232,14 @@ async function requestCameraPermission() {
     }
 
     try {
-        // --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE ROTAÇÃO) ---
-        // Removemos o 'width' e 'height' ideais para FORÇAR paisagem.
-        // Agora, o navegador irá escolher a melhor resolução PARA A ORIENTAÇÃO ATUAL 
-        // (ex: 1080x1920 em retrato, 1920x1080 em paisagem).
+        // Correção de Rotação (removido width/height fixos)
         const constraints = {
             video: {
                 facingMode: usingFrontCamera ? "user" : "environment"
-                // Removido: width: { ideal: 4096 }, 
-                // Removido: height: { ideal: 2160 }
             },
             audio: false
         };
-        // --- FIM DA MODIFICAÇÃO ---
-
+        
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
         hasCameraPermission = true;
@@ -301,7 +295,6 @@ function updatePhotoCounter() {
 
 
 // --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ---
-// (Esta função NÃO precisa de mudanças. Ela já é flexível)
 /**
  * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva.
  */
@@ -405,8 +398,31 @@ function removePhoto(index) {
     }
 }
 
+// ==================================================================
+// --- INÍCIO DAS NOVAS FUNÇÕES ---
 /**
- * @description Atualiza o HTML da galeria com as fotos salvas.
+ * @description Baixa uma foto individual da galeria. (NOVO)
+ * @param {number} index - O índice da foto a ser baixada.
+ */
+function downloadSinglePhoto(index) {
+    const photoURL = photos[index];
+    if (!photoURL) return;
+
+    const link = document.createElement("a");
+    link.href = photoURL;
+    const date = new Date().toISOString().replace(/:/g, '-').slice(0, 19);
+    // O nome do arquivo incluirá o índice (ex: Foto 1, Foto 2)
+    link.download = `Qdelicia_Foto_${date}_${index + 1}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+// --- FIM DAS NOVAS FUNÇÕES ---
+// ==================================================================
+
+
+/**
+ * @description Atualiza o HTML da galeria com as fotos salvas. (MODIFICADO)
  */
 function updateGalleryView() {
     if (!photoList) return;
@@ -430,26 +446,46 @@ function updateGalleryView() {
         const photoItem = document.createElement('div');
         photoItem.className = 'photo-item';
         
-        // HTML ATUALIZADO COM O BOTÃO LIXEIRA
+        // --- HTML ATUALIZADO COM OS DOIS BOTÕES ---
         photoItem.innerHTML = `
             <img src="${photoURL}" alt="Foto ${index + 1}">
-            <button class="delete-photo-btn" data-index="${index}">
-                <i class="fas fa-trash-alt"></i>
-            </button>
+            
+            <div class="photo-controls">
+                <button class="icon-btn download-single-btn" title="Baixar foto" data-index="${index}">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button class="icon-btn remove-single-btn" title="Remover foto" data-index="${index}">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+            
             <div class="photo-info">Foto ${index + 1}</div>
         `;
+        // --- FIM DA ATUALIZAÇÃO DO HTML ---
+
         photoList.appendChild(photoItem);
     });
 
-    // Adiciona event listeners para os botões de lixeira
-    document.querySelectorAll('.delete-photo-btn').forEach(button => {
+    // --- ATUALIZAÇÃO DOS EVENT LISTENERS ---
+    
+    // Adiciona event listeners para os botões de LIXEIRA (agora .remove-single-btn)
+    document.querySelectorAll('.remove-single-btn').forEach(button => {
         button.addEventListener('click', (event) => {
-            // Impede que o clique se propague para outros elementos
             event.stopPropagation(); 
             const indexToRemove = parseInt(event.currentTarget.dataset.index);
-            removePhoto(indexToRemove);
+            removePhoto(indexToRemove); // Reutiliza a função existente
         });
     });
+    
+    // Adiciona event listeners para os botões de DOWNLOAD (NOVOS)
+    document.querySelectorAll('.download-single-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.stopPropagation(); 
+            const indexToDownload = parseInt(event.currentTarget.dataset.index);
+            downloadSinglePhoto(indexToDownload); // Chama a nova função
+        });
+    });
+    // --- FIM DA ATUALIZAÇÃO DOS LISTENERS ---
 }
 
 /**
@@ -480,6 +516,7 @@ if (switchBtn) {
     switchBtn.addEventListener('click', switchCamera);
 }
 
+// Botão "Baixar Todas" (Função original mantida)
 if (downloadAllBtn) {
     downloadAllBtn.addEventListener("click", () => {
         photos.forEach((img, i) => {
@@ -494,9 +531,7 @@ if (downloadAllBtn) {
     });
 }
 
-// ==================================================================
-// SESSÃO DE COMPARTILHAMENTO - (Mantida como na última versão)
-// ==================================================================
+// Botão "Compartilhar" (Função original mantida)
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
         
@@ -506,7 +541,7 @@ if (shareAllBtn && navigator.share) {
         const loja = selectLoja.options[selectLoja.selectedIndex].text;
         
         // 2. Cria a legenda dinâmica
-        const legendaCompartilhada = `Promotor: ${promotor}\nLoja: ${rede} - ${loja}`;
+        const legendaCompartilhada = `Fotos de: ${promotor}\nRede: ${rede}\nLoja: ${loja}\n\n|| Agrícola Qdelícia Frutas ||`;
 
         const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
@@ -534,30 +569,20 @@ if (shareAllBtn && navigator.share) {
     });
 }
 
-// ==================================================================
-// --- INÍCIO DA MODIFICAÇÃO (OUVINTE DE ROTAÇÃO) ---
-/**
- * @description Lida com a mudança de orientação do dispositivo.
- */
+// Listener de Rotação (Função original mantida)
 function handleOrientationChange() {
-    // Apenas reinicia a câmera se ela estiver aberta (ativa)
     if (currentStream && fullscreenCameraContainer && fullscreenCameraContainer.classList.contains('active')) {
-        
-        // Um pequeno atraso é bom para dar tempo ao navegador se ajustar
         setTimeout(() => {
             requestCameraPermission();
         }, 150);
     }
 }
 
-// Adiciona o "ouvinte" moderno (screen.orientation) e o antigo (orientationchange)
 try {
     screen.orientation.addEventListener("change", handleOrientationChange);
 } catch (e) {
     window.addEventListener("orientationchange", handleOrientationChange);
 }
-// --- FIM DA MODIFICAÇÃO ---
-// ==================================================================
 
 
 // Inicializa a galeria e os dropdowns ao carregar a página
