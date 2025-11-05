@@ -86,10 +86,9 @@ const selectLoja = document.getElementById('select-loja');
 
 let currentStream = null;
 let usingFrontCamera = false;
-let photos = []; // Array de URLs de fotos
+let photos = []; // Array de URLs de fotos (Sempre começará vazio)
 let hasCameraPermission = false;
-const localStorageKey = 'qdelicia_last_selection'; // Chave para persistência
-const localStoragePhotosKey = 'qdelicia_photos'; // Chave para persistência das fotos
+const localStorageKey = 'qdelicia_last_selection'; // Chave para persistência (APENAS DROPDOWNS)
 
 // Carregar a imagem da logomarca
 const logoImage = new Image();
@@ -112,12 +111,6 @@ function saveSelection() {
     checkCameraAccess();
 }
 
-/**
- * @description Salva as fotos no localStorage. (NOVO)
- */
-function savePhotos() {
-    localStorage.setItem(localStoragePhotosKey, JSON.stringify(photos));
-}
 
 /**
  * @description Carrega as seleções do localStorage e preenche os dropdowns. (ATUALIZADO)
@@ -145,12 +138,8 @@ function loadAndPopulateDropdowns() {
         }
     }
     
-    // Carrega as fotos salvas (NOVO)
-    const savedPhotos = JSON.parse(localStorage.getItem(localStoragePhotosKey));
-    if (savedPhotos) {
-        photos = savedPhotos;
-    }
-
+    // NENHUMA FOTO É CARREGADA DAQUI
+    
     // Força a validação inicial do botão
     checkCameraAccess();
 }
@@ -395,20 +384,20 @@ function capturePhoto() {
     const dataURL = canvas.toDataURL('image/jpeg', 0.8);
     
     photos.unshift(dataURL); // Adiciona a nova foto no início
-    savePhotos(); // Salva as fotos no localStorage (NOVO)
+    // savePhotos(); // REMOVIDO
     updatePhotoCounter();
     
     updateGalleryView();
 }
 
 /**
- * @description Remove uma foto específica da galeria pelo seu índice. (NOVO)
+ * @description Remove uma foto específica da galeria pelo seu índice. (ATUALIZADO)
  * @param {number} index - O índice da foto a ser removida.
  */
 function removePhoto(index) {
     if (confirm("Tem certeza que deseja remover esta foto?")) {
         photos.splice(index, 1); // Remove 1 elemento a partir do índice
-        savePhotos(); // Salva as fotos atualizadas
+        // savePhotos(); // REMOVIDO
         updatePhotoCounter();
         updateGalleryView(); // Re-renderiza a galeria
     }
