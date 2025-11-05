@@ -113,7 +113,7 @@ function saveSelection() {
 
 
 /**
- * @description Carrega as seleções do localStorage e preenche os dropdowns. (ATUALIZADO)
+ * @description Carrega as seleções do localStorage e preenche os dropdowns.
  */
 function loadAndPopulateDropdowns() {
     // 1. Preenche o Promotor
@@ -137,9 +137,7 @@ function loadAndPopulateDropdowns() {
             selectLoja.value = savedSelection.loja;
         }
     }
-    
-    // NENHUMA FOTO É CARREGADA DAQUI
-    
+        
     // Força a validação inicial do botão
     checkCameraAccess();
 }
@@ -300,7 +298,7 @@ function updatePhotoCounter() {
 // --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ATUALIZADA ---
 
 /**
- * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva. (ATUALIZADO)
+ * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva.
  */
 function capturePhoto() {
     if (!selectPromotor.value || !selectRede.value || !selectLoja.value) {
@@ -384,27 +382,25 @@ function capturePhoto() {
     const dataURL = canvas.toDataURL('image/jpeg', 0.8);
     
     photos.unshift(dataURL); // Adiciona a nova foto no início
-    // savePhotos(); // REMOVIDO
     updatePhotoCounter();
     
     updateGalleryView();
 }
 
 /**
- * @description Remove uma foto específica da galeria pelo seu índice. (ATUALIZADO)
+ * @description Remove uma foto específica da galeria pelo seu índice.
  * @param {number} index - O índice da foto a ser removida.
  */
 function removePhoto(index) {
     if (confirm("Tem certeza que deseja remover esta foto?")) {
         photos.splice(index, 1); // Remove 1 elemento a partir do índice
-        // savePhotos(); // REMOVIDO
         updatePhotoCounter();
         updateGalleryView(); // Re-renderiza a galeria
     }
 }
 
 /**
- * @description Atualiza o HTML da galeria com as fotos salvas. (ATUALIZADO)
+ * @description Atualiza o HTML da galeria com as fotos salvas.
  */
 function updateGalleryView() {
     if (!photoList) return;
@@ -439,7 +435,7 @@ function updateGalleryView() {
         photoList.appendChild(photoItem);
     });
 
-    // Adiciona event listeners para os botões de lixeira (NOVO)
+    // Adiciona event listeners para os botões de lixeira
     document.querySelectorAll('.delete-photo-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             // Impede que o clique se propague para outros elementos
@@ -492,8 +488,24 @@ if (downloadAllBtn) {
     });
 }
 
+// ==================================================================
+// SESSÃO DE COMPARTILHAMENTO - AJUSTADA
+// ==================================================================
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
+        
+        // ---- INÍCIO DA ALTERAÇÃO ----
+        
+        // 1. Captura os dados dos dropdowns para a legenda
+        const promotor = selectPromotor.options[selectPromotor.selectedIndex].text;
+        const rede = selectRede.options[selectRede.selectedIndex].text;
+        const loja = selectLoja.options[selectLoja.selectedIndex].text;
+        
+        // 2. Cria a legenda dinâmica
+        const legendaCompartilhada = `${promotor}\nRede: ${rede}\nLoja: ${loja}`;
+
+        // ---- FIM DA ALTERAÇÃO ----
+
         const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
             const ab = new ArrayBuffer(byteString.length);
@@ -507,7 +519,7 @@ if (shareAllBtn && navigator.share) {
         navigator.share({
             files,
             title: "Fotos Qdelícia Frutas",
-            text: " || Agrícola Qdelícia Frutas ||",
+            text: legendaCompartilhada, // Usa a nova legenda dinâmica
         }).catch((error) => {
             if (error.name !== 'AbortError') {
                 alert(`Erro ao compartilhar: ${error.message}`);
@@ -519,6 +531,7 @@ if (shareAllBtn && navigator.share) {
         alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manualmente.");
     });
 }
+// ==================================================================
 
 // Inicializa a galeria e os dropdowns ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
