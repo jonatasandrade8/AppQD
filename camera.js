@@ -224,7 +224,7 @@ if (selectLoja) {
 // --- LÓGICA DA CÂMERA (requestCameraPermission agora chama checkCameraAccess) ---
 
 /**
- * @description Solicita permissão da câmera e inicia o stream com alta qualidade.
+ * @description Solicita permissão da câmera e inicia o stream. (MODIFICADO)
  */
 async function requestCameraPermission() {
     if (currentStream) {
@@ -232,14 +232,19 @@ async function requestCameraPermission() {
     }
 
     try {
+        // --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE ROTAÇÃO) ---
+        // Removemos o 'width' e 'height' ideais para FORÇAR paisagem.
+        // Agora, o navegador irá escolher a melhor resolução PARA A ORIENTAÇÃO ATUAL 
+        // (ex: 1080x1920 em retrato, 1920x1080 em paisagem).
         const constraints = {
             video: {
-                facingMode: usingFrontCamera ? "user" : "environment",
-                width: { ideal: 4096 }, 
-                height: { ideal: 2160 }
+                facingMode: usingFrontCamera ? "user" : "environment"
+                // Removido: width: { ideal: 4096 }, 
+                // Removido: height: { ideal: 2160 }
             },
             audio: false
         };
+        // --- FIM DA MODIFICAÇÃO ---
 
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
@@ -295,8 +300,8 @@ function updatePhotoCounter() {
 }
 
 
-// --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ATUALIZADA ---
-
+// --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ---
+// (Esta função NÃO precisa de mudanças. Ela já é flexível)
 /**
  * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva.
  */
@@ -324,6 +329,7 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
+    // O canvas terá o tamanho do *stream* de vídeo (seja retrato ou paisagem)
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -489,12 +495,10 @@ if (downloadAllBtn) {
 }
 
 // ==================================================================
-// SESSÃO DE COMPARTILHAMENTO - AJUSTADA
+// SESSÃO DE COMPARTILHAMENTO - (Mantida como na última versão)
 // ==================================================================
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
-        
-        // ---- INÍCIO DA ALTERAÇÃO ----
         
         // 1. Captura os dados dos dropdowns para a legenda
         const promotor = selectPromotor.options[selectPromotor.selectedIndex].text;
@@ -503,8 +507,6 @@ if (shareAllBtn && navigator.share) {
         
         // 2. Cria a legenda dinâmica
         const legendaCompartilhada = `${promotor}\nRede: ${rede}\nLoja: ${loja}`;
-
-        // ---- FIM DA ALTERAÇÃO ----
 
         const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
@@ -531,7 +533,32 @@ if (shareAllBtn && navigator.share) {
         alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manualmente.");
     });
 }
+
 // ==================================================================
+// --- INÍCIO DA MODIFICAÇÃO (OUVINTE DE ROTAÇÃO) ---
+/**
+ * @description Lida com a mudança de orientação do dispositivo.
+ */
+function handleOrientationChange() {
+    // Apenas reinicia a câmera se ela estiver aberta (ativa)
+    if (currentStream && fullscreenCameraContainer && fullscreenCameraContainer.classList.contains('active')) {
+        
+        // Um pequeno atraso é bom para dar tempo ao navegador se ajustar
+        setTimeout(() => {
+            requestCameraPermission();
+        }, 150);
+    }
+}
+
+// Adiciona o "ouvinte" moderno (screen.orientation) e o antigo (orientationchange)
+try {
+    screen.orientation.addEventListener("change", handleOrientationChange);
+} catch (e) {
+    window.addEventListener("orientationchange", handleOrientationChange);
+}
+// --- FIM DA MODIFICAÇÃO ---
+// ==================================================================
+
 
 // Inicializa a galeria e os dropdowns ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
