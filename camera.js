@@ -453,6 +453,8 @@ function updateGalleryView() {
     // Adiciona event listeners para os botões de lixeira (NOVO)
     document.querySelectorAll('.delete-photo-btn').forEach(button => {
         button.addEventListener('click', (event) => {
+            // Impede que o clique se propague para outros elementos
+            event.stopPropagation(); 
             const indexToRemove = parseInt(event.currentTarget.dataset.index);
             removePhoto(indexToRemove);
         });
