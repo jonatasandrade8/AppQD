@@ -675,8 +675,8 @@ hr {
     .start-camera-section {
         min-height: 400px; 
     }
- /* ======================================================
-   ESTILOS PARA BOTÕES DE FOTO INDIVIDUAL (NOVO)
+/* ======================================================
+   ESTILOS PARA BOTÕES DE FOTO INDIVIDUAL 
    ====================================================== */
 
 /* O container da foto (já deve existir, mas garantindo a posição) */
@@ -702,8 +702,8 @@ hr {
     color: white;
     border: none;
     border-radius: 50%; /* Botões redondos */
-    width: 35px; /* Ajustado para 35px (igual ao delete-btn antigo) */
-    height: 35px; /* Ajustado para 35px */
+    width: 35px; 
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -718,7 +718,7 @@ hr {
 
 /* Variação de cor para o botão de remover (lixeira) */
 .icon-btn.remove-single-btn {
-    background-color: rgba(220, 53, 69, 0.8); /* Vermelho (cor do 'delete-btn' antigo) */
+    background-color: rgba(220, 53, 69, 0.8); /* Vermelho */
 }
 .icon-btn.remove-single-btn:hover {
     background-color: rgba(220, 53, 69, 1);
@@ -731,4 +731,3 @@ hr {
 .icon-btn.download-single-btn:hover {
     background-color: rgba(0, 123, 255, 1);
 }
-
