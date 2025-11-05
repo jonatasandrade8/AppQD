@@ -86,9 +86,10 @@ const selectLoja = document.getElementById('select-loja');
 
 let currentStream = null;
 let usingFrontCamera = false;
-let photos = [];
+let photos = []; // Array de URLs de fotos
 let hasCameraPermission = false;
 const localStorageKey = 'qdelicia_last_selection'; // Chave para persistência
+const localStoragePhotosKey = 'qdelicia_photos'; // Chave para persistência das fotos
 
 // Carregar a imagem da logomarca
 const logoImage = new Image();
@@ -109,6 +110,13 @@ function saveSelection() {
     };
     localStorage.setItem(localStorageKey, JSON.stringify(selection));
     checkCameraAccess();
+}
+
+/**
+ * @description Salva as fotos no localStorage.
+ */
+function savePhotos() {
+    localStorage.setItem(localStoragePhotosKey, JSON.stringify(photos));
 }
 
 /**
@@ -137,6 +145,12 @@ function loadAndPopulateDropdowns() {
         }
     }
     
+    // Carrega as fotos salvas
+    const savedPhotos = JSON.parse(localStorage.getItem(localStoragePhotosKey));
+    if (savedPhotos) {
+        photos = savedPhotos;
+    }
+
     // Força a validação inicial do botão
     checkCameraAccess();
 }
@@ -263,10 +277,8 @@ async function requestCameraPermission() {
     }
 }
 
-// ... (openCameraFullscreen e closeCameraFullscreen permanecem iguais) ...
 function openCameraFullscreen() {
     if (!fullscreenCameraContainer) return;
-    // ... (restante da função) ...
     fullscreenCameraContainer.classList.add('active');
     document.body.style.overflow = 'hidden';
     requestCameraPermission();
@@ -274,7 +286,6 @@ function openCameraFullscreen() {
 
 function closeCameraFullscreen() {
     if (!fullscreenCameraContainer) return;
-    // ... (restante da função) ...
     fullscreenCameraContainer.classList.remove('active');
     document.body.style.overflow = '';
     if (currentStream) {
@@ -285,7 +296,6 @@ function closeCameraFullscreen() {
 }
 
 
-// ... (updateDateTime e updatePhotoCounter permanecem iguais) ...
 function updateDateTime() {
     const now = new Date();
     if (dateTimeElement) {
@@ -340,7 +350,6 @@ function capturePhoto() {
     const textBaseColor = '#FFFFFF';
     const bgColor = 'rgba(0, 0, 0, 0.7)';
     const defaultFontSize = Math.max(20, Math.floor(canvas.height / 40)); 
-    let currentY = canvas.height - padding; // Ponto inicial (canto inferior)
     
     ctx.textAlign = 'right';
     ctx.textBaseline = 'bottom';
@@ -388,20 +397,34 @@ function capturePhoto() {
     
     const dataURL = canvas.toDataURL('image/jpeg', 0.8);
     
-    photos.unshift(dataURL); 
+    photos.unshift(dataURL); // Adiciona a nova foto no início
+    savePhotos(); // Salva as fotos no localStorage
     updatePhotoCounter();
     
-    if (photos.length > 10) {
-        photos.pop(); 
-    }
+    // Não remove mais as fotos antigas aqui, o limite será gerenciado visualmente ou no save/load
+    // if (photos.length > 10) {
+    //     photos.pop(); 
+    // }
 
     updateGalleryView();
 }
 
 /**
+ * @description Remove uma foto específica da galeria pelo seu índice.
+ * @param {number} index - O índice da foto a ser removida.
+ */
+function removePhoto(index) {
+    if (confirm("Tem certeza que deseja remover esta foto?")) {
+        photos.splice(index, 1); // Remove 1 elemento a partir do índice
+        savePhotos(); // Salva as fotos atualizadas
+        updatePhotoCounter();
+        updateGalleryView(); // Re-renderiza a galeria
+    }
+}
+
+/**
  * @description Atualiza o HTML da galeria com as fotos salvas.
  */
-// ... (updateGalleryView permanece igual) ...
 function updateGalleryView() {
     if (!photoList) return;
 
@@ -426,16 +449,24 @@ function updateGalleryView() {
         
         photoItem.innerHTML = `
             <img src="${photoURL}" alt="Foto ${index + 1}">
+            <button class="delete-photo-btn" data-index="${index}"><i class="fas fa-trash-alt"></i></button>
             <div class="photo-info">Foto ${index + 1}</div>
         `;
         photoList.appendChild(photoItem);
+    });
+
+    // Adiciona event listeners para os botões de lixeira
+    document.querySelectorAll('.delete-photo-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const indexToRemove = parseInt(event.currentTarget.dataset.index);
+            removePhoto(indexToRemove);
+        });
     });
 }
 
 /**
  * @description Alterna entre as câmeras frontal e traseira.
  */
-// ... (switchCamera permanece igual) ...
 function switchCamera() {
     usingFrontCamera = !usingFrontCamera;
     requestCameraPermission();
@@ -461,7 +492,6 @@ if (switchBtn) {
     switchBtn.addEventListener('click', switchCamera);
 }
 
-// ... (Botões Baixar Todas e Compartilhar Todas - Preservados) ...
 if (downloadAllBtn) {
     downloadAllBtn.addEventListener("click", () => {
         photos.forEach((img, i) => {
@@ -478,7 +508,7 @@ if (downloadAllBtn) {
 
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
-        const files = photos.slice(0, 3).map((img, i) => {
+        const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
             const ab = new ArrayBuffer(byteString.length);
             const ia = new Uint8Array(ab);
@@ -500,7 +530,7 @@ if (shareAllBtn && navigator.share) {
     });
 } else if (shareAllBtn) {
     shareAllBtn.addEventListener("click", () => {
-        alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manually.");
+        alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manualmente.");
     });
 }
 
