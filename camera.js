@@ -87,7 +87,7 @@ const selectLoja = document.getElementById('select-loja');
 let currentStream = null;
 let usingFrontCamera = false;
 let photos = []; // Array de URLs de fotos (Sempre começará vazio)
-let hasCameraPermission = false;
+let hasCameraPermission = false; // Inicia como 'false'
 const localStorageKey = 'qdelicia_last_selection'; // Chave para persistência (APENAS DROPDOWNS)
 
 // Carregar a imagem da logomarca
@@ -182,26 +182,29 @@ function populateLoja(promotor, rede) {
     }
 }
 
+// ==================================================================
+// --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE PERMISSÃO) ---
 /**
- * @description Verifica se todos os campos estão preenchidos para liberar a câmera.
+ * @description Verifica se os dropdowns estão preenchidos para liberar o botão da câmera.
  */
 function checkCameraAccess() {
     const isReady = selectPromotor.value && selectRede.value && selectLoja.value;
     
     if (openCameraBtn) {
-        if (isReady && hasCameraPermission) {
+        if (isReady) {
+            // Se os dropdowns estiverem preenchidos, o botão está pronto para TENTAR abrir.
             openCameraBtn.disabled = false;
-            openCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Abrir Câmera'; // Ícone atualizado
-        } else if (isReady && !hasCameraPermission) {
-            // Acesso liberado, mas esperando a permissão da câmera
-            openCameraBtn.disabled = true;
-            openCameraBtn.innerHTML = '<i class="fas fa-video"></i> Aguardando Câmera...';
+            openCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Abrir Câmera';
         } else {
+            // Dropdowns não preenchidos, botão bloqueado.
             openCameraBtn.disabled = true;
             openCameraBtn.innerHTML = '<i class="fas fa-lock"></i> Preencha as Informações';
         }
     }
 }
+// --- FIM DA MODIFICAÇÃO ---
+// ==================================================================
+
 
 // EVENT LISTENERS para os Dropdowns
 if (selectPromotor) {
@@ -224,7 +227,7 @@ if (selectLoja) {
 // --- LÓGICA DA CÂMERA (requestCameraPermission agora chama checkCameraAccess) ---
 
 /**
- * @description Solicita permissão da câmera e inicia o stream. (MODIFICADO)
+ * @description Solicita permissão da câmera e inicia o stream.
  */
 async function requestCameraPermission() {
     if (currentStream) {
@@ -242,29 +245,29 @@ async function requestCameraPermission() {
         
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
-        hasCameraPermission = true;
-        checkCameraAccess(); // Atualiza o botão
+        hasCameraPermission = true; // Permissão concedida!
+        // checkCameraAccess(); // Não é mais necessário aqui
 
     } catch (err) {
         console.error("Erro ao acessar câmera:", err);
-        if (fullscreenCameraContainer && fullscreenCameraContainer.classList.contains('active')) {
-            alert("Não foi possível iniciar a câmera. Verifique as permissões de acesso.");
-            closeCameraFullscreen();
-        }
+        // Se o usuário negar, hasCameraPermission continuará 'false'
         hasCameraPermission = false;
         
-        if (openCameraBtn) {
-            openCameraBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Sem Acesso à Câmera';
-            openCameraBtn.disabled = true;
-        }
+        // Alerta o usuário e fecha a tela cheia se algo der errado
+        alert("Não foi possível iniciar a câmera. Verifique as permissões de acesso no seu navegador.");
+        closeCameraFullscreen(); // Fecha a interface da câmera
     }
 }
 
-function openCameraFullscreen() {
+async function openCameraFullscreen() {
     if (!fullscreenCameraContainer) return;
+    
+    // Mostra a interface da câmera
     fullscreenCameraContainer.classList.add('active');
     document.body.style.overflow = 'hidden';
-    requestCameraPermission();
+    
+    // Tenta pedir a permissão (só é chamado aqui, no clique)
+    await requestCameraPermission();
 }
 
 function closeCameraFullscreen() {
@@ -275,7 +278,10 @@ function closeCameraFullscreen() {
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
     }
-    checkCameraAccess(); // Chama a verificação para resetar o status do botão
+    // --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE PERMISSÃO) ---
+    hasCameraPermission = false; // Reinicia o estado da permissão
+    // --- FIM DA MODIFICAÇÃO ---
+    checkCameraAccess(); // Verifica o estado do botão (que voltará a checar os dropdowns)
 }
 
 
@@ -304,6 +310,7 @@ function capturePhoto() {
         return;
     }
 
+    // A verificação de permissão é crucial aqui
     if (!hasCameraPermission || !video || video.readyState < 2) {
         alert("Câmera não está pronta ou permissão não concedida.");
         return;
@@ -318,7 +325,6 @@ function capturePhoto() {
     // Linhas de texto a serem impressas no canto inferior direito, em ordem inversa de desenho (de baixo para cima)
     const watermarkLines = [dateText, lojaText, redeText, promotorText];
     
-
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
@@ -398,10 +404,8 @@ function removePhoto(index) {
     }
 }
 
-// ==================================================================
-// --- INÍCIO DAS NOVAS FUNÇÕES ---
 /**
- * @description Baixa uma foto individual da galeria. (NOVO)
+ * @description Baixa uma foto individual da galeria.
  * @param {number} index - O índice da foto a ser baixada.
  */
 function downloadSinglePhoto(index) {
@@ -417,12 +421,10 @@ function downloadSinglePhoto(index) {
     link.click();
     document.body.removeChild(link);
 }
-// --- FIM DAS NOVAS FUNÇÕES ---
-// ==================================================================
 
 
 /**
- * @description Atualiza o HTML da galeria com as fotos salvas. (MODIFICADO)
+ * @description Atualiza o HTML da galeria com as fotos salvas.
  */
 function updateGalleryView() {
     if (!photoList) return;
@@ -493,16 +495,22 @@ function updateGalleryView() {
  */
 function switchCamera() {
     usingFrontCamera = !usingFrontCamera;
+    // Reinicia a câmera com a nova configuração
     requestCameraPermission();
 }
 
 
 // ==================== EVENT LISTENERS ====================
 
+// ==================================================================
+// --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE PERMISSÃO) ---
 if (openCameraBtn) {
     openCameraBtn.addEventListener('click', openCameraFullscreen);
-    requestCameraPermission(); 
+    // A chamada requestCameraPermission() FOI REMOVIDA DAQUI
 }
+// --- FIM DA MODIFICAÇÃO ---
+// ==================================================================
+
 
 if (backToGalleryBtn) {
     backToGalleryBtn.addEventListener('click', closeCameraFullscreen);
@@ -541,7 +549,7 @@ if (shareAllBtn && navigator.share) {
         const loja = selectLoja.options[selectLoja.selectedIndex].text;
         
         // 2. Cria a legenda dinâmica
-        const legendaCompartilhada = `Fotos de: ${promotor}\nRede: ${rede}\nLoja: ${loja}\n\n|| Agrícola Qdelícia Frutas ||`;
+        const legendaCompartilhada = `${promotor}\nLoja ${rede} - ${loja}`;
 
         const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
