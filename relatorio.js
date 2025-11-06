@@ -738,7 +738,7 @@ async function generatePDFReport(action) {
     pdf.text(splitObs, margin, yPos);
     yPos += (splitObs.length * 5) + 2;
 
-    const fileName = `Rel_${reportType}_${rede}_${loja}_${date.split(' ')[0].replace(/\//g, '-')}.pdf`;
+    const fileName = `Relat_${reportType}_${rede}_${loja}_${date.split(' ')[0].replace(/\//g, '-')}.pdf`;
 
     if (action === 'download') {
         pdf.save(fileName);
