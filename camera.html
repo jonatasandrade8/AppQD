@@ -62,6 +62,168 @@
 }
 
     </style>
+    
+    <style>
+    /* ---------------------------------------------------- */
+    /* CSS SUGERIDO PARA INTERFACE NATIVA (deve ir em style.css) */
+    /* ---------------------------------------------------- */
+    
+    /* Reposiciona o botão de voltar/fechar */
+    #back-to-gallery-btn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* Estilo do contador de fotos (melhor posicionado) */
+    #photo-count {
+        position: absolute;
+        top: 20px;
+        right: 15px;
+        z-index: 10;
+        background-color: rgba(255, 193, 7, 0.9); /* Amarelo/Dourado (Qdelícia) */
+        color: black;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    
+    /* Novo container para Flash e Zoom - Topo Esquerdo */
+    .advanced-controls {
+        position: absolute;
+        top: 70px; /* Abaixo do back-to-gallery-btn */
+        left: 10px;
+        z-index: 10;
+        display: none; /* Escondido por padrão, mostrado por JS */
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* Estilo do botão de Flash */
+    #flash-toggle-btn {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    
+    /* Indicador visual de Flash Ligado */
+    .flash-on {
+        background-color: #ffc107; /* Cor de destaque (Amarelo) */
+        color: black;
+    }
+
+    /* Controles de Zoom */
+    .zoom-controls {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 20px;
+    }
+    
+    /* Range de Zoom (Slider) */
+    #zoom-range {
+        width: 120px;
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+    }
+    #zoom-range::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #fff;
+        cursor: pointer;
+    }
+
+    .zoom-controls button {
+        background-color: transparent;
+        color: white;
+        border: none;
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    
+    /* Reposiciona a Marca D'água (Timestamp) - Canto Inferior Esquerdo */
+    .watermark {
+        position: absolute;
+        bottom: 100px; /* Acima dos controles do obturador */
+        left: 10px;
+        padding: 5px 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border-radius: 5px;
+        font-size: 0.8em;
+        z-index: 10;
+    }
+
+    /* Controles Inferiores (Obturador e Switch) */
+    .controls {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10;
+        max-width: 400px; /* Limita a largura para dispositivos maiores */
+    }
+    
+    /* Botão de Troca de Câmera (Switch) - Lado Esquerdo */
+    #switch-btn {
+        order: 1; /* Posição 1 (Esquerda) */
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    /* Botão de Obturador (Shutter) - Centro */
+    #shutter-btn {
+        order: 2; /* Posição 2 (Centro) */
+        background-color: white;
+        border: 4px solid rgba(255, 255, 255, 0.7);
+        width: 70px;
+        height: 70px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Adiciona um anel externo no obturador */
+    #shutter-btn::after {
+        content: '';
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        border: 3px solid black;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    
+    /* Espaço Vazio para alinhamento - Lado Direito */
+    .controls::after {
+        content: '';
+        order: 3; /* Posição 3 (Direita) */
+        width: 50px; /* Igual ao switch-btn para centralizar o shutter */
+    }
+
+    </style>
 </head>
 <body class="camera-page">
     
@@ -155,7 +317,17 @@
             <button id="back-to-gallery-btn"><i class="fas fa-times"></i></button>
 
             <div id="photo-count">0</div>
-
+            
+            <div class="advanced-controls">
+                <button id="flash-toggle-btn" class="icon-btn flash-off" title="Ligar/Desligar Flash">
+                    <i class="fas fa-bolt"></i>
+                </button>
+                <div class="zoom-controls">
+                    <button id="zoom-out-btn" title="Menos Zoom"><i class="fas fa-minus"></i></button>
+                    <input type="range" id="zoom-range" min="1" max="10" value="1" step="0.1" title="Controle de Zoom">
+                    <button id="zoom-in-btn" title="Mais Zoom"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
             <div class="camera-container">
                 <video id="video" autoplay playsinline></video>
             </div>
