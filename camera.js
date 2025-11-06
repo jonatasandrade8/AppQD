@@ -37,7 +37,7 @@ const APP_DATA = {
         "Atacadão": ["BR-101 Sul"]
     },
     "Jordão": {
-        "Superfácil": ["Olho d'Água"],
+        "Superfácil": ["Olho d'Água", "Emaús"],
         "Assaí": ["Ponta Negra"],
         "Mar Vermelho": ["BR-101 Sul"]
     },
@@ -549,7 +549,7 @@ if (shareAllBtn && navigator.share) {
         const loja = selectLoja.options[selectLoja.selectedIndex].text;
         
         // 2. Cria a legenda dinâmica
-        const legendaCompartilhada = `${promotor}\nLoja ${rede} - ${loja}`;
+        const legendaCompartilhada = `Promotor: ${promotor}\nLoja: ${rede} ${loja}`;
 
         const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
