@@ -93,7 +93,6 @@ const localStorageKey = 'qdelicia_last_selection'; // Chave para persistência (
 // Variáveis para Zoom e Flash
 let currentZoom = 1; // Zoom inicial
 let maxZoom = 1; // Zoom máximo suportado pelo dispositivo
-let isFlashOn = false; // Estado do flash
 let deviceOrientation = 0; // Orientação do dispositivo em graus
 
 // Carregar a imagem da logomarca
@@ -273,9 +272,6 @@ async function requestCameraPermission() {
         
         // Detectar orientação do dispositivo
         detectDeviceOrientation();
-        
-        // Verificar suporte a flash (torch)
-        checkFlashSupport();
 
     } catch (err) {
         console.error("Erro ao acessar câmera:", err);
@@ -600,114 +596,6 @@ function updateZoomButtons() {
     }
 }
 
-// ==================== FUNCIONALIDADES DE FLASH ====================
-
-/**
- * @description Alterna o estado do flash (torch)
- */
-function toggleFlash() {
-    if (!currentStream) return;
-    
-    const videoTrack = currentStream.getVideoTracks()[0];
-    if (!videoTrack) return;
-    
-    try {
-        // Alternar o estado do flash
-        isFlashOn = !isFlashOn;
-        
-        // Tentar aplicar a restrição de torch
-        const constraints = {
-            advanced: [{ torch: isFlashOn }]
-        };
-        
-        videoTrack.applyConstraints(constraints).then(() => {
-            updateFlashButton();
-            console.log('Flash ' + (isFlashOn ? 'ligado' : 'desligado'));
-        }).catch(err => {
-            console.error('Erro ao aplicar flash com applyConstraints:', err);
-            
-            // Tentar com getSettings e setSettings (fallback)
-            try {
-                if (videoTrack.getSettings) {
-                    const settings = videoTrack.getSettings();
-                    console.log('Configurações atuais:', settings);
-                }
-                
-                // Tentar novamente com delay
-                setTimeout(() => {
-                    videoTrack.applyConstraints(constraints).then(() => {
-                        updateFlashButton();
-                        console.log('Flash ' + (isFlashOn ? 'ligado' : 'desligado') + ' (retry)');
-                    }).catch(err2 => {
-                        console.error('Erro no retry:', err2);
-                        isFlashOn = !isFlashOn;
-                        updateFlashButton();
-                    });
-                }, 100);
-            } catch (fallbackErr) {
-                console.error('Erro no fallback:', fallbackErr);
-                isFlashOn = !isFlashOn;
-                updateFlashButton();
-            }
-        });
-    } catch (err) {
-        console.error('Erro ao alternar flash:', err);
-        isFlashOn = !isFlashOn;
-        updateFlashButton();
-    }
-}
-
-/**
- * @description Atualiza o estado visual do botão de flash
- */
-function updateFlashButton() {
-    const flashBtn = document.getElementById('flash-btn');
-    const flashStatus = document.getElementById('flash-status');
-    
-    if (flashBtn) {
-        if (isFlashOn) {
-            flashBtn.classList.add('active');
-            flashBtn.title = 'Desativar Flash';
-        } else {
-            flashBtn.classList.remove('active');
-            flashBtn.title = 'Ativar Flash';
-        }
-    }
-    
-    if (flashStatus) {
-        if (isFlashOn) {
-            flashStatus.textContent = 'ON';
-            flashStatus.classList.add('on');
-        } else {
-            flashStatus.textContent = 'OFF';
-            flashStatus.classList.remove('on');
-        }
-    }
-}
-
-/**
- * @description Verifica se o dispositivo suporta flash
- */
-function checkFlashSupport() {
-    if (!currentStream) return false;
-    
-    const videoTrack = currentStream.getVideoTracks()[0];
-    if (!videoTrack) return false;
-    
-    try {
-        const capabilities = videoTrack.getCapabilities();
-        console.log('Capacidades do dispositivo:', capabilities);
-        
-        if (capabilities && capabilities.torch) {
-            console.log('Flash (torch) suportado!');
-            return true;
-        }
-    } catch (err) {
-        console.warn('Não foi possível verificar capacidades:', err);
-    }
-    
-    return false;
-}
 // ==================== DETECÇÃO DE ORIENTAÇÃO DO DISPOSITIVO ====================
 
 /**
@@ -790,12 +678,6 @@ if (zoomInBtn) {
 const zoomOutBtn = document.getElementById('zoom-out-btn');
 if (zoomOutBtn) {
     zoomOutBtn.addEventListener('click', zoomOut);
-}
-
-// Event listener para Flash
-const flashBtn = document.getElementById('flash-btn');
-if (flashBtn) {
-    flashBtn.addEventListener('click', toggleFlash);
 }
 
 // Botão "Baixar Todas" (Função original mantida)
