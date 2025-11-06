@@ -533,7 +533,7 @@ function takePhoto() {
     const promotor = selectPromotor.value;
     const rede = selectRede.value;
     const loja = selectLoja.value;
-    const reportType = selectReportType.value === 'qualidade' ? 'QUALIDADE' : 'DEVOLUÇÃO';
+    const reportType = selectReportType.value === 'Qualidade' ? 'QUALIDADE' : 'DEVOLUÇÃO';
     const now = new Date();
     const dateStr = now.toLocaleDateString('pt-BR');
     const timeStr = now.toLocaleTimeString('pt-BR');
@@ -676,7 +676,7 @@ async function generatePDFReport(action) {
     const rede = selectRede.value;
     const loja = selectLoja.value;
     const reportType = selectReportType.value; // Pega o tipo de relatório
-    const reportTitle = reportType === 'qualidade' ? 'Relatório de Qualidade' : 'Relatório de Devolução'; // Título dinâmico
+    const reportTitle = reportType === 'Qualidade' ? 'Relatório de Qualidade' : 'Relatório de Devolução'; // Título dinâmico
     const observacoes = inputObservacoes.value.trim() || 'Nenhuma observação.';
     const date = new Date().toLocaleString('pt-BR');
     let yPos = margin;
@@ -738,7 +738,7 @@ async function generatePDFReport(action) {
     pdf.text(splitObs, margin, yPos);
     yPos += (splitObs.length * 5) + 2;
 
-    const fileName = `relatorio_${reportType}_${rede}_${loja}_${date.split(' ')[0].replace(/\//g, '-')}.pdf`;
+    const fileName = `Rel_${reportType}_${rede}_${loja}_${date.split(' ')[0].replace(/\//g, '-')}.pdf`;
 
     if (action === 'download') {
         pdf.save(fileName);
