@@ -273,6 +273,9 @@ async function requestCameraPermission() {
         
         // Detectar orientação do dispositivo
         detectDeviceOrientation();
+        
+        // Verificar suporte a flash (torch)
+        checkFlashSupport();
 
     } catch (err) {
         console.error("Erro ao acessar câmera:", err);
@@ -613,20 +616,42 @@ function toggleFlash() {
         isFlashOn = !isFlashOn;
         
         // Tentar aplicar a restrição de torch
-        videoTrack.applyConstraints({
+        const constraints = {
             advanced: [{ torch: isFlashOn }]
-        }).then(() => {
+        };
+        
+        videoTrack.applyConstraints(constraints).then(() => {
             updateFlashButton();
             console.log('Flash ' + (isFlashOn ? 'ligado' : 'desligado'));
         }).catch(err => {
-            console.error('Erro ao aplicar flash:', err);
-            // Se falhar, reverter o estado
-            isFlashOn = !isFlashOn;
-            updateFlashButton();
+            console.error('Erro ao aplicar flash com applyConstraints:', err);
+            
+            // Tentar com getSettings e setSettings (fallback)
+            try {
+                if (videoTrack.getSettings) {
+                    const settings = videoTrack.getSettings();
+                    console.log('Configurações atuais:', settings);
+                }
+                
+                // Tentar novamente com delay
+                setTimeout(() => {
+                    videoTrack.applyConstraints(constraints).then(() => {
+                        updateFlashButton();
+                        console.log('Flash ' + (isFlashOn ? 'ligado' : 'desligado') + ' (retry)');
+                    }).catch(err2 => {
+                        console.error('Erro no retry:', err2);
+                        isFlashOn = !isFlashOn;
+                        updateFlashButton();
+                    });
+                }, 100);
+            } catch (fallbackErr) {
+                console.error('Erro no fallback:', fallbackErr);
+                isFlashOn = !isFlashOn;
+                updateFlashButton();
+            }
         });
     } catch (err) {
         console.error('Erro ao alternar flash:', err);
-        // Se falhar, reverter o estado
         isFlashOn = !isFlashOn;
         updateFlashButton();
     }
@@ -660,6 +685,29 @@ function updateFlashButton() {
     }
 }
 
+/**
+ * @description Verifica se o dispositivo suporta flash
+ */
+function checkFlashSupport() {
+    if (!currentStream) return false;
+    
+    const videoTrack = currentStream.getVideoTracks()[0];
+    if (!videoTrack) return false;
+    
+    try {
+        const capabilities = videoTrack.getCapabilities();
+        console.log('Capacidades do dispositivo:', capabilities);
+        
+        if (capabilities && capabilities.torch) {
+            console.log('Flash (torch) suportado!');
+            return true;
+        }
+    } catch (err) {
+        console.warn('Não foi possível verificar capacidades:', err);
+    }
+    
+    return false;
+}
 // ==================== DETECÇÃO DE ORIENTAÇÃO DO DISPOSITIVO ====================
 
 /**
