@@ -80,6 +80,7 @@ const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
 
 // NOVOS ELEMENTOS: Dropdowns para Marca D'água
+const selectTipoFoto = document.getElementById('select-tipo-foto'); // NOVO: Tipo de Foto
 const selectPromotor = document.getElementById('select-promotor'); 
 const selectRede = document.getElementById('select-rede'); 
 const selectLoja = document.getElementById('select-loja'); 
@@ -88,7 +89,7 @@ let currentStream = null;
 let usingFrontCamera = false;
 let photos = []; // Array de URLs de fotos (Sempre começará vazio)
 let hasCameraPermission = false; // Inicia como 'false'
-const localStorageKey = 'qdelicia_last_selection'; // Chave para persistência (APENAS DROPDOWNS)
+const localStorageKey = 'qdelicia_last_selection_v2'; // Chave para persistência (v2 devido à adição do novo campo)
 
 // Variáveis para Zoom e Flash
 let currentZoom = 1; // Zoom inicial
@@ -108,6 +109,7 @@ logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca.
  */
 function saveSelection() {
     const selection = {
+        tipoFoto: selectTipoFoto.value, // NOVO CAMPO SALVO
         promotor: selectPromotor.value,
         rede: selectRede.value,
         loja: selectLoja.value
@@ -121,6 +123,8 @@ function saveSelection() {
  * @description Carrega as seleções do localStorage e preenche os dropdowns.
  */
 function loadAndPopulateDropdowns() {
+    // O selectTipoFoto já é preenchido no HTML, só precisamos do Promotor
+
     // 1. Preenche o Promotor
     Object.keys(APP_DATA).forEach(promotor => {
         const option = document.createElement('option');
@@ -131,15 +135,22 @@ function loadAndPopulateDropdowns() {
 
     const savedSelection = JSON.parse(localStorage.getItem(localStorageKey));
 
-    if (savedSelection && savedSelection.promotor) {
-        selectPromotor.value = savedSelection.promotor;
-        // 2. Preenche a Rede baseada no Promotor salvo
-        populateRede(savedSelection.promotor);
-        selectRede.value = savedSelection.rede;
-        // 3. Preenche a Loja baseada na Rede salva
-        if (savedSelection.rede) {
-            populateLoja(savedSelection.promotor, savedSelection.rede);
-            selectLoja.value = savedSelection.loja;
+    if (savedSelection) {
+        // NOVO: Carrega o Tipo de Foto
+        if (savedSelection.tipoFoto) {
+             selectTipoFoto.value = savedSelection.tipoFoto;
+        }
+
+        if (savedSelection.promotor) {
+            selectPromotor.value = savedSelection.promotor;
+            // 2. Preenche a Rede baseada no Promotor salvo
+            populateRede(savedSelection.promotor);
+            selectRede.value = savedSelection.rede;
+            // 3. Preenche a Loja baseada na Rede salva
+            if (savedSelection.rede) {
+                populateLoja(savedSelection.promotor, savedSelection.rede);
+                selectLoja.value = savedSelection.loja;
+            }
         }
     }
         
@@ -193,7 +204,8 @@ function populateLoja(promotor, rede) {
  * @description Verifica se os dropdowns estão preenchidos para liberar o botão da câmera.
  */
 function checkCameraAccess() {
-    const isReady = selectPromotor.value && selectRede.value && selectLoja.value;
+    // NOVO: Adicionado selectTipoFoto.value à verificação
+    const isReady = selectTipoFoto.value && selectPromotor.value && selectRede.value && selectLoja.value;
     
     if (openCameraBtn) {
         if (isReady) {
@@ -212,6 +224,10 @@ function checkCameraAccess() {
 
 
 // EVENT LISTENERS para os Dropdowns
+// NOVO: Adicionado listener para o Tipo de Foto
+if (selectTipoFoto) {
+    selectTipoFoto.addEventListener('change', saveSelection);
+}
 if (selectPromotor) {
     selectPromotor.addEventListener('change', () => {
         populateRede(selectPromotor.value);
@@ -285,6 +301,9 @@ async function requestCameraPermission() {
 }
 
 async function openCameraFullscreen() {
+    // Verificação de validação extra para garantir que o botão só é clicado quando pronto
+    if (openCameraBtn && openCameraBtn.disabled) return; 
+
     if (!fullscreenCameraContainer) return;
     
     // Mostra a interface da câmera
@@ -331,8 +350,9 @@ function updatePhotoCounter() {
  * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva com rotação automática.
  */
 function capturePhoto() {
-    if (!selectPromotor.value || !selectRede.value || !selectLoja.value) {
-        alert("Por favor, preencha Promotor, Rede e Loja antes de tirar a foto.");
+    // NOVO: Adicionada verificação para o novo campo
+    if (!selectTipoFoto.value || !selectPromotor.value || !selectRede.value || !selectLoja.value) {
+        alert("Por favor, preencha Tipo de Foto, Promotor, Rede e Loja antes de tirar a foto.");
         return;
     }
 
@@ -343,13 +363,15 @@ function capturePhoto() {
     }
     
     // Captura os dados da Marca D'água para impressão
+    const tipoFotoText = `Tipo: ${selectTipoFoto.value}`; // NOVO CAMPO PARA MARCA D'ÁGUA
     const promotorText = `Promotor: ${selectPromotor.value}`;
     const redeText = `Rede: ${selectRede.value}`;
     const lojaText = `Loja: ${selectLoja.value}`;
     const dateText = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
 
     // Linhas de texto a serem impressas no canto inferior direito, em ordem inversa de desenho (de baixo para cima)
-    const watermarkLines = [dateText, lojaText, redeText, promotorText];
+    // NOVO: tipoFotoText é adicionado ao topo da lista
+    const watermarkLines = [dateText, lojaText, redeText, promotorText, tipoFotoText];
     
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -496,8 +518,7 @@ function updateGalleryView() {
                 </button>
             </div>
             
-            <div class="photo-info">Foto ${index + 1}</div>
-        `;
+            <div class="photo-info">Foto ${index + 1} (${selectTipoFoto.value})</div> `;
         // --- FIM DA ATUALIZAÇÃO DO HTML ---
 
         photoList.appendChild(photoItem);
@@ -695,17 +716,23 @@ if (downloadAllBtn) {
     });
 }
 
-// Botão "Compartilhar" (Função original mantida)
+// Botão "Compartilhar" (Função original mantida e ATUALIZADA)
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
         
         // 1. Captura os dados dos dropdowns para a legenda
+        const tipoFoto = selectTipoFoto.options[selectTipoFoto.selectedIndex].text; // NOVO
         const promotor = selectPromotor.options[selectPromotor.selectedIndex].text;
         const rede = selectRede.options[selectRede.selectedIndex].text;
         const loja = selectLoja.options[selectLoja.selectedIndex].text;
         
         // 2. Cria a legenda dinâmica
-        const legendaCompartilhada = `Promotor: ${promotor}\nLoja: ${rede} ${loja}`;
+        const now = new Date();
+        const dateOptions = { weekday: 'long', year: '2-digit', month: '2-digit', day: '2-digit' };
+        const dataFormatada = now.toLocaleDateString('pt-BR', dateOptions).replace(/,/, '').replace(/\b\d\b/g, '0$&'); // "Segunda-feira, 03/11/25"
+
+        // Legenda com 3 linhas: Data, Tipo de Foto, Promotor/Loja
+        const legendaCompartilhada = `${dataFormatada}\n${tipoFoto}\nPromotor: ${promotor}\nLoja: ${rede} ${loja}`;
 
         const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
