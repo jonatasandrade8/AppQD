@@ -449,60 +449,12 @@ hr {
     object-fit: cover; 
 }
 
-/* ---------------------------------------------------------------------- */
-/* NOVOS ESTILOS PARA A ORGANIZAÇÃO DO FULLSCREEN-CAMERA-CONTAINER */
-/* ---------------------------------------------------------------------- */
-
-/* NOVO: Controles de Topo (Alinha o botão de voltar e o contador) */
-.top-controls {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-between; /* Espaçamento entre os elementos */
-    align-items: center;
-    padding: 15px; /* Padding interno */
-    z-index: 30;
-}
-
-/* Botão de Voltar/Fechar Câmera (Agora dentro do .top-controls) */
-#back-to-gallery-btn {
-    position: static; /* Não é mais absoluto, agora dentro de top-controls */
-    background: rgba(255, 255, 255, 0.5);
-    color: var(--primary-color);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: background 0.3s;
-    border: none;
-}
-
-/* Contador de Fotos (Agora dentro do .top-controls) */
-#photo-count {
-    position: static; /* Não é mais absoluto, agora dentro de top-controls */
-    background: rgba(255, 255, 255, 0.8); 
-    color: var(--text-dark);
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 1rem;
-    min-width: 35px; 
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
-
-/* Marca d'água Visual (Data/Hora): Posicionada no Canto INFERIOR ESQUERDO */
+/* Marca d'água (Preservado) */
 .watermark {
     position: absolute;
-    bottom: 15px; 
-    left: 15px; 
-    transform: none; /* Remove a centralização anterior */
+    top: 15px; 
+    left: 50%;
+    transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.7);
     color: var(--white);
     padding: 8px 15px;
@@ -516,8 +468,26 @@ hr {
     backdrop-filter: blur(4px);
 }
 
-/* Controles de Rodapé: Disparador e Switch */
-.controls, .bottom-controls {
+/* Contador de Fotos (Refinado para Badge Discreto no Canto) */
+#photo-count {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.8); 
+    color: var(--text-dark);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1rem;
+    min-width: 35px; 
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    z-index: 10;
+}
+
+
+/* Controles (Preservado) */
+.controls {
     position: absolute;
     bottom: 50px;
     left: 50%;
@@ -526,16 +496,6 @@ hr {
     align-items: center;
     gap: 20px;
     z-index: 20;
-    /* Adicionando largura e ajuste de espaçamento para alinhar o switch à esquerda */
-    width: 250px; 
-    justify-content: space-between;
-}
-
-/* PlaceHolder para alinhar o Switch-btn à esquerda, mantendo o Shutter-btn centralizado */
-.bottom-controls .placeholder-btn {
-    width: 60px; /* Mesma largura do switch-btn */
-    height: 60px;
-    visibility: hidden;
 }
 
 .btn-circle {
@@ -560,18 +520,33 @@ hr {
     box-shadow: 0 0 0 4px var(--white);
     background: var(--accent-color);
     color: var(--white);
-    flex-shrink: 0; /* Garante que o shutter mantenha o tamanho */
 }
 
 #switch-btn {
     background: rgba(255,255,255,0.9);
     color: var(--primary-color);
     border: 2px solid var(--primary-color);
-    flex-shrink: 0; /* Garante que o switch mantenha o tamanho */
 }
 
-
-/* FIM DOS ESTILOS DA CÂMERA */
+/* Botão de Voltar/Fechar Câmera (Preservado) */
+#back-to-gallery-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 30;
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--primary-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background 0.3s;
+    border: none;
+}
 
 
 /* Galeria (Preservado) */
@@ -635,12 +610,12 @@ hr {
     background: var(--secondary-color);
 }
 
-/* Botão de Compartilhar WhatsApp (para a galeria) */
-.whatsapp-btn-gallery {
+/* Botão de Compartilhar PDF (FIXADO) */
+.share-btn {
     background: #25d366; /* Verde WhatsApp */
 }
 
-.whatsapp-btn-gallery:hover {
+.share-btn:hover {
     background: #1da851; /* Tom mais escuro */
 }
 

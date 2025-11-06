@@ -37,7 +37,7 @@ const APP_DATA = {
         "Atacadão": ["BR-101 Sul"]
     },
     "Jordão": {
-        "Superfácil": ["Olho d'Água", "Emaús"],
+        "Superfácil": ["Olho d'Água"],
         "Assaí": ["Ponta Negra"],
         "Mar Vermelho": ["BR-101 Sul"]
     },
@@ -539,7 +539,7 @@ if (downloadAllBtn) {
     });
 }
 
-// Botão "Compartilhar" (Função original corrigida)
+// Botão "Compartilhar" (Função original mantida)
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
         
@@ -548,8 +548,8 @@ if (shareAllBtn && navigator.share) {
         const rede = selectRede.options[selectRede.selectedIndex].text;
         const loja = selectLoja.options[selectLoja.selectedIndex].text;
         
-        // 2. CRITICAL FIX: Cria a legenda dinâmica (agora corrigida para incluir todos os 3 campos)
-        const legendaCompartilhada = `Promotor: ${promotor}\nRede: ${rede}\nLoja: ${loja}`;
+        // 2. Cria a legenda dinâmica
+        const legendaCompartilhada = `${promotor}\nLoja ${rede} - ${loja}`;
 
         const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
