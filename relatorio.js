@@ -128,8 +128,10 @@ const photoList = document.getElementById('photo-list');
 const downloadAllBtn = document.getElementById('download-all');
 const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
+const dateTimeElement = document.getElementById('date-time'); // Adicionado para marca d'água de data/hora
 
 // Elementos para Marca D'água (Base)
+const selectReportType = document.getElementById('select-report-type'); // NOVO: Tipo de Relatório
 const selectPromotor = document.getElementById('select-promotor'); 
 const selectRede = document.getElementById('select-rede'); 
 const selectLoja = document.getElementById('select-loja'); 
@@ -142,12 +144,13 @@ const inputObservacoes = document.getElementById('input-observacoes');
 
 // Novos Elementos para a lista de itens
 const addItemBtn = document.getElementById('add-item-btn');
-const itemListElement = document.getElementById('item-list');
+const itemListElement = document.getElementById('report-items-list'); // ID corrigido para o HTML
 
 let currentStream = null;
 let usingFrontCamera = false;
 let photos = [];
 let items = []; // Armazena a lista de itens (produto, motivo, qtd)
+let hasCameraPermission = false; // Adicionado para controle de permissão
 const localStorageKey = 'qdelicia_last_selection'; 
 
 // Carregar a imagem da logomarca (mantida para uso apenas no PDF)
@@ -163,6 +166,7 @@ logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca.
  */
 function saveSelection() {
     const selection = {
+        reportType: selectReportType.value, // Salva o tipo de relatório
         promotor: selectPromotor.value,
         rede: selectRede.value,
         loja: selectLoja.value,
@@ -258,6 +262,11 @@ function loadAndPopulateDropdowns() {
         }
     }
     
+    // --- Lógica de Tipo de Relatório ---
+    if (selectReportType && savedSelection && savedSelection.reportType) {
+        selectReportType.value = savedSelection.reportType;
+    }
+    
     // --- Lógica de Motivo/Produto/Observações ---
     populateSelect(selectMotivo, RELATORIO_DATA.MOTIVOS_DEVOLUCAO, "Selecione o Motivo");
     populateSelect(selectProduto, RELATORIO_DATA.TIPOS_PRODUTO, "Selecione o Produto");
@@ -288,6 +297,7 @@ function handleAddItem() {
     updateItemListUI();
     checkCameraAccess();
 
+    // Limpa os campos de item após adicionar
     selectProduto.value = "";
     selectMotivo.value = "";
     inputQuantidade.value = "";
@@ -313,192 +323,292 @@ function updateItemListUI() {
             </button>
         `;
         
-        li.querySelector('.delete-item-btn').addEventListener('click', () => {
-            items.splice(index, 1); 
-            updateItemListUI(); 
-            checkCameraAccess(); 
+        // Adiciona o listener de remoção
+        li.querySelector('.delete-item-btn').addEventListener('click', (e) => {
+            // O índice é lido do atributo data-index do botão
+            const indexToRemove = parseInt(e.currentTarget.getAttribute('data-index'));
+            // Remove 1 elemento a partir do índice
+            items.splice(indexToRemove, 1); 
+            // Atualiza a UI e verifica o acesso à câmera/botões
+            updateItemListUI();
+            checkCameraAccess();
         });
-
+        
         itemListElement.appendChild(li);
     });
 }
 
+
+// ==================================================================
+// --- LÓGICA DE VALIDAÇÃO PARA ACESSO À CÂMERA E PDF ---
 /**
- * @description Verifica se todos os campos estão preenchidos para liberar a câmera.
+ * @description Verifica se os dropdowns obrigatórios e a lista de itens estão preenchidos.
+ * @returns {boolean} True se estiver pronto para abrir a câmera ou gerar PDF.
  */
 function checkCameraAccess() {
-    let isReady = false;
-
-    // Verificação dos campos base (Promotor/Rede/Loja)
-    const baseFieldsReady = selectPromotor && selectPromotor.value && 
-                            selectRede && selectRede.value && 
-                            selectLoja && selectLoja.value;
+    const isReportTypeSelected = selectReportType && selectReportType.value !== "";
+    const isPromotorSelected = selectPromotor && selectPromotor.value !== "";
+    const isRedeSelected = selectRede && selectRede.value !== "";
+    const isLojaSelected = selectLoja && selectLoja.value !== "";
+    const hasItems = items.length > 0;
     
-    // Verificação dos itens (pelo menos 1)
-    const itemsReady = items.length > 0;
+    const isReady = isReportTypeSelected && isPromotorSelected && isRedeSelected && isLojaSelected && hasItems;
     
-    isReady = baseFieldsReady && itemsReady;
-
     if (openCameraBtn) {
         if (isReady) {
             openCameraBtn.disabled = false;
-            // Texto do botão baseado no estado da câmera
-            openCameraBtn.innerHTML = currentStream 
-                ? '<i class="fas fa-video"></i> Câmera Aberta (Fechar)' 
-                : '<i class="fas fa-camera"></i> Abrir Câmera'; 
+            openCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Abrir Câmera';
         } else {
             openCameraBtn.disabled = true;
-            if (!baseFieldsReady) {
-                openCameraBtn.innerHTML = '<i class="fas fa-lock"></i> Preencha Promotor/Rede/Loja';
-            } else {
-                openCameraBtn.innerHTML = '<i class="fas fa-plus"></i> Adicione Pelo Menos 1 Item';
-            }
+            openCameraBtn.innerHTML = '<i class="fas fa-lock"></i> Preencha as Informações';
         }
     }
+    
+    // Habilita/Desabilita botões de download/compartilhamento
+    if (downloadAllBtn && shareAllBtn) {
+        const canGeneratePdf = isReady && photos.length > 0;
+        downloadAllBtn.disabled = !canGeneratePdf;
+        shareAllBtn.disabled = !canGeneratePdf;
+    }
+    
     return isReady;
 }
+// --- FIM DA LÓGICA DE VALIDAÇÃO ---
+// ==================================================================
 
-// EVENT LISTENERS para os Dropdowns
-if (selectPromotor) { 
-    selectPromotor.addEventListener('change', () => {
-        populateRede(selectPromotor.value);
-        saveSelection();
-    });
+
+// --- LÓGICA DA CÂMERA (Baseada em camera.js) ---
+
+/**
+ * @description Atualiza o display de data e hora na marca d'água.
+ */
+function updateDateTime() {
+    if (dateTimeElement) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('pt-BR');
+        const timeStr = now.toLocaleTimeString('pt-BR');
+        dateTimeElement.innerHTML = `<i class="fas fa-clock"></i> ${dateStr} ${timeStr}`;
+    }
 }
-if (selectRede) {
-    selectRede.addEventListener('change', () => {
-        populateLoja(selectPromotor.value, selectRede.value);
-        saveSelection();
-    });
-}
-if (selectLoja) selectLoja.addEventListener('change', saveSelection);
 
-// Listeners específicos de Devolução
-if (inputObservacoes) inputObservacoes.addEventListener('input', saveSelection); 
-if (addItemBtn) addItemBtn.addEventListener('click', handleAddItem);
+// Variáveis para Zoom e Flash (Mantidas de camera.js)
+let currentZoom = 1; 
+let maxZoom = 1; 
+let deviceOrientation = 0; 
 
+/**
+ * @description Solicita permissão da câmera e inicia o stream com qualidade otimizada.
+ */
+async function requestCameraPermission() {
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+    }
 
-// --- LÓGICA DA CÂMERA ---
-
-function startCamera(facingMode = 'environment') {
-    if (currentStream) stopCamera(); 
-
-    const constraints = {
-        video: {
-            facingMode: facingMode,
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
+    try {
+        // Configuração otimizada para melhor qualidade e menor zoom (De camera.js)
+        const constraints = {
+            video: {
+                facingMode: usingFrontCamera ? "user" : "environment",
+                width: { ideal: 1920 }, 
+                height: { ideal: 1080 },
+                zoom: { ideal: 1 } 
+            },
+            audio: false
+        };
+        
+        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = currentStream;
+        hasCameraPermission = true; 
+        
+        // Obter capacidades de zoom do dispositivo (De camera.js)
+        const videoTrack = currentStream.getVideoTracks()[0];
+        if (videoTrack && videoTrack.getCapabilities) {
+            const capabilities = videoTrack.getCapabilities();
+            if (capabilities.zoom) {
+                maxZoom = capabilities.zoom.max || 4;
+                currentZoom = capabilities.zoom.min || 1;
+                // updateZoomButtons(); // Não temos botões de zoom no HTML
+            }
         }
-    };
+        
+        currentZoom = 1;
+        applyZoom();
+        
+        // Detectar orientação do dispositivo (De camera.js)
+        detectDeviceOrientation();
 
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then(stream => {
-            currentStream = stream;
-            video.srcObject = stream;
-            video.play();
-            checkCameraAccess(); 
-            if (fullscreenCameraContainer) {
-                fullscreenCameraContainer.style.display = 'flex';
-            }
-        })
-        .catch(err => {
-            console.error("Erro ao acessar a câmera: ", err);
-            currentStream = null; 
-            checkCameraAccess();
-            if (fullscreenCameraContainer) {
-                fullscreenCameraContainer.style.display = 'none';
-                alert("Não foi possível acessar a câmera. Verifique as permissões.");
-            }
-        });
+    } catch (err) {
+        console.error("Erro ao acessar câmera:", err);
+        hasCameraPermission = false;
+        
+        alert("Não foi possível iniciar a câmera. Verifique as permissões de acesso no seu navegador.");
+        closeCameraFullscreen(); 
+    }
 }
 
-function stopCamera() {
+async function openCameraFullscreen() {
+    if (!fullscreenCameraContainer) return;
+    
+    fullscreenCameraContainer.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    await requestCameraPermission();
+    
+    // Inicia a atualização da data/hora
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+}
+
+function closeCameraFullscreen() {
+    if (!fullscreenCameraContainer) return;
+    fullscreenCameraContainer.classList.remove('active');
+    document.body.style.overflow = '';
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
     }
-    if (fullscreenCameraContainer) {
-        fullscreenCameraContainer.style.display = 'none';
-    }
-    checkCameraAccess();
+    hasCameraPermission = false; 
 }
 
+/**
+ * @description Aplica o zoom atual à track de vídeo. (De camera.js)
+ */
+function applyZoom() {
+    if (currentStream) {
+        const videoTrack = currentStream.getVideoTracks()[0];
+        if (videoTrack && videoTrack.getCapabilities().zoom) {
+            videoTrack.applyConstraints({ advanced: [{ zoom: currentZoom }] });
+        }
+    }
+}
+
+/**
+ * @description Detecta a orientação do dispositivo para corrigir a rotação da foto. (De camera.js)
+ */
+function detectDeviceOrientation() {
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', function(event) {
+            // Beta (eixo X) e Gamma (eixo Y) são usados para determinar a orientação
+            const beta = event.beta; // -180 a 180 (frente/trás)
+            const gamma = event.gamma; // -90 a 90 (esquerda/direita)
+
+            if (Math.abs(gamma) > 45) {
+                // Paisagem
+                deviceOrientation = gamma > 0 ? 90 : 270;
+            } else {
+                // Retrato
+                deviceOrientation = beta > 135 || beta < -135 ? 180 : 0;
+            }
+        }, true);
+    }
+}
+
+/**
+ * @description Tira a foto, aplica a marca d'água (data/hora e dados do relatório) e adiciona à galeria.
+ */
 function takePhoto() {
-    if (!currentStream) {
-        alert("A câmera não está ativa.");
+    if (!hasCameraPermission) {
+        alert("A câmera não está ativa ou as permissões foram negadas.");
         return;
     }
     
     const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    
+    // Define o tamanho do canvas para o tamanho do vídeo
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const photoDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    // Desenha o frame do vídeo no canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // --- APLICAÇÃO DA MARCA D'ÁGUA (APENAS DATA/HORA E DADOS DO RELATÓRIO) ---
+    
+    const promotor = selectPromotor.value;
+    const rede = selectRede.value;
+    const loja = selectLoja.value;
+    const reportType = selectReportType.value === 'qualidade' ? 'QUALIDADE' : 'DEVOLUÇÃO';
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('pt-BR');
+    const timeStr = now.toLocaleTimeString('pt-BR');
+    
+    // Configurações de texto
+    context.font = "bold 30px Arial";
+    context.fillStyle = "white";
+    context.strokeStyle = "black";
+    context.lineWidth = 2;
+    context.textAlign = "left";
+    
+    const textLines = [
+        `${reportType} - ${promotor}`,
+        `${rede} - ${loja}`,
+        `${dateStr} ${timeStr}`
+    ];
+    
+    const lineHeight = 40;
+    let y = canvas.height - (lineHeight * textLines.length) - 20;
+    const x = 20;
+    
+    textLines.forEach(line => {
+        context.strokeText(line, x, y); // Contorno preto
+        context.fillText(line, x, y);   // Preenchimento branco
+        y += lineHeight;
+    });
+    
+    // --- FIM DA MARCA D'ÁGUA ---
+    
+    // Converte o canvas para Data URL
+    const photoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
     photos.push(photoDataUrl);
     
     updateGallery();
+    checkCameraAccess(); // Atualiza o estado dos botões de PDF
 }
 
+/**
+ * @description Atualiza a galeria de fotos na UI.
+ */
 function updateGallery() {
-    if (!photoList) return; 
-
-    photoList.innerHTML = ''; 
-
-    if (photoCountElement) photoCountElement.textContent = photos.length;
+    if (!photoList) return;
     
-    const hasPhotos = photos.length > 0;
-    if (downloadAllBtn) downloadAllBtn.disabled = !hasPhotos;
-    if (shareAllBtn) shareAllBtn.disabled = !hasPhotos;
-    
-    if (photos.length === 0) {
-        // Mensagem de galeria vazia (para consistência)
-        photoList.innerHTML = `
-            <div class="photo-item">
-                <div class="photo-info">Galeria de fotos Vazia || Tire uma foto para o relatório.</div>
-            </div>
+    photoList.innerHTML = '';
+    photos.forEach((photoDataUrl, index) => {
+        const div = document.createElement('div');
+        div.classList.add('photo-item');
+        div.innerHTML = `
+            <img src="${photoDataUrl}" alt="Foto ${index + 1}">
+            <button class="delete-photo-btn" data-index="${index}" title="Remover foto">
+                <i class="fas fa-trash"></i>
+            </button>
         `;
+        
+        div.querySelector('.delete-photo-btn').addEventListener('click', (e) => {
+            const indexToRemove = parseInt(e.currentTarget.getAttribute('data-index'));
+            photos.splice(indexToRemove, 1);
+            updateGallery();
+            checkCameraAccess();
+        });
+        
+        photoList.appendChild(div);
+    });
+    
+    if (photoCountElement) {
+        photoCountElement.textContent = photos.length;
+    }
+}
+
+
+// --- LÓGICA DE GERAÇÃO DE PDF ---
+
+/**
+ * @description Gera o relatório em PDF.
+ * @param {string} action 'download' ou 'share'.
+ */
+async function generatePDFReport(action) {
+    if (!checkCameraAccess()) {
+        alert("Por favor, preencha todas as informações obrigatórias e adicione pelo menos um item e uma foto.");
         return;
     }
-
-    photos.forEach((photoUrl, index) => {
-        const photoItem = document.createElement('div');
-        photoItem.classList.add('photo-item');
-        
-        const img = document.createElement('img');
-        img.src = photoUrl;
-        photoItem.appendChild(img);
-        
-        // Botões de download/delete
-        const downloadBtn = document.createElement('a');
-        downloadBtn.href = photoUrl;
-        downloadBtn.download = `qdelicia_registro_${index + 1}.jpg`;
-        downloadBtn.classList.add('icon-btn', 'download-icon');
-        downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.classList.add('icon-btn', 'delete-icon');
-        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            photos.splice(index, 1); 
-            updateGallery(); 
-        });
-
-        const controlsContainer = document.createElement('div');
-        controlsContainer.classList.add('photo-controls');
-        controlsContainer.appendChild(downloadBtn);
-        controlsContainer.appendChild(deleteBtn);
-        
-        photoItem.appendChild(controlsContainer);
-        photoList.prepend(photoItem); // Adiciona no início
-    });
-}
-
-// ==================== LÓGICA DE GERAÇÃO DE PDF ====================
-async function generatePDFReport(action) {
     if (photos.length === 0) {
         alert("Tire pelo menos uma foto para gerar o relatório.");
         return;
@@ -559,6 +669,8 @@ async function generatePDFReport(action) {
     const promotor = selectPromotor.value; 
     const rede = selectRede.value;
     const loja = selectLoja.value;
+    const reportType = selectReportType.value; // Pega o tipo de relatório
+    const reportTitle = reportType === 'qualidade' ? 'Relatório de Qualidade' : 'Relatório de Devolução'; // Título dinâmico
     const observacoes = inputObservacoes.value.trim() || 'Nenhuma observação.';
     const date = new Date().toLocaleString('pt-BR');
     let yPos = margin;
@@ -571,12 +683,14 @@ async function generatePDFReport(action) {
     }
     
     pdf.setFontSize(18);
-    pdf.text('Relatório de Devolução', margin, yPos);
+    pdf.text(reportTitle, margin, yPos); // Título dinâmico
     pdf.line(margin, yPos + 2, pdfWidth - margin, yPos + 2); 
     yPos += 10; 
 
     // Dados Gerais
     pdf.setFontSize(11);
+    pdf.text(`Tipo de Relatório: ${reportTitle}`, margin, yPos); // Adiciona o tipo de relatório
+    yPos += 7;
     pdf.text(`Data e Hora: ${date}`, margin, yPos);
     yPos += 7;
     pdf.text(`Promotor: ${promotor}`, margin, yPos); 
@@ -584,14 +698,15 @@ async function generatePDFReport(action) {
     pdf.text(`Rede: ${rede} - Loja: ${loja}`, margin, yPos);
     yPos += 10;
     
-    // Itens da Devolução
+    // Itens da Devolução/Qualidade
     pdf.setFontSize(14);
-    pdf.text('Itens da Devolução', margin, yPos);
+    pdf.text(`Itens do Relatório (${reportTitle})`, margin, yPos);
     pdf.line(margin, yPos + 2, pdfWidth - margin, yPos + 2); 
     yPos += 7;
     
     pdf.setFontSize(11);
     items.forEach((item, index) => {
+        // Ajusta o texto para ser mais genérico (Qualidade/Devolução)
         const text = `• Item ${index + 1}: ${item.produto} (${item.motivo}) - ${item.quantidade} KG`;
         const splitText = pdf.splitTextToSize(text, pdfWidth - (margin * 2));
         pdf.text(splitText, margin, yPos);
@@ -617,7 +732,7 @@ async function generatePDFReport(action) {
     pdf.text(splitObs, margin, yPos);
     yPos += (splitObs.length * 5) + 2;
 
-    const fileName = `relatorio_devolucao_${rede}_${loja}_${date.split(' ')[0].replace(/\//g, '-')}.pdf`;
+    const fileName = `relatorio_${reportType}_${rede}_${loja}_${date.split(' ')[0].replace(/\//g, '-')}.pdf`;
 
     if (action === 'download') {
         pdf.save(fileName);
@@ -629,7 +744,7 @@ async function generatePDFReport(action) {
                 const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
                 await navigator.share({
                     files: [file],
-                    title: 'Relatório de Devolução QDelícia'
+                    title: reportTitle + ' QDelícia'
                 });
             } catch (error) {
                 if (error.name !== 'AbortError') {
@@ -646,23 +761,48 @@ async function generatePDFReport(action) {
 }
 
 
-// ==================== CÂMERA: EVENT LISTENERS ====================
-if (openCameraBtn) {
-    openCameraBtn.addEventListener('click', () => {
-        if (currentStream) {
-            stopCamera(); 
-        } else if (checkCameraAccess()) { 
-            startCamera(usingFrontCamera ? 'user' : 'environment'); 
-        }
+// ==================== EVENT LISTENERS ====================
+
+// Listeners para os Dropdowns
+if (selectReportType) {
+    selectReportType.addEventListener('change', saveSelection);
+}
+if (selectPromotor) {
+    selectPromotor.addEventListener('change', () => {
+        populateRede(selectPromotor.value);
+        saveSelection();
     });
+}
+if (selectRede) {
+    selectRede.addEventListener('change', () => {
+        populateLoja(selectPromotor.value, selectRede.value);
+        saveSelection();
+    });
+}
+if (selectLoja) {
+    selectLoja.addEventListener('change', saveSelection);
+}
+if (inputObservacoes) {
+    inputObservacoes.addEventListener('input', saveSelection);
+}
+
+// Listener para Adicionar Item
+if (addItemBtn) {
+    addItemBtn.addEventListener('click', handleAddItem);
+}
+
+// Listeners da Câmera
+if (openCameraBtn) {
+    openCameraBtn.addEventListener('click', openCameraFullscreen);
 }
 
 if (shutterBtn) shutterBtn.addEventListener('click', takePhoto);
-if (backToGalleryBtn) backToGalleryBtn.addEventListener('click', stopCamera);
+if (backToGalleryBtn) backToGalleryBtn.addEventListener('click', closeCameraFullscreen);
 if (switchBtn) {
     switchBtn.addEventListener('click', () => {
         usingFrontCamera = !usingFrontCamera;
-        startCamera(usingFrontCamera ? 'user' : 'environment');
+        // Reinicia a câmera com a nova facingMode
+        requestCameraPermission(); 
     });
 }
 
