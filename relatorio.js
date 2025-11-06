@@ -58,7 +58,7 @@ const RELATORIO_DATA = {
         "Tamanho Fora do Padrão",
         "Atraso na Entrega",
         "Peso Alterado",
-        "Outro Motivo"
+        "Encruada"
     ],
     TIPOS_PRODUTO: [
         "Prata",
@@ -163,14 +163,15 @@ logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca.
 
 /**
  * @description Salva as seleções atuais no localStorage.
+ * (MODIFICADO: 'reportType' e 'observacoes' removidos da persistência)
  */
 function saveSelection() {
     const selection = {
-        reportType: selectReportType.value, // Salva o tipo de relatório
+        // reportType: selectReportType.value, // Persistência removida
         promotor: selectPromotor.value,
         rede: selectRede.value,
         loja: selectLoja.value,
-        observacoes: inputObservacoes ? inputObservacoes.value : ''
+        // observacoes: inputObservacoes ? inputObservacoes.value : '' // Persistência removida
     };
     localStorage.setItem(localStorageKey, JSON.stringify(selection));
     checkCameraAccess();
@@ -237,6 +238,7 @@ function populateLoja(promotor, rede) {
 
 /**
  * @description Carrega as seleções do localStorage e preenche os dropdowns.
+ * (MODIFICADO: 'reportType' e 'observacoes' removidos do carregamento)
  */
 function loadAndPopulateDropdowns() {
     // --- Lógica de Promotor/Rede/Loja ---
@@ -263,17 +265,21 @@ function loadAndPopulateDropdowns() {
     }
     
     // --- Lógica de Tipo de Relatório ---
+    /*
     if (selectReportType && savedSelection && savedSelection.reportType) {
         selectReportType.value = savedSelection.reportType;
     }
+    */ // Persistência removida
     
     // --- Lógica de Motivo/Produto/Observações ---
     populateSelect(selectMotivo, RELATORIO_DATA.MOTIVOS_DEVOLUCAO, "Selecione o Motivo");
     populateSelect(selectProduto, RELATORIO_DATA.TIPOS_PRODUTO, "Selecione o Produto");
 
+    /*
     if (savedSelection && inputObservacoes && savedSelection.observacoes) {
         inputObservacoes.value = savedSelection.observacoes; 
     }
+    */ // Persistência removida
     
     checkCameraAccess();
 }
