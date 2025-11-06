@@ -3,65 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Página de Câmera para Registro de Fotos - Qdelícia Frutas">
-    <title>Câmera - Qdelícia Frutas</title>
+    <meta name="description" content="Câmera para Registro de Devolução - Logística Qdelícia">
+    <title>Registro Devolução - Logística Qdelícia</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="./style.css">
-    <style>
+    <link rel="stylesheet" href="./style.css"> 
     
-    .photo-item {
-    position: relative;
-    overflow: hidden; /* Para os botões não vazarem */
-    }
-
-    /* Container para os botões (inspirado no camera_geral.html) */
-    .photo-controls {
-    position: absolute;
-    top: 8px; /* Distância do topo */
-    right: 8px; /* Distância da direita */
-    display: flex;
-    flex-direction: column; /* Empilha os botões verticalmente */
-    gap: 8px; /* Espaçamento entre os botões */
-    z-index: 5; /* Garante que fiquem acima da info e da imagem */
-    }
-
-    /* Estilo base para os botões de ícone (inspirado no camera_geral.html) */
-    .icon-btn {
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    border-radius: 50%; /* Botões redondos */
-    width: 35px; 
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 14px; /* Tamanho do ícone */
-    transition: background-color 0.2s ease;
-}
-
-.icon-btn:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-/* Variação de cor para o botão de remover (lixeira) */
-.icon-btn.remove-single-btn {
-    background-color: rgba(220, 53, 69, 0.8); /* Vermelho */
-}
-.icon-btn.remove-single-btn:hover {
-    background-color: rgba(220, 53, 69, 1);
-}
-
-/* Variação de cor para o botão de download */
-.icon-btn.download-single-btn {
-    background-color: rgba(0, 123, 255, 0.8); /* Azul */
-}
-.icon-btn.download-single-btn:hover {
-    background-color: rgba(0, 123, 255, 1);
-}
-
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> 
+    
 </head>
 <body class="camera-page">
     
@@ -72,12 +21,10 @@
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="vendas.html"><i class="fas fa-chart-line"></i> Vendas</a>
         <a href="avarias.html"><i class="fas fa-trash-can"></i> Avarias</a>
-        <a href="camera.html" class="active"><i class="fas fa-camera"></i> Câmera</a>
-        <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
+        <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
+        <a href="relatorio.html" class="active"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
         
-    </aside>
-
-    <header id="cabecalho-principal">
+    </aside> <header id="cabecalho-principal">
         <button class="menu-toggle" aria-label="Abrir Menu">
             <i class="fas fa-bars"></i>
         </button>
@@ -94,8 +41,9 @@
         <a href="caixas.html">Caixas</a>
         <a href="vendas.html">Vendas</a>
         <a href="avarias.html">Avarias</a>
-        <a href="camera.html" class="active">Câmera</a>
-        <a href="relatorio.html">Relatório/Qualidade</a>
+        <a href="camera.html">Câmera</a>
+        <a href="relatorio.html" class="active">Relatório/Qualidade</a>
+
         
     </nav>
     
@@ -126,21 +74,58 @@
             </div>
         </section>
         <hr>
-        
-        <section class="start-camera-section">
-            <button id="open-camera-btn" disabled> 
-                <i class="fas fa-lock"></i> Preencha as Informações Acima
-            </button>
-        </section>
-        <div class="gallery">
-            <h2>Fotos Recentes na Galeria</h2>
+            <fieldset class="item-adder-fieldset">
+                <legend>Itens e Observações da Devolução</legend>
+                
+                <div class="input-group">
+                    <label for="select-produto"><i class="fas fa-seedling"></i> Tipo do Produto</label>
+                    <select id="select-produto" required>
+                        <option value="" disabled selected>Selecione o Produto</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="select-motivo"><i class="fas fa-triangle-exclamation"></i> Motivo da Devolução</label>
+                    <select id="select-motivo" required>
+                        <option value="" disabled selected>Selecione o Motivo</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="input-quantidade"><i class="fas fa-weight-hanging"></i> Quantidade (KG)</label>
+                    <input type="text" id="input-quantidade" placeholder="**Quantidade deve ser em KG**" required>
+                </div>
+
+                <button id="add-item-btn" class="action-btn" style="width: 100%; background-color: var(--primary-color); color: var(--white);">
+                    <i class="fas fa-plus"></i> Adicionar Item à Lista
+                </button>
+                
+                <div id="item-list-container" class="item-list-container">
+                    <h3>Itens Adicionados</h3>
+                    <ul id="item-list">
+                        </ul>
+                </div>
+
+                <div class="input-group" style="margin-top: 20px;">
+                    <label for="input-observacoes"><i class="fas fa-pencil-alt"></i> Observações Gerais</label>
+                    <textarea id="input-observacoes" placeholder="Adicione qualquer observação relevante aqui..." rows="4"></textarea>
+                </div>
+            </fieldset>
             
+            <section class="start-camera-section">
+                <button id="open-camera-btn" disabled>
+                    <i class="fas fa-lock"></i> Preencha as Informações Acima
+                </button>
+            </section>
+        
+        <div class="gallery">
+            <h2>Galeria de Registros</h2>
             <div class="action-buttons">
-                <button class="action-btn whatsapp-btn-gallery" id="share-all" disabled>
-                  <i class="fab fa-whatsapp"></i> Compartilhar Fotos
+                <button class="action-btn share-btn" id="share-all" disabled>
+                  <i class="fas fa-share-alt"></i> Compartilhar PDF
                 </button>
                 <button class="action-btn download-btn" id="download-all" disabled>
-                  <i class="fas fa-download"></i> Baixar Todas
+                  <i class="fas fa-download"></i> Baixar Relatório (PDF)
                 </button>
             </div>
             
@@ -158,10 +143,6 @@
 
             <div class="camera-container">
                 <video id="video" autoplay playsinline></video>
-            </div>
-            
-            <div class="watermark">
-              <i class="fas fa-clock"></i> <span id="date-time">--/--/---- --:--:--</span>
             </div>
             
             <div class="controls">
@@ -182,8 +163,7 @@
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
-    
-    <script src="script.js"></script>
-    <script src="camera.js"></script>
+
+    <script src="relatorio.js"></script>
 </body>
 </html>
