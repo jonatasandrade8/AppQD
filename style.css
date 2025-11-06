@@ -473,18 +473,75 @@ hr {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: rgba(255, 255, 255, 0.8); 
-    color: var(--text-dark);
-    padding: 6px 10px;
-    border-radius: 4px;
+    background: rgba(93, 63, 211, 0.95); 
+    color: var(--white);
+    padding: 8px 14px;
+    border-radius: 20px;
     font-weight: bold;
-    font-size: 1rem;
-    min-width: 35px; 
+    font-size: 1.1rem;
+    min-width: 45px; 
     text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     z-index: 10;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
 }
 
+
+/* Controles de Zoom e Flash (Lado Direito) */
+.camera-controls-right {
+    position: absolute;
+    right: 15px;
+    top: 70px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 20;
+}
+
+.camera-control-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.camera-control-btn:hover:not(:disabled) {
+    background: var(--white);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.camera-control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.camera-control-btn.active {
+    background: var(--accent-color);
+    color: var(--text-dark);
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+}
+
+.zoom-level {
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--white);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-align: center;
+    min-width: 50px;
+}
 
 /* Controles (Preservado) */
 .controls {

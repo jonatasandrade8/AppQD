@@ -37,7 +37,7 @@ const APP_DATA = {
         "Atacadão": ["BR-101 Sul"]
     },
     "Jordão": {
-        "Superfácil": ["Olho d'Água"],
+        "Superfácil": ["Olho d'Água", "Emaús"],
         "Assaí": ["Ponta Negra"],
         "Mar Vermelho": ["BR-101 Sul"]
     },
@@ -89,6 +89,12 @@ let usingFrontCamera = false;
 let photos = []; // Array de URLs de fotos (Sempre começará vazio)
 let hasCameraPermission = false; // Inicia como 'false'
 const localStorageKey = 'qdelicia_last_selection'; // Chave para persistência (APENAS DROPDOWNS)
+
+// Variáveis para Zoom e Flash
+let currentZoom = 1; // Zoom inicial
+let maxZoom = 1; // Zoom máximo suportado pelo dispositivo
+let isFlashOn = false; // Estado do flash
+let deviceOrientation = 0; // Orientação do dispositivo em graus
 
 // Carregar a imagem da logomarca
 const logoImage = new Image();
@@ -227,7 +233,7 @@ if (selectLoja) {
 // --- LÓGICA DA CÂMERA (requestCameraPermission agora chama checkCameraAccess) ---
 
 /**
- * @description Solicita permissão da câmera e inicia o stream.
+ * @description Solicita permissão da câmera e inicia o stream com qualidade otimizada.
  */
 async function requestCameraPermission() {
     if (currentStream) {
@@ -235,10 +241,13 @@ async function requestCameraPermission() {
     }
 
     try {
-        // Correção de Rotação (removido width/height fixos)
+        // Configuração otimizada para melhor qualidade e menor zoom
         const constraints = {
             video: {
-                facingMode: usingFrontCamera ? "user" : "environment"
+                facingMode: usingFrontCamera ? "user" : "environment",
+                width: { ideal: 1920 }, // Melhor qualidade possível
+                height: { ideal: 1080 },
+                zoom: { ideal: 1 } // Zoom mínimo (sem zoom)
             },
             audio: false
         };
@@ -246,7 +255,24 @@ async function requestCameraPermission() {
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
         hasCameraPermission = true; // Permissão concedida!
-        // checkCameraAccess(); // Não é mais necessário aqui
+        
+        // Obter capacidades de zoom do dispositivo
+        const videoTrack = currentStream.getVideoTracks()[0];
+        if (videoTrack && videoTrack.getCapabilities) {
+            const capabilities = videoTrack.getCapabilities();
+            if (capabilities.zoom) {
+                maxZoom = capabilities.zoom.max || 4;
+                currentZoom = capabilities.zoom.min || 1;
+                updateZoomButtons();
+            }
+        }
+        
+        // Resetar zoom ao mudar de câmera
+        currentZoom = 1;
+        applyZoom();
+        
+        // Detectar orientação do dispositivo
+        detectDeviceOrientation();
 
     } catch (err) {
         console.error("Erro ao acessar câmera:", err);
@@ -282,6 +308,7 @@ function closeCameraFullscreen() {
     hasCameraPermission = false; // Reinicia o estado da permissão
     // --- FIM DA MODIFICAÇÃO ---
     checkCameraAccess(); // Verifica o estado do botão (que voltará a checar os dropdowns)
+    window.removeEventListener('deviceorientation', handleDeviceOrientation);
 }
 
 
@@ -302,7 +329,7 @@ function updatePhotoCounter() {
 
 // --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ---
 /**
- * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva.
+ * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva com rotação automática.
  */
 function capturePhoto() {
     if (!selectPromotor.value || !selectRede.value || !selectLoja.value) {
@@ -331,6 +358,15 @@ function capturePhoto() {
     // O canvas terá o tamanho do *stream* de vídeo (seja retrato ou paisagem)
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
+    
+    // Aplicar rotação automática baseada na orientação do dispositivo
+    const rotation = getPhotoRotation();
+    if (rotation !== 0) {
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.translate(-canvas.width / 2, -canvas.height / 2);
+    }
+    
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     
@@ -500,6 +536,157 @@ function switchCamera() {
 }
 
 
+// ==================== FUNCIONALIDADES DE ZOOM ====================
+
+/**
+ * @description Aplica o zoom ao vídeo da câmera
+ */
+function applyZoom() {
+    if (!currentStream) return;
+    
+    const videoTrack = currentStream.getVideoTracks()[0];
+    if (videoTrack && videoTrack.getSettings) {
+        try {
+            videoTrack.applyConstraints({
+                advanced: [{ zoom: currentZoom }]
+            }).catch(err => console.error('Erro ao aplicar zoom:', err));
+        } catch (err) {
+            console.error('Zoom não suportado neste dispositivo:', err);
+        }
+    }
+}
+
+/**
+ * @description Aumenta o zoom
+ */
+function zoomIn() {
+    if (currentZoom < maxZoom) {
+        currentZoom = Math.min(currentZoom + 0.5, maxZoom);
+        applyZoom();
+        updateZoomButtons();
+    }
+}
+
+/**
+ * @description Diminui o zoom
+ */
+function zoomOut() {
+    if (currentZoom > 1) {
+        currentZoom = Math.max(currentZoom - 0.5, 1);
+        applyZoom();
+        updateZoomButtons();
+    }
+}
+
+/**
+ * @description Atualiza o estado visual dos botões de zoom
+ */
+function updateZoomButtons() {
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    const zoomLevelDisplay = document.getElementById('zoom-level');
+    
+    if (zoomInBtn) {
+        zoomInBtn.disabled = currentZoom >= maxZoom;
+    }
+    if (zoomOutBtn) {
+        zoomOutBtn.disabled = currentZoom <= 1;
+    }
+    if (zoomLevelDisplay) {
+        zoomLevelDisplay.textContent = currentZoom.toFixed(1) + 'x';
+    }
+}
+
+// ==================== FUNCIONALIDADES DE FLASH ====================
+
+/**
+ * @description Alterna o estado do flash (torch)
+ */
+function toggleFlash() {
+    if (!currentStream) return;
+    
+    const videoTrack = currentStream.getVideoTracks()[0];
+    if (videoTrack && videoTrack.getCapabilities && videoTrack.getCapabilities().torch) {
+        try {
+            isFlashOn = !isFlashOn;
+            videoTrack.applyConstraints({
+                advanced: [{ torch: isFlashOn }]
+            }).then(() => {
+                updateFlashButton();
+            }).catch(err => console.error('Erro ao ativar flash:', err));
+        } catch (err) {
+            console.error('Flash não suportado neste dispositivo:', err);
+        }
+    } else {
+        console.warn('Flash (torch) não suportado neste dispositivo');
+    }
+}
+
+/**
+ * @description Atualiza o estado visual do botão de flash
+ */
+function updateFlashButton() {
+    const flashBtn = document.getElementById('flash-btn');
+    if (flashBtn) {
+        if (isFlashOn) {
+            flashBtn.classList.add('active');
+            flashBtn.title = 'Desativar Flash';
+        } else {
+            flashBtn.classList.remove('active');
+            flashBtn.title = 'Ativar Flash';
+        }
+    }
+}
+
+// ==================== DETECÇÃO DE ORIENTAÇÃO DO DISPOSITIVO ====================
+
+/**
+ * @description Detecta a orientação do dispositivo
+ */
+function detectDeviceOrientation() {
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', handleDeviceOrientation);
+    }
+}
+
+/**
+ * @description Manipula mudanças na orientação do dispositivo
+ */
+function handleDeviceOrientation(event) {
+    const alpha = event.alpha; // Rotação ao redor do eixo Z (0-360)
+    const beta = event.beta;   // Rotação ao redor do eixo X (-180 a 180)
+    const gamma = event.gamma; // Rotação ao redor do eixo Y (-90 a 90)
+    
+    // Determinar orientação baseado no beta (inclinação para frente/trás)
+    if (Math.abs(beta) < 45) {
+        deviceOrientation = 0; // Retrato normal
+    } else if (beta > 45) {
+        deviceOrientation = 180; // Retrato invertido
+    } else if (gamma > 45) {
+        deviceOrientation = 90; // Paisagem (girado para a direita)
+    } else if (gamma < -45) {
+        deviceOrientation = -90; // Paisagem (girado para a esquerda)
+    }
+}
+
+/**
+ * @description Calcula a rotação necessária para a foto
+ */
+function getPhotoRotation() {
+    // Usar screen.orientation se disponível
+    if (screen.orientation) {
+        const orientation = screen.orientation.type;
+        if (orientation.includes('portrait-primary')) return 0;
+        if (orientation.includes('portrait-secondary')) return 180;
+        if (orientation.includes('landscape-primary')) return 90;
+        if (orientation.includes('landscape-secondary')) return -90;
+    }
+    
+    // Fallback para deviceOrientation
+    return deviceOrientation;
+}
+
+
 // ==================== EVENT LISTENERS ====================
 
 // ==================================================================
@@ -522,6 +709,23 @@ if (shutterBtn) {
 
 if (switchBtn) {
     switchBtn.addEventListener('click', switchCamera);
+}
+
+// Event listeners para Zoom
+const zoomInBtn = document.getElementById('zoom-in-btn');
+if (zoomInBtn) {
+    zoomInBtn.addEventListener('click', zoomIn);
+}
+
+const zoomOutBtn = document.getElementById('zoom-out-btn');
+if (zoomOutBtn) {
+    zoomOutBtn.addEventListener('click', zoomOut);
+}
+
+// Event listener para Flash
+const flashBtn = document.getElementById('flash-btn');
+if (flashBtn) {
+    flashBtn.addEventListener('click', toggleFlash);
 }
 
 // Botão "Baixar Todas" (Função original mantida)
@@ -549,7 +753,7 @@ if (shareAllBtn && navigator.share) {
         const loja = selectLoja.options[selectLoja.selectedIndex].text;
         
         // 2. Cria a legenda dinâmica
-        const legendaCompartilhada = `${promotor}\nLoja ${rede} - ${loja}`;
+        const legendaCompartilhada = `Promotor: ${promotor}\nLoja: ${rede} ${loja}`;
 
         const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
@@ -598,4 +802,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAndPopulateDropdowns();
     updateGalleryView(); 
     updatePhotoCounter();
+    detectDeviceOrientation();
 });
