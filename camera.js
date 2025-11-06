@@ -84,18 +84,10 @@ const selectPromotor = document.getElementById('select-promotor');
 const selectRede = document.getElementById('select-rede'); 
 const selectLoja = document.getElementById('select-loja'); 
 
-// NOVOS ELEMENTOS: Controles Avançados
-const zoomRange = document.getElementById('zoom-range');
-const zoomInBtn = document.getElementById('zoom-in-btn');
-const zoomOutBtn = document.getElementById('zoom-out-btn');
-const flashToggleBtn = document.getElementById('flash-toggle-btn');
-
-
 let currentStream = null;
 let usingFrontCamera = false;
 let photos = []; // Array de URLs de fotos (Sempre começará vazio)
 let hasCameraPermission = false; // Inicia como 'false'
-let currentTrack = null; // Rastreia a trilha de vídeo atual
 const localStorageKey = 'qdelicia_last_selection'; // Chave para persistência (APENAS DROPDOWNS)
 
 // Carregar a imagem da logomarca
@@ -232,99 +224,10 @@ if (selectLoja) {
 }
 
 
-// --- LÓGICA DA CÂMERA E CONTROLES AVANÇADOS (ADICIONADOS) ---
+// --- LÓGICA DA CÂMERA (requestCameraPermission agora chama checkCameraAccess) ---
 
 /**
- * @description Configura e habilita os controles de Zoom e Flash se suportados pelo dispositivo.
- */
-function setupAdvancedControls() {
-    if (!currentStream) return;
-    
-    // Pega a trilha de vídeo
-    currentTrack = currentStream.getVideoTracks()[0];
-    if (!currentTrack) return;
-    
-    const capabilities = currentTrack.getCapabilities();
-    const advancedControls = document.querySelector('.advanced-controls');
-    
-    // Esconde todos por padrão
-    advancedControls.style.display = 'none';
-
-    // --- LÓGICA DO ZOOM ---
-    if (capabilities.zoom && zoomRange) {
-        const maxZoom = capabilities.zoom.max;
-        const minZoom = capabilities.zoom.min;
-        const stepZoom = capabilities.zoom.step;
-        
-        zoomRange.min = minZoom;
-        zoomRange.max = maxZoom;
-        zoomRange.step = stepZoom;
-        zoomRange.value = minZoom; // Inicia no menor zoom possível
-
-        document.querySelector('.zoom-controls').style.display = 'flex';
-        advancedControls.style.display = 'flex';
-        
-        zoomRange.oninput = () => {
-            currentTrack.applyConstraints({ advanced: [{ zoom: parseFloat(zoomRange.value) }] }).catch(e => console.error("Erro no Zoom:", e));
-        };
-        
-        if (zoomInBtn) {
-            zoomInBtn.onclick = () => {
-                const newZoom = Math.min(maxZoom, parseFloat(zoomRange.value) + parseFloat(stepZoom * 5));
-                zoomRange.value = newZoom;
-                zoomRange.dispatchEvent(new Event('input')); 
-            };
-        }
-        if (zoomOutBtn) {
-            zoomOutBtn.onclick = () => {
-                const newZoom = Math.max(minZoom, parseFloat(zoomRange.value) - parseFloat(stepZoom * 5));
-                zoomRange.value = newZoom;
-                zoomRange.dispatchEvent(new Event('input')); 
-            };
-        }
-    } else if (zoomRange) {
-        document.querySelector('.zoom-controls').style.display = 'none';
-    }
-
-    // --- LÓGICA DO FLASH/Torch ---
-    if (capabilities.torch && flashToggleBtn) {
-        flashToggleBtn.style.display = 'flex'; 
-        advancedControls.style.display = 'flex';
-        let isFlashOn = false;
-        
-        // Garante que o estado inicial do botão seja 'off'
-        flashToggleBtn.classList.remove('flash-on');
-        flashToggleBtn.classList.add('flash-off');
-
-
-        flashToggleBtn.onclick = async () => {
-            isFlashOn = !isFlashOn;
-            
-            // Requer que a trilha seja "mutável" (em teoria)
-            await currentTrack.applyConstraints({ 
-                advanced: [{ torch: isFlashOn }]
-            }).then(() => {
-                // Atualiza o estilo do botão para feedback visual
-                if (isFlashOn) {
-                    flashToggleBtn.classList.remove('flash-off');
-                    flashToggleBtn.classList.add('flash-on');
-                } else {
-                    flashToggleBtn.classList.remove('flash-on');
-                    flashToggleBtn.classList.add('flash-off');
-                }
-            }).catch(e => {
-                 console.error("Erro ao tentar ligar/desligar o flash:", e);
-                 isFlashOn = !isFlashOn; // Reverte o estado em caso de falha
-            });
-        };
-    } else if (flashToggleBtn) {
-        flashToggleBtn.style.display = 'none';
-    }
-}
-
-
-/**
- * @description Solicita permissão da câmera e inicia o stream com alta qualidade e correção de rotação.
+ * @description Solicita permissão da câmera e inicia o stream.
  */
 async function requestCameraPermission() {
     if (currentStream) {
@@ -332,25 +235,18 @@ async function requestCameraPermission() {
     }
 
     try {
-        // --- NOVAS CONSTRAINTS PARA ALTA QUALIDADE E MENOR ZOOM POSSÍVEL ---
+        // Correção de Rotação (removido width/height fixos)
         const constraints = {
-            audio: false,
             video: {
-                // Prioriza a câmera traseira (environment)
-                facingMode: usingFrontCamera ? "user" : "environment",
-                
-                // Tenta capturar na melhor resolução (Alta Qualidade) para o menor zoom óptico
-                width: { ideal: 4096 },  
-                height: { ideal: 2160 }, 
-            }
+                facingMode: usingFrontCamera ? "user" : "environment"
+            },
+            audio: false
         };
         
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
         hasCameraPermission = true; // Permissão concedida!
-        
-        // Configura e verifica controles avançados (Zoom, Flash)
-        setupAdvancedControls(); 
+        // checkCameraAccess(); // Não é mais necessário aqui
 
     } catch (err) {
         console.error("Erro ao acessar câmera:", err);
@@ -379,10 +275,6 @@ function closeCameraFullscreen() {
     fullscreenCameraContainer.classList.remove('active');
     document.body.style.overflow = '';
     if (currentStream) {
-        // Desliga o flash/torch ao fechar (boa prática)
-        if (currentTrack) {
-             currentTrack.applyConstraints({ advanced: [{ torch: false }] }).catch(() => {});
-        }
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
     }
@@ -408,7 +300,7 @@ function updatePhotoCounter() {
 }
 
 
-// --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) COM CORREÇÃO DE ROTAÇÃO ---
+// --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ---
 /**
  * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva.
  */
@@ -436,45 +328,17 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    const videoWidth = video.videoWidth;
-    const videoHeight = video.videoHeight;
+    // O canvas terá o tamanho do *stream* de vídeo (seja retrato ou paisagem)
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // --- CORREÇÃO DE ROTAÇÃO (HEURÍSTICA PARA RETRATO) ---
-    let renderWidth = videoWidth;
-    let renderHeight = videoHeight;
-    let rotation = 0; 
     
-    // Se a tela estiver em retrato (height > width) e o stream for paisagem (width > height), 
-    // giramos 90 graus e invertemos as dimensões do canvas.
-    if (window.innerHeight > window.innerWidth && videoWidth > videoHeight) {
-        rotation = Math.PI / 2; // 90 graus em radianos
-        renderWidth = videoHeight;
-        renderHeight = videoWidth;
-    } 
-    // --- FIM DA CORREÇÃO DE ROTAÇÃO ---
-    
-    canvas.width = renderWidth;
-    canvas.height = renderHeight;
-
-    // Aplica a transformação de rotação e translação (no centro)
-    ctx.translate(renderWidth / 2, renderHeight / 2); 
-    ctx.rotate(rotation);
-    
-    // Desenha a imagem. As coordenadas são ajustadas para o centro, e o drawImage usa as dimensões originais do vídeo.
-    ctx.drawImage(video, -videoWidth / 2, -videoHeight / 2, videoWidth, videoHeight);
-
-    // Reverte a transformação para desenhar o texto/logo na orientação correta (topo-esquerda/inferior-direita)
-    ctx.rotate(-rotation);
-    ctx.translate(-renderWidth / 2, -renderHeight / 2);
-
-    const finalWidth = canvas.width;
-    const finalHeight = canvas.height;
-    
-    // --- Configurações Comuns de Estilo e Posição (Usando finalWidth/finalHeight) ---
-    const padding = Math.max(15, Math.floor(finalHeight / 80)); // Espaçamento
+    // --- Configurações Comuns de Estilo e Posição ---
+    const padding = Math.max(15, Math.floor(canvas.height / 80)); // Espaçamento
     const textBaseColor = '#FFFFFF';
     const bgColor = 'rgba(0, 0, 0, 0.7)';
-    const defaultFontSize = Math.max(20, Math.floor(finalHeight / 40)); 
+    const defaultFontSize = Math.max(20, Math.floor(canvas.height / 40)); 
     
     ctx.textAlign = 'right';
     ctx.textBaseline = 'bottom';
@@ -494,27 +358,27 @@ function capturePhoto() {
     // Desenha o fundo único para todas as linhas
     ctx.fillStyle = bgColor; 
     ctx.fillRect(
-        finalWidth - maxWidth - 2*padding, // Posição X (começa da direita para a esquerda)
-        finalHeight - totalHeight - 2*padding, // Posição Y (de baixo para cima)
+        canvas.width - maxWidth - 2*padding, // Posição X (começa da direita para a esquerda)
+        canvas.height - totalHeight - 2*padding, // Posição Y (de baixo para cima)
         maxWidth + 2*padding, 
         totalHeight + 2*padding
     );
 
     // Desenha as linhas de texto
     ctx.fillStyle = textBaseColor; 
-    let lineY = finalHeight - 2 * padding; // Posição inicial para o primeiro texto (dateText)
+    let lineY = canvas.height - 2 * padding; // Posição inicial para o primeiro texto (dateText)
 
     // Percorre as linhas e desenha de baixo para cima
     for (let i = 0; i < watermarkLines.length; i++) {
         const line = watermarkLines[i];
-        ctx.fillText(line, finalWidth - padding, lineY);
+        ctx.fillText(line, canvas.width - padding, lineY);
         lineY -= (defaultFontSize * 0.9 + (padding / 2)); // Move para a linha acima
     }
 
 
     // --- 2. Aplicação da Marca D'água (Logomarca - Canto Superior Esquerdo) ---
     if (logoImage.complete && logoImage.naturalHeight !== 0) {
-        const logoHeight = Math.max(50, Math.floor(finalHeight / 10)); 
+        const logoHeight = Math.max(50, Math.floor(canvas.height / 10)); 
         const logoWidth = (logoImage.naturalWidth / logoImage.naturalHeight) * logoHeight; 
         
         ctx.drawImage(logoImage, padding, padding, logoWidth, logoHeight);
@@ -675,7 +539,7 @@ if (downloadAllBtn) {
     });
 }
 
-// Botão "Compartilhar" (Função original mantida)
+// Botão "Compartilhar" (Função original corrigida)
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
         
@@ -684,8 +548,8 @@ if (shareAllBtn && navigator.share) {
         const rede = selectRede.options[selectRede.selectedIndex].text;
         const loja = selectLoja.options[selectLoja.selectedIndex].text;
         
-        // 2. Cria a legenda dinâmica
-        const legendaCompartilhada = `Promotor: ${promotor}\nLoja: ${rede} ${loja}`;
+        // 2. CRITICAL FIX: Cria a legenda dinâmica (agora corrigida para incluir todos os 3 campos)
+        const legendaCompartilhada = `Promotor: ${promotor}\nRede: ${rede}\nLoja: ${loja}`;
 
         const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
             const byteString = atob(img.split(",")[1]);
