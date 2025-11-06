@@ -606,19 +606,29 @@ function toggleFlash() {
     if (!currentStream) return;
     
     const videoTrack = currentStream.getVideoTracks()[0];
-    if (videoTrack && videoTrack.getCapabilities && videoTrack.getCapabilities().torch) {
-        try {
+    if (!videoTrack) return;
+    
+    try {
+        // Alternar o estado do flash
+        isFlashOn = !isFlashOn;
+        
+        // Tentar aplicar a restrição de torch
+        videoTrack.applyConstraints({
+            advanced: [{ torch: isFlashOn }]
+        }).then(() => {
+            updateFlashButton();
+            console.log('Flash ' + (isFlashOn ? 'ligado' : 'desligado'));
+        }).catch(err => {
+            console.error('Erro ao aplicar flash:', err);
+            // Se falhar, reverter o estado
             isFlashOn = !isFlashOn;
-            videoTrack.applyConstraints({
-                advanced: [{ torch: isFlashOn }]
-            }).then(() => {
-                updateFlashButton();
-            }).catch(err => console.error('Erro ao ativar flash:', err));
-        } catch (err) {
-            console.error('Flash não suportado neste dispositivo:', err);
-        }
-    } else {
-        console.warn('Flash (torch) não suportado neste dispositivo');
+            updateFlashButton();
+        });
+    } catch (err) {
+        console.error('Erro ao alternar flash:', err);
+        // Se falhar, reverter o estado
+        isFlashOn = !isFlashOn;
+        updateFlashButton();
     }
 }
 
@@ -627,6 +637,8 @@ function toggleFlash() {
  */
 function updateFlashButton() {
     const flashBtn = document.getElementById('flash-btn');
+    const flashStatus = document.getElementById('flash-status');
+    
     if (flashBtn) {
         if (isFlashOn) {
             flashBtn.classList.add('active');
@@ -634,6 +646,16 @@ function updateFlashButton() {
         } else {
             flashBtn.classList.remove('active');
             flashBtn.title = 'Ativar Flash';
+        }
+    }
+    
+    if (flashStatus) {
+        if (isFlashOn) {
+            flashStatus.textContent = 'ON';
+            flashStatus.classList.add('on');
+        } else {
+            flashStatus.textContent = 'OFF';
+            flashStatus.classList.remove('on');
         }
     }
 }

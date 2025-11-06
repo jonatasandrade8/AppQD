@@ -136,7 +136,7 @@
             <h2>Fotos Recentes na Galeria</h2>
             
             <div class="action-buttons">
-                <button class="action-btn whatsapp-btn-gallery" id="share-all" disabled>
+                <button class="action-btn share-btn" id="share-all" disabled>
                   <i class="fab fa-whatsapp"></i> Compartilhar Fotos
                 </button>
                 <button class="action-btn download-btn" id="download-all" disabled>
@@ -158,9 +158,12 @@
 
             <!-- Controles de Zoom e Flash (Lado Direito) -->
             <div class="camera-controls-right">
-                <button id="flash-btn" class="camera-control-btn" title="Ativar Flash">
-                    <i class="fas fa-bolt"></i>
-                </button>
+                <div class="flash-control-wrapper">
+                    <button id="flash-btn" class="camera-control-btn" title="Ativar Flash">
+                        <i class="fas fa-bolt"></i>
+                    </button>
+                    <div id="flash-status" class="flash-status">OFF</div>
+                </div>
                 <button id="zoom-in-btn" class="camera-control-btn" title="Aumentar Zoom">
                     <i class="fas fa-plus"></i>
                 </button>
