@@ -166,7 +166,7 @@ footer {
     font-size: 0.8rem;
 }
 
-/* ===================== BOTÕES FLUTUANTES (Preservado) ===================== */
+/* ===================== BOTÕES FLUTUANTES ===================== */
 .whatsapp-btn {
     position: fixed;
     bottom: 15px;
@@ -265,7 +265,7 @@ footer {
 }
 
 
-/* ===================== ESTILOS PARA AS CAIXAS DE SELEÇÃO DA MARCA D'ÁGUA (REVISADO) ===================== */
+/* ===================== ESTILOS PARA DROPDOWNS E INPUTS GERAIS ===================== */
 
 .watermark-settings h2 {
     color: var(--primary-color);
@@ -279,7 +279,7 @@ footer {
     align-items: flex-start; 
     width: 100%;
     max-width: 350px; 
-    margin: 15px auto; /* Adiciona margem entre os grupos */
+    margin: 15px auto; 
     text-align: left;
 }
 
@@ -293,46 +293,65 @@ footer {
     font-size: 0.9rem;
 }
 
-/* Estilo Base para as Caixas de Seleção */
-.input-group select {
-    appearance: none; /* Remove estilo nativo para personalização */
+/* Estilo Base para Inputs de Texto, Número, Textarea e Selects (PADRONIZADO) */
+.input-group select, 
+.input-group .report-input, 
+.input-group .report-textarea {
+    appearance: none; 
     -webkit-appearance: none;
     -moz-appearance: none;
     width: 100%;
     padding: 12px 15px;
     border: 2px solid var(--tertiary-color);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius); /* 8px */
     font-size: 1rem;
     color: var(--text-dark);
     background-color: var(--white);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%235d3fd3' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E"); /* Seta customizada */
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 16px;
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
     cursor: pointer;
+    box-sizing: border-box; /* Garante que padding e border não aumentem a largura total */
+}
+
+/* Tratamento específico para o selectbox, que precisa da seta */
+.input-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%235d3fd3' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E"); 
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+}
+
+/* Estilo para Inputs/Textareas sem seta de dropdown */
+.input-group .report-input, 
+.input-group .report-textarea {
+    cursor: text;
+    resize: vertical;
 }
 
 /* Foco e Hover */
-.input-group select:hover {
+.input-group select:hover,
+.input-group .report-input:hover,
+.input-group .report-textarea:hover {
     border-color: var(--secondary-color);
 }
-.input-group select:focus {
+.input-group select:focus,
+.input-group .report-input:focus,
+.input-group .report-textarea:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.2); 
 }
 
 /* Estilo para caixas de seleção DESABILITADAS */
-.input-group select:disabled {
+.input-group select:disabled, 
+.input-group .report-input:disabled {
     cursor: not-allowed;
-    background-color: var(--bg-light); /* Cor de fundo mais clara para indicar desabilitação */
+    background-color: var(--bg-light); 
     border-color: #ddd;
     color: #a0a0a0;
     opacity: 0.8;
 }
 
-/* Estilo para o botão de acesso à câmera no estado desabilitado */
+/* Botão de acesso à câmera */
 #open-camera-btn[disabled] {
     background-color: #aaa;
     color: #eee;
@@ -343,7 +362,6 @@ footer {
 #open-camera-btn[disabled] i.fa-lock {
     color: #555;
 }
-
 
 /* Linha separadora horizontal */
 hr {
@@ -455,14 +473,13 @@ hr {
     position: absolute;
     top: 15px;
     right: 15px;
-    /* Estilo modificado para ser um badge, e não um botão */
     background: rgba(255, 255, 255, 0.8); 
     color: var(--text-dark);
     padding: 6px 10px;
     border-radius: 4px;
     font-weight: bold;
     font-size: 1rem;
-    min-width: 35px; /* Garante que é visível mesmo com 1 dígito */
+    min-width: 35px; 
     text-align: center;
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     z-index: 10;
@@ -562,7 +579,7 @@ hr {
     object-fit: cover;
 }
 
-/* Botões de Ação na Galeria (Preservado) */
+/* Botões de Ação na Galeria (Geral) */
 .action-buttons {
     display: flex;
     flex-direction: column; 
@@ -589,9 +606,151 @@ hr {
 .download-btn {
     background: var(--primary-color);
 }
+.download-btn:hover {
+    background: var(--secondary-color);
+}
 
-.whatsapp-btn-gallery {
-    background: #25d366; 
+/* Botão de Compartilhar PDF (FIXADO) */
+.share-btn {
+    background: #25d366; /* Verde WhatsApp */
+}
+
+.share-btn:hover {
+    background: #1da851; /* Tom mais escuro */
+}
+
+
+/* ===================== BOTÕES UNITÁRIOS DA GALERIA (FIXADO) ===================== */
+
+.photo-controls {
+    position: absolute;
+    top: 10px; 
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+    z-index: 10;
+}
+
+.icon-btn {
+    width: 35px; 
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--white);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.icon-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.1);
+}
+
+/* Botão de Download na foto */
+.download-icon {
+    background-color: var(--primary-color);
+}
+
+/* Botão de Excluir na foto */
+.delete-icon {
+    background-color: #dc3545; /* Vermelho padrão para exclusão */
+}
+
+/* ===================== ESTILOS ESPECÍFICOS PARA RELATÓRIO ===================== */
+
+.report-section {
+    text-align: left; 
+}
+
+/* Estilo para Fieldset (Contêiner para Agrupamento) */
+.report-fieldset {
+    border: 2px solid var(--tertiary-color);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    background-color: var(--bg-light);
+    box-shadow: 0 2px 5px var(--shadow);
+}
+
+.report-fieldset legend {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    padding: 0 10px;
+}
+
+/* Estilo para Botões de Ação dentro do fieldset (Ex: Adicionar Item) */
+.report-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: var(--white);
+    transition: background-color 0.3s, transform 0.1s;
+    margin-top: 10px;
+}
+
+.report-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.report-btn:active {
+    transform: scale(0.98);
+}
+
+/* Estilos para a Lista de Itens do Relatório */
+.report-items-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.report-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-left: 5px solid var(--primary-color);
+    border-radius: 4px;
+    background-color: var(--white);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.item-details {
+    flex-grow: 1;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.item-details strong {
+    color: var(--text-dark);
+    font-size: 1rem;
+}
+
+/* Botão de Remover Item da Lista */
+.delete-item-btn { 
+    background: none;
+    border: none;
+    color: #dc3545; 
+    cursor: pointer;
+    font-size: 1.2rem;
+    margin-left: 10px;
+    transition: color 0.2s;
+}
+
+.delete-item-btn:hover {
+    color: #a01d2a;
 }
 
 
@@ -651,7 +810,7 @@ hr {
 
     /* Estilos do Input em Desktop */
     .input-group {
-        max-width: 450px; /* Aumenta a largura em desktop */
+        max-width: 450px; 
     }
 
     /* Carrossel */
@@ -674,5 +833,11 @@ hr {
     /* Câmera: Botão de abrir centralizado no desktop */
     .start-camera-section {
         min-height: 400px; 
+    }
+    
+    .gallery {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
     }
 }

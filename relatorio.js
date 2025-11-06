@@ -1,5 +1,5 @@
-// ==================== ESTRUTURA DE DADOS PARA DROPDOWNS (DEVOLUÇÃO) ====================
-// Esta estrutura é IDÊNTICA à de camera.js para padronização
+// ==================== ESTRUTURA DE DADOS PARA DROPDOWNS (PROMOTORES/REDES) ====================
+// RESTAURADO: A lista de promotores e lojas foi restaurada para a versão anterior.
 const APP_DATA = {
     "Miqueias": {
         "Assaí": ["Ponta Negra"],
@@ -37,8 +37,7 @@ const APP_DATA = {
         "Atacadão": ["BR-101 Sul"]
     },
     "Jordão": {
-        "Superfácil": ["Olho d'Água"],
-        "Assaí": ["Ponta Negra"],
+        "Superfácil": ["Olho d'Água", "Emaús"],
         "Mar Vermelho": ["BR-101 Sul"]
     },
     "Mateus": {
@@ -46,47 +45,36 @@ const APP_DATA = {
         "Carrefour": ["Zona Sul"]
     },
     "Cristiane": {
-        "Nordestão": ["Loja 07"],
-        
-    },
-    "J Mauricio": {
-        "Nordestão": ["Loja 03"],
-        
-    },
-    "Neto": {
-        "Superfácil": ["Emaús"],
-        
-    },
-    "Antonio": {
-        "Superfácil": ["Nazaré"],
+        "Carrefour": ["Zona Norte"],
         
     }
 };
 
-// ATENÇÃO: A lógica original de relatorio.js dependia dos dados abaixo.
-// Preencha 'MOTIVOS_DEVOLUCAO' e 'TIPOS_PRODUTO' com os valores corretos.
+// PRESERVADO: Esta é a lista correta de motivos e produtos que você especificou.
 const RELATORIO_DATA = {
     MOTIVOS_DEVOLUCAO: [
-        "Baixa Qualidade",
-        "Danos Mecânicos",
-        "Fora de Padrão",
-        "Produto Encruado",
-        "Outro"
+        "Muito Madura",
+        "Muito Arranhada",
+        "Tamanho Fora do Padrão",
+        "Atraso na Entrega",
+        "Peso Alterado",
+        "Outro Motivo"
     ],
     TIPOS_PRODUTO: [
-        "Banana Pacovan",
-        "Banana Prata",
-        "Banana Nanica",
-        "Banana Comprida",
-        "Banana Leite",
-        "Abacaxi",
-        "Goiaba"
+        "Prata",
+        "Pacovan",
+        "Comprida",
+        "Leite",
+        "Nanica",
+        "Goiaba",
+        "Abacaxi"
+        
     ]
 };
 
 
 // ================= MENU HAMBÚRGUER e VOLTAR AO TOPO =================
-// (A lógica original do menu foi mantida)
+// (Restante do código JS mantido)
 const menuToggle = document.querySelector('.menu-toggle');
 const sideMenu = document.querySelector('.side-menu');
 const menuOverlay = document.querySelector('.menu-overlay');
@@ -141,8 +129,8 @@ const downloadAllBtn = document.getElementById('download-all');
 const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
 
-// Elementos para Marca D'água (Base) - CORRIGIDO
-const selectPromotor = document.getElementById('select-promotor'); // CORRIGIDO (era select-entregador)
+// Elementos para Marca D'água (Base)
+const selectPromotor = document.getElementById('select-promotor'); 
 const selectRede = document.getElementById('select-rede'); 
 const selectLoja = document.getElementById('select-loja'); 
 
@@ -160,7 +148,7 @@ let currentStream = null;
 let usingFrontCamera = false;
 let photos = [];
 let items = []; // Armazena a lista de itens (produto, motivo, qtd)
-const localStorageKey = 'qdelicia_last_selection'; // PADRONIZADO (o mesmo de camera.js)
+const localStorageKey = 'qdelicia_last_selection'; 
 
 // Carregar a imagem da logomarca (mantida para uso apenas no PDF)
 const logoImage = new Image();
@@ -169,17 +157,15 @@ logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca.
 
 
 // --- LÓGICA DE DROP DOWNS, PERSISTÊNCIA E VALIDAÇÃO ---
-// (Funções de camera.js mescladas com as de relatorio.js)
 
 /**
- * @description Salva as seleções atuais no localStorage. (Atualizado)
+ * @description Salva as seleções atuais no localStorage.
  */
 function saveSelection() {
     const selection = {
         promotor: selectPromotor.value,
         rede: selectRede.value,
         loja: selectLoja.value,
-        // Funcionalidade preservada de relatorio.js:
         observacoes: inputObservacoes ? inputObservacoes.value : ''
     };
     localStorage.setItem(localStorageKey, JSON.stringify(selection));
@@ -187,7 +173,7 @@ function saveSelection() {
 }
 
 /**
- * @description Preenche um <select> genérico. (Preservado de relatorio.js)
+ * @description Preenche um <select> genérico.
  */
 function populateSelect(selectElement, data, placeholder) {
     if (!selectElement) return;
@@ -206,7 +192,7 @@ function populateSelect(selectElement, data, placeholder) {
 }
 
 /**
- * @description Preenche as opções de Rede com base no Promotor selecionado. (De camera.js)
+ * @description Preenche as opções de Rede com base no Promotor selecionado.
  */
 function populateRede(promotor) {
     selectRede.innerHTML = '<option value="" disabled selected>Selecione a Rede</option>';
@@ -227,7 +213,7 @@ function populateRede(promotor) {
 }
 
 /**
- * @description Preenche as opções de Loja com base na Rede e Promotor selecionados. (De camera.js)
+ * @description Preenche as opções de Loja com base na Rede e Promotor selecionados.
  */
 function populateLoja(promotor, rede) {
     selectLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
@@ -246,10 +232,10 @@ function populateLoja(promotor, rede) {
 }
 
 /**
- * @description Carrega as seleções do localStorage e preenche os dropdowns. (Atualizado)
+ * @description Carrega as seleções do localStorage e preenche os dropdowns.
  */
 function loadAndPopulateDropdowns() {
-    // --- Lógica de camera.js (para Promotor/Rede/Loja) ---
+    // --- Lógica de Promotor/Rede/Loja ---
     Object.keys(APP_DATA).forEach(promotor => {
         if (!selectPromotor) return;
         const option = document.createElement('option');
@@ -272,8 +258,7 @@ function loadAndPopulateDropdowns() {
         }
     }
     
-    // --- Lógica preservada de relatorio.js (para Motivo/Produto/Observações) ---
-    // (Usando a função 'populateSelect' que estava em relatorio.js)
+    // --- Lógica de Motivo/Produto/Observações ---
     populateSelect(selectMotivo, RELATORIO_DATA.MOTIVOS_DEVOLUCAO, "Selecione o Motivo");
     populateSelect(selectProduto, RELATORIO_DATA.TIPOS_PRODUTO, "Selecione o Produto");
 
@@ -286,7 +271,7 @@ function loadAndPopulateDropdowns() {
 
 
 /**
- * @description Lógica de Adicionar Itens (Preservada de relatorio.js)
+ * @description Lógica de Adicionar Itens
  */
 function handleAddItem() {
     const produto = selectProduto.value;
@@ -309,7 +294,7 @@ function handleAddItem() {
 }
 
 /**
- * @description Atualiza UI da Lista de Itens (Preservada de relatorio.js)
+ * @description Atualiza UI da Lista de Itens
  */
 function updateItemListUI() {
     if (!itemListElement) return;
@@ -339,7 +324,7 @@ function updateItemListUI() {
 }
 
 /**
- * @description Verifica se todos os campos estão preenchidos para liberar a câmera. (Atualizado)
+ * @description Verifica se todos os campos estão preenchidos para liberar a câmera.
  */
 function checkCameraAccess() {
     let isReady = false;
@@ -357,7 +342,7 @@ function checkCameraAccess() {
     if (openCameraBtn) {
         if (isReady) {
             openCameraBtn.disabled = false;
-            // Texto do botão baseado no estado da câmera (lógica preservada de relatorio.js)
+            // Texto do botão baseado no estado da câmera
             openCameraBtn.innerHTML = currentStream 
                 ? '<i class="fas fa-video"></i> Câmera Aberta (Fechar)' 
                 : '<i class="fas fa-camera"></i> Abrir Câmera'; 
@@ -373,8 +358,8 @@ function checkCameraAccess() {
     return isReady;
 }
 
-// EVENT LISTENERS para os Dropdowns (Atualizados)
-if (selectPromotor) { // Corrigido (era selectEntregador)
+// EVENT LISTENERS para os Dropdowns
+if (selectPromotor) { 
     selectPromotor.addEventListener('change', () => {
         populateRede(selectPromotor.value);
         saveSelection();
@@ -388,13 +373,12 @@ if (selectRede) {
 }
 if (selectLoja) selectLoja.addEventListener('change', saveSelection);
 
-// Listeners específicos de Devolução (Preservados)
+// Listeners específicos de Devolução
 if (inputObservacoes) inputObservacoes.addEventListener('input', saveSelection); 
 if (addItemBtn) addItemBtn.addEventListener('click', handleAddItem);
 
 
-// --- LÓGICA DA CÂMERA (Preservada de relatorio.js) ---
-// (Esta lógica é diferente de camera.js, notavelmente 'takePhoto' não aplica marca d'água)
+// --- LÓGICA DA CÂMERA ---
 
 function startCamera(facingMode = 'environment') {
     if (currentStream) stopCamera(); 
@@ -452,7 +436,6 @@ function takePhoto() {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Esta função NÃO aplica marca d'água, conforme lógica original de relatorio.js
     const photoDataUrl = canvas.toDataURL('image/jpeg', 0.9);
     photos.push(photoDataUrl);
     
@@ -488,7 +471,7 @@ function updateGallery() {
         img.src = photoUrl;
         photoItem.appendChild(img);
         
-        // Botões de download/delete (lógica original de relatorio.js)
+        // Botões de download/delete
         const downloadBtn = document.createElement('a');
         downloadBtn.href = photoUrl;
         downloadBtn.download = `qdelicia_registro_${index + 1}.jpg`;
@@ -514,7 +497,7 @@ function updateGallery() {
     });
 }
 
-// ==================== LÓGICA DE GERAÇÃO DE PDF (Preservada de relatorio.js) ====================
+// ==================== LÓGICA DE GERAÇÃO DE PDF ====================
 async function generatePDFReport(action) {
     if (photos.length === 0) {
         alert("Tire pelo menos uma foto para gerar o relatório.");
@@ -573,7 +556,7 @@ async function generatePDFReport(action) {
     
     pdf.addPage();
     
-    const promotor = selectPromotor.value; // Corrigido
+    const promotor = selectPromotor.value; 
     const rede = selectRede.value;
     const loja = selectLoja.value;
     const observacoes = inputObservacoes.value.trim() || 'Nenhuma observação.';
@@ -596,7 +579,7 @@ async function generatePDFReport(action) {
     pdf.setFontSize(11);
     pdf.text(`Data e Hora: ${date}`, margin, yPos);
     yPos += 7;
-    pdf.text(`Promotor: ${promotor}`, margin, yPos); // Corrigido
+    pdf.text(`Promotor: ${promotor}`, margin, yPos); 
     yPos += 7;
     pdf.text(`Rede: ${rede} - Loja: ${loja}`, margin, yPos);
     yPos += 10;
@@ -663,7 +646,7 @@ async function generatePDFReport(action) {
 }
 
 
-// ==================== CÂMERA: EVENT LISTENERS (Preservados) ====================
+// ==================== CÂMERA: EVENT LISTENERS ====================
 if (openCameraBtn) {
     openCameraBtn.addEventListener('click', () => {
         if (currentStream) {
@@ -683,7 +666,7 @@ if (switchBtn) {
     });
 }
 
-// Listeners para os botões de PDF (Preservados)
+// Listeners para os botões de PDF
 if (downloadAllBtn) downloadAllBtn.addEventListener('click', () => generatePDFReport('download'));
 if (shareAllBtn) shareAllBtn.addEventListener('click', () => generatePDFReport('share'));
 
@@ -692,5 +675,5 @@ if (shareAllBtn) shareAllBtn.addEventListener('click', () => generatePDFReport('
 window.addEventListener('load', () => {
     loadAndPopulateDropdowns(); 
     updateItemListUI();
-    updateGallery(); // Adicionado para exibir a galeria vazia inicialmente
+    updateGallery(); 
 });
