@@ -1,3 +1,15 @@
+// ==================== NOVAS ESTRUTURA DE DADOS PARA DROPDOWNS ====================
+/**
+ * @description Tipos de foto disponíveis para seleção.
+ * Chave: Valor que será salvo (value), 
+ * Valor: Texto que será exibido no dropdown (textContent).
+ */
+const PHOTO_TYPES = {
+    "Bancadas": "Bancadas",
+    "Ponto Extra": "Ponto Extra",
+};
+
+
 // ==================== ESTRUTURA DE DADOS PARA DROPDOWNS ====================
 // ATENÇÃO: Preencha este objeto com os nomes dos promotores, as redes que ele atende e as lojas/PDVs.
 const APP_DATA = {
@@ -123,9 +135,15 @@ function saveSelection() {
  * @description Carrega as seleções do localStorage e preenche os dropdowns.
  */
 function loadAndPopulateDropdowns() {
-    // O selectTipoFoto já é preenchido no HTML, só precisamos do Promotor
+    // 1. Preenche o Tipo de Foto (USANDO O NOVO OBJETO PHOTO_TYPES)
+    Object.keys(PHOTO_TYPES).forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = PHOTO_TYPES[value];
+        selectTipoFoto.appendChild(option);
+    });
 
-    // 1. Preenche o Promotor
+    // 2. Preenche o Promotor
     Object.keys(APP_DATA).forEach(promotor => {
         const option = document.createElement('option');
         option.value = promotor;
@@ -143,10 +161,10 @@ function loadAndPopulateDropdowns() {
 
         if (savedSelection.promotor) {
             selectPromotor.value = savedSelection.promotor;
-            // 2. Preenche a Rede baseada no Promotor salvo
+            // 3. Preenche a Rede baseada no Promotor salvo
             populateRede(savedSelection.promotor);
             selectRede.value = savedSelection.rede;
-            // 3. Preenche a Loja baseada na Rede salva
+            // 4. Preenche a Loja baseada na Rede salva
             if (savedSelection.rede) {
                 populateLoja(savedSelection.promotor, savedSelection.rede);
                 selectLoja.value = savedSelection.loja;
@@ -199,7 +217,6 @@ function populateLoja(promotor, rede) {
 }
 
 // ==================================================================
-// --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE PERMISSÃO) ---
 /**
  * @description Verifica se os dropdowns estão preenchidos para liberar o botão da câmera.
  */
@@ -219,8 +236,6 @@ function checkCameraAccess() {
         }
     }
 }
-// --- FIM DA MODIFICAÇÃO ---
-// ==================================================================
 
 
 // EVENT LISTENERS para os Dropdowns
@@ -322,9 +337,7 @@ function closeCameraFullscreen() {
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
     }
-    // --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE PERMISSÃO) ---
     hasCameraPermission = false; // Reinicia o estado da permissão
-    // --- FIM DA MODIFICAÇÃO ---
     checkCameraAccess(); // Verifica o estado do botão (que voltará a checar os dropdowns)
     window.removeEventListener('deviceorientation', handleDeviceOrientation);
 }
@@ -668,14 +681,9 @@ function getPhotoRotation() {
 
 // ==================== EVENT LISTENERS ====================
 
-// ==================================================================
-// --- INÍCIO DA MODIFICAÇÃO (CORREÇÃO DE PERMISSÃO) ---
 if (openCameraBtn) {
     openCameraBtn.addEventListener('click', openCameraFullscreen);
-    // A chamada requestCameraPermission() FOI REMOVIDA DAQUI
 }
-// --- FIM DA MODIFICAÇÃO ---
-// ==================================================================
 
 
 if (backToGalleryBtn) {
@@ -701,7 +709,7 @@ if (zoomOutBtn) {
     zoomOutBtn.addEventListener('click', zoomOut);
 }
 
-// Botão "Baixar Todas" (Função original mantida)
+// Botão "Baixar Todas"
 if (downloadAllBtn) {
     downloadAllBtn.addEventListener("click", () => {
         photos.forEach((img, i) => {
