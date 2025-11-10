@@ -346,7 +346,8 @@ function updateItemListUI() {
 }
 
 /**
- * @description Limpa a lista de itens, a galeria de fotos e o Tipo de Relatório, preservando Promotor/Rede/Loja.
+ * @description Limpa a lista de itens, a galeria de fotos e o Tipo de Relatório.
+ * PRESERVA: Promotor, Rede, Loja e Observações (que são persistidos no localStorage).
  */
 function clearReportData() {
     // 1. Limpa a lista de itens
@@ -357,17 +358,17 @@ function clearReportData() {
     photos = [];
     updateGallery();
 
-    // 3. Limpa o Tipo de Relatório (e remove a persistência, embora já estivesse desativada)
+    // 3. Limpa o Tipo de Relatório
     if (selectReportType) {
-        selectReportType.value = ""; // Define o valor como vazio para voltar ao placeholder
+        selectReportType.value = ""; 
     }
 
     // 4. Garante que os botões de câmera/PDF sejam atualizados
     checkCameraAccess();
     
-    // O restante dos campos (Promotor, Rede, Loja, Observações) é preservado.
     alert("Dados do Relatório (Itens, Fotos e Tipo) foram limpos com sucesso.");
 }
+
 
 // ==================================================================
 // --- LÓGICA DE VALIDAÇÃO PARA ACESSO À CÂMERA E PDF ---
@@ -654,8 +655,8 @@ async function generatePDFReport(action) {
     }
     
     const { jsPDF } = jspdf; 
-    // alert("Iniciando geração do PDF. Isso pode levar um momento."); // LINHA REMOVIDA
-    
+    // alert("Iniciando geração do PDF. Isso pode levar um momento."); // LINHA REMOVIDA CONFORME SOLICITADO
+
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -780,12 +781,12 @@ async function generatePDFReport(action) {
                 if (error.name !== 'AbortError') {
                     console.error('Erro ao compartilhar:', error);
                     pdf.save(fileName); // Fallback para download
-                    alert(`O PDF "${fileName}" foi baixado. Compartilhe manualmente.`);
+                    // O ALERTA DE SUCESSO DE COMPARTILHAMENTO É SILENCIOSO
                 }
             }
         } else {
             pdf.save(fileName);
-            alert(`O PDF "${fileName}" foi baixado. Compartilhe manualmente.`);
+            // O ALERTA DE SUCESSO DE DOWNLOAD É SILENCIOSO
         }
     }
 }
@@ -821,7 +822,7 @@ if (addItemBtn) {
     addItemBtn.addEventListener('click', handleAddItem);
 }
 
-// Listener para Limpar Relatório
+// Listener para Limpar Relatório (NOVO)
 if (clearReportBtn) {
     clearReportBtn.addEventListener('click', clearReportData);
 }
