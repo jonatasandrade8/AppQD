@@ -360,6 +360,10 @@ function updatePhotoCounter() {
 
 
 // --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ---
+
+// ######################################################################
+// ### INÍCIO DA SUBSTITUIÇÃO - LÓGICA DE ROTAÇÃO CORRIGIDA ###
+// ######################################################################
 /**
  * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva com rotação automática.
  */
@@ -390,22 +394,48 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // O canvas terá o tamanho do *stream* de vídeo (seja retrato ou paisagem)
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // --- INÍCIO DA LÓGICA DE ROTAÇÃO CORRIGIDA ---
     
-    // Aplicar rotação automática baseada na orientação do dispositivo
+    // 1. Obter a rotação e as dimensões do stream
     const rotation = getPhotoRotation();
-    if (rotation !== 0) {
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate((rotation * Math.PI) / 180);
-        ctx.translate(-canvas.width / 2, -canvas.height / 2);
+    const isSideways = rotation === 90 || rotation === -90;
+    const videoW = video.videoWidth;
+    const videoH = video.videoHeight;
+
+    // 2. Definir o tamanho do CANVAS para corresponder à orientação final
+    if (isSideways) {
+        // Se o celular está em "retrato", o canvas deve ser "retrato"
+        // (invertendo as dimensões do stream de vídeo, que é paisagem)
+        canvas.width = videoH;
+        canvas.height = videoW;
+    } else {
+        // Se o celular está em "paisagem" (0) ou de cabeça para baixo (180),
+        // o canvas mantém as dimensões do stream
+        canvas.width = videoW;
+        canvas.height = videoH;
     }
+
+    // 3. Centralizar o contexto e aplicar a rotação
+    // Movemos o ponto (0,0) para o centro do NOVO canvas
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    // Giramos o "pincel"
+    if (rotation !== 0) {
+         ctx.rotate((rotation * Math.PI) / 180);
+    }
+
+    // 4. Desenha o vídeo no contexto girado
+    // O vídeo (que está sempre na orientação do stream, ex: 1920x1080)
+    // é desenhado centralizado no contexto (-videoW/2, -videoH/2).
+    // A rotação aplicada ao contexto fará com que ele preencha
+    // o canvas "retrato" corretamente.
+    ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
     
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // --- FIM DA LÓGICA DE ROTAÇÃO CORRIGIDA ---
 
     
     // --- Configurações Comuns de Estilo e Posição ---
+    // O restante da função (desenhar marcas d'água) continua o mesmo.
+    // Ele vai desenhar no contexto que já está girado e posicionado.
     const padding = Math.max(15, Math.floor(canvas.height / 80)); // Espaçamento
     const textBaseColor = '#FFFFFF';
     const bgColor = 'rgba(0, 0, 0, 0.7)';
@@ -462,6 +492,10 @@ function capturePhoto() {
     
     updateGalleryView();
 }
+// ######################################################################
+// ### FIM DA SUBSTITUIÇÃO - LÓGICA DE ROTAÇÃO CORRIGIDA ###
+// ######################################################################
+
 
 /**
  * @description Remove uma foto específica da galeria pelo seu índice.
@@ -765,7 +799,7 @@ if (shareAllBtn && navigator.share) {
     });
 } else if (shareAllBtn) {
     shareAllBtn.addEventListener("click", () => {
-        alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manualmente.");
+        alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manually.");
     });
 }
 
