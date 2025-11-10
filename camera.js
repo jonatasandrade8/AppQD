@@ -119,10 +119,11 @@ logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca.
 
 /**
  * @description Salva as seleções atuais no localStorage.
+ * *** Tipo de Foto NÃO é salvo para ser resetado a cada sessão. ***
  */
 function saveSelection() {
     const selection = {
-        tipoFoto: selectTipoFoto.value, // NOVO CAMPO SALVO
+        // NÃO INCLUI selectTipoFoto.value AQUI
         promotor: selectPromotor.value,
         rede: selectRede.value,
         loja: selectLoja.value
@@ -136,7 +137,8 @@ function saveSelection() {
  * @description Carrega as seleções do localStorage e preenche os dropdowns.
  */
 function loadAndPopulateDropdowns() {
-    // 1. Preenche o Tipo de Foto (USANDO O NOVO OBJETO PHOTO_TYPES)
+    // 1. Preenche o Tipo de Foto e GARANTE QUE ELE RECOMECE NA OPÇÃO PADRÃO
+    selectTipoFoto.innerHTML = '<option value="" disabled selected>Selecione o Tipo</option>';
     Object.keys(PHOTO_TYPES).forEach(value => {
         const option = document.createElement('option');
         option.value = value;
@@ -155,10 +157,7 @@ function loadAndPopulateDropdowns() {
     const savedSelection = JSON.parse(localStorage.getItem(localStorageKey));
 
     if (savedSelection) {
-        // NOVO: Carrega o Tipo de Foto
-        if (savedSelection.tipoFoto) {
-             selectTipoFoto.value = savedSelection.tipoFoto;
-        }
+        // *** NÃO CARREGA O Tipo de Foto A PARTIR DO localStorage ***
 
         if (savedSelection.promotor) {
             selectPromotor.value = savedSelection.promotor;
@@ -242,7 +241,8 @@ function checkCameraAccess() {
 // EVENT LISTENERS para os Dropdowns
 // NOVO: Adicionado listener para o Tipo de Foto
 if (selectTipoFoto) {
-    selectTipoFoto.addEventListener('change', saveSelection);
+    // Apenas salva/checa, mas não é persistido (o valor será resetado ao recarregar a página)
+    selectTipoFoto.addEventListener('change', saveSelection); 
 }
 if (selectPromotor) {
     selectPromotor.addEventListener('change', () => {
