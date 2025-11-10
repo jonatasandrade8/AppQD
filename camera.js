@@ -46,7 +46,7 @@ const APP_DATA = {
     },
     "Markson": {
         "Nordestão": ["Loja 08"],
-        "Mar Vermelho": ["Parnamirim"],
+        "Mar Vermelho": ["Parnamirim", "Natal"],
         "Atacadão": ["BR-101 Sul"]
     },
     "Jordão": {
