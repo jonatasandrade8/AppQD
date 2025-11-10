@@ -134,6 +134,7 @@ function saveSelection() {
 
 /**
  * @description Carrega as seleções do localStorage e preenche os dropdowns.
+ * (IMPLEMENTAÇÃO 1: O 'Tipo de Foto' não é mais carregado do localStorage)
  */
 function loadAndPopulateDropdowns() {
     // 1. Preenche o Tipo de Foto (USANDO O NOVO OBJETO PHOTO_TYPES)
@@ -155,10 +156,9 @@ function loadAndPopulateDropdowns() {
     const savedSelection = JSON.parse(localStorage.getItem(localStorageKey));
 
     if (savedSelection) {
-        // NOVO: Carrega o Tipo de Foto
-        if (savedSelection.tipoFoto) {
-             selectTipoFoto.value = savedSelection.tipoFoto;
-        }
+        
+        // O bloco que carregava o 'Tipo de Foto' foi removido
+        // para forçar o usuário a selecionar um novo a cada sessão.
 
         if (savedSelection.promotor) {
             selectPromotor.value = savedSelection.promotor;
@@ -395,7 +395,7 @@ function capturePhoto() {
     canvas.height = video.videoHeight;
     
     // Aplicar rotação automática baseada na orientação do dispositivo
-    const rotation = getPhotoRotation();
+    const rotation = getPhotoRotation(); // USA A FUNÇÃO MODIFICADA
     if (rotation !== 0) {
         ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.rotate((rotation * Math.PI) / 180);
@@ -664,18 +664,14 @@ function handleDeviceOrientation(event) {
 
 /**
  * @description Calcula a rotação necessária para a foto
+ * (IMPLEMENTAÇÃO 2: Ignora o 'screen.orientation' e usa apenas
+ * o sensor físico 'deviceOrientation' para 'burlar' a trava de rotação)
  */
 function getPhotoRotation() {
-    // Usar screen.orientation se disponível
-    if (screen.orientation) {
-        const orientation = screen.orientation.type;
-        if (orientation.includes('portrait-primary')) return 0;
-        if (orientation.includes('portrait-secondary')) return 180;
-        if (orientation.includes('landscape-primary')) return 90;
-        if (orientation.includes('landscape-secondary')) return -90;
-    }
-    
-    // Fallback para deviceOrientation
+    // Ao usar apenas a variável 'deviceOrientation', nós garantimos
+    // que a rotação da marca d'água e da logo será baseada
+    // na orientação física real do aparelho, ignorando a trava
+    // de rotação do sistema.
     return deviceOrientation;
 }
 
