@@ -652,51 +652,65 @@ function updateZoomButtons() {
     }
 }
 
-// ==================== DETECÇÃO DE ORIENTAÇÃO DO DISPOSITIVO ====================
+// ==================== DETECÇÃO DE ORIENTAÇÃO DO DISPOSITIVO (LOGICAMENTE MELHORADA) ====================
 
 /**
  * @description Detecta a orientação do dispositivo
  */
 function detectDeviceOrientation() {
     if (window.DeviceOrientationEvent) {
+        // Remove listeners antigos para evitar duplicação
+        window.removeEventListener('deviceorientation', handleDeviceOrientation); 
         window.addEventListener('deviceorientation', handleDeviceOrientation);
     }
 }
 
 /**
- * @description Manipula mudanças na orientação do dispositivo
+ * @description Manipula mudanças na orientação do dispositivo (Melhorado para ser mais robusto)
  */
 function handleDeviceOrientation(event) {
-    const alpha = event.alpha; // Rotação ao redor do eixo Z (0-360)
-    const beta = event.beta;   // Rotação ao redor do eixo X (-180 a 180)
-    const gamma = event.gamma; // Rotação ao redor do eixo Y (-90 a 90)
+    const beta = event.beta;   // Rotação ao redor do eixo X (inclinação frente/trás)
+    const gamma = event.gamma; // Rotação ao redor do eixo Y (inclinação lateral)
+    
+    // Threshold de 45 graus é usado para definir se o dispositivo está em modo retrato ou paisagem.
+    const THRESHOLD = 45; 
 
-    // Determinar orientação baseado no beta (inclinação para frente/trás)
-    if (Math.abs(beta) < 45) {
-        deviceOrientation = 0; // Retrato normal
-    } else if (beta > 45) {
-        deviceOrientation = 180; // Retrato invertido
-    } else if (gamma > 45) {
-        deviceOrientation = 90; // Paisagem (girado para a direita)
-    } else if (gamma < -45) {
-        deviceOrientation = -90; // Paisagem (girado para a esquerda)
+    // 1. Prioridade: Modo Retrato (Dispositivo vertical, gamma próximo de 0)
+    // Se o ângulo lateral (gamma) estiver entre -THRESHOLD e +THRESHOLD, está na vertical.
+    if (Math.abs(gamma) < THRESHOLD) {
+        // Se beta for positivo (mais inclinado para frente), é retrato invertido (180).
+        // Caso contrário (beta negativo ou próximo de 0), é retrato normal (0).
+        deviceOrientation = (beta > 135 || beta < -135) ? 180 : 0; 
+    } 
+    // 2. Fallback: Modo Paisagem (Dispositivo horizontal, girado lateralmente)
+    else {
+        // Se gamma for positivo (topo do telefone para a esquerda), é Paisagem Primária (90).
+        if (gamma > THRESHOLD) {
+            deviceOrientation = 90; 
+        } 
+        // Se gamma for negativo (topo do telefone para a direita), é Paisagem Secundária (-90).
+        else if (gamma < -THRESHOLD) {
+            deviceOrientation = -90; 
+        }
     }
 }
 
+
 /**
- * @description Calcula a rotação necessária para a foto
+ * @description Calcula a rotação necessária para a foto, priorizando screen.orientation.
  */
 function getPhotoRotation() {
-    // Usar screen.orientation se disponível
-    if (screen.orientation) {
-        const orientation = screen.orientation.type;
-        if (orientation.includes('portrait-primary')) return 0;
-        if (orientation.includes('portrait-secondary')) return 180;
-        if (orientation.includes('landscape-primary')) return 90;
-        if (orientation.includes('landscape-secondary')) return -90;
+    // 1. PRIMEIRO: Usar screen.orientation se disponível (Mais confiável, mesmo com bloqueio de rotação de tela em alguns SOs)
+    if (screen.orientation && screen.orientation.angle !== undefined) {
+        let angle = screen.orientation.angle; // 0, 90, 180, 270
+
+        if (angle === 270) {
+            return -90; // API de vídeo prefere -90 para "landscape-secondary"
+        }
+        return angle;
     }
 
-    // Fallback para deviceOrientation
+    // 2. FALLBACK: Usar o valor calculado a partir do DeviceOrientationEvent (Menos preciso, mas necessário se a orientação da tela não mudar)
     return deviceOrientation;
 }
 
@@ -792,7 +806,9 @@ if (shareAllBtn && navigator.share) {
 
 // Listener de Rotação (Função original mantida)
 function handleOrientationChange() {
+    // Isso é disparado quando o screen.orientation.angle muda.
     if (currentStream && fullscreenCameraContainer && fullscreenCameraContainer.classList.contains('active')) {
+        // Pequeno atraso para garantir que as novas dimensões de tela sejam registradas
         setTimeout(() => {
             requestCameraPermission();
         }, 150);
@@ -800,8 +816,10 @@ function handleOrientationChange() {
 }
 
 try {
+    // Tenta usar a API mais moderna
     screen.orientation.addEventListener("change", handleOrientationChange);
 } catch (e) {
+    // Fallback para navegadores antigos
     window.addEventListener("orientationchange", handleOrientationChange);
 }
 
