@@ -14,50 +14,30 @@
 </head>
 <body class="camera-page">
     
+    <header>
+        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
+        <h1><i class="fas fa-file-invoice"></i> Relatório Qdelícia</h1>
+    </header>
+
     <div class="menu-overlay"></div>
     <aside class="side-menu">
         <a href="index.html"><i class="fas fa-home"></i> Início</a>
         <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> Estoque</a>
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
-        <!--<a href="vendas.html"><i class="fas fa-chart-line"></i> Vendas</a>
-        <a href="avarias.html"><i class="fas fa-trash-can"></i> Avarias</a>-->
-        <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
-        <a href="relatorio.html" class="active"><i class="fas fa-file-alt"></i> Relatório de Qualidade</a>
+        <a href="relatorio.html" class="active"><i class="fas fa-file-alt"></i> Relatórios</a>
     </aside>
 
-    <header id="cabecalho-principal">
-        <button class="menu-toggle" aria-label="Abrir Menu">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="logo-placeholder">
-            <img src="./images/logo-qdelicia.png" alt="Logo Qdelícia Frutas">
-        </div>
-        <h1>Relatório de Qualidade</h1>
-        <p>Registro de Ocorrências (Devolução / Qualidade)</p>
-    </header>
-
-    <nav>
-        <a href="index.html">Início</a>
-        <a href="estoque.html" class="active">Estoque</a>
-        <a href="caixas.html">Caixas</a>
-        <!--<a href="vendas.html">Vendas</a>
-        <a href="avarias.html">Avarias</a>-->
-        <a href="camera.html">Câmera</a>
-        <a href="relatorio.html">Relatório/Qualidade</a>
-        
-        
-    </nav>
-    <main>
+    <main class="container">
         
         <section class="watermark-settings">
             <h2>Informações do Registro</h2>
             
             <div class="input-group">
-                <label for="select-report-type"><i class="fas fa-file-alt"></i> Selecione o Tipo de Relatório</label>
+                <label for="select-report-type"><i class="fas fa-list-alt"></i> Tipo de Relatório</label>
                 <select id="select-report-type" required>
-                    <option value="" disabled selected>Selecione o Tipo de Relatório</option>
-                    <option value="Devolucao">Relatório de Devolução</option>
-                    <option value="Qualidade">Relatório de Qualidade</option>
+                    <option value="" disabled selected>Selecione o Tipo</option>
+                    <option value="Devolucao">Devolução</option>
+                    <option value="Qualidade">Qualidade</option>
                 </select>
             </div>
 
@@ -83,73 +63,64 @@
             </div>
 
             <hr>
-
             
+            <button class="report-btn clear-btn" id="clear-report-btn" style="background-color: #dc3545; margin-bottom: 20px;">
+                <i class="fas fa-eraser"></i> Limpar Relatório (Itens, Fotos e Tipo)
+            </button>
+            </section>
 
-        </section>
-
-        <section class="report-section">
-            <h2>Itens do Relatório</h2>
+        <section class="item-list-section">
+            <h2>Adicionar Itens</h2>
             
-            <fieldset class="report-fieldset">
-                <legend>Adicionar Item</legend>
+            <div class="input-group">
+                <label for="select-produto"><i class="fas fa-apple-alt"></i> Produto</label>
+                <select id="select-produto">
+                    <option value="" disabled selected>Selecione o Produto</option>
+                    </select>
+            </div>
 
-                <div class="input-group">
-                    <label for="select-produto"><i class="fas fa-box-open"></i> Produto</label>
-                    <select id="select-produto" required>
-                        <option value="" disabled selected>Selecione o Produto</option>
-                        </select>
-                </div>
+            <div class="input-group">
+                <label for="select-motivo"><i class="fas fa-clipboard-question"></i> Motivo</label>
+                <select id="select-motivo">
+                    <option value="" disabled selected>Selecione o Motivo</option>
+                    </select>
+            </div>
 
-                <div class="input-group">
-                    <label for="input-quantidade"><i class="fas fa-sort-numeric-up-alt"></i> Quantidade em KG</label>
-                    <input type="number" id="input-quantidade" class="report-input" placeholder="Ex: 20 " required>
-                </div>
+            <div class="input-group">
+                <label for="input-quantidade"><i class="fas fa-weight-hanging"></i> Quantidade (KG)</label>
+                <input type="number" id="input-quantidade" placeholder="Ex: 12.5" step="0.1" min="0">
+            </div>
 
-                <div class="input-group">
-                    <label for="select-motivo"><i class="fas fa-exclamation-triangle"></i> Motivo/Detalhe</label>
-                    <select id="select-motivo" required>
-                        <option value="" disabled selected>Selecione o Motivo</option>
-                        </select>
-                </div>
-
-                <button class="report-btn" id="add-item-btn">
-                    <i class="fas fa-plus-circle"></i> Adicionar à Lista
-                </button>
-            </fieldset>
-
-            <ul class="report-items-list" id="report-items-list">
-                <li>Nenhum item adicionado.</li>
+            <button class="report-btn add-btn" id="add-item-btn">
+                <i class="fas fa-plus-circle"></i> Adicionar Item
+            </button>
+            
+            <h3>Itens Adicionados</h3>
+            <ul id="report-items-list">
+                <li class="empty-list">Nenhum item adicionado.</li>
             </ul>
         </section>
 
-        <section class="report-section">
-            <h2>Observações Gerais</h2>
+        <section class="camera-gallery-section">
+            <h2>Registro Fotográfico</h2>
 
-            <div class="input-group" style="max-width: 100%;">
-                <label for="input-observacoes"><i class="fas fa-comment-dots"></i> Observações Adicionais</label>
-                <textarea id="input-observacoes" class="report-textarea" placeholder="Observações Ex: Encarregado devolveu, Autorizado receber por... ***." style="min-height: 150px;"></textarea>
+            <div class="input-group">
+                <label for="input-observacoes"><i class="fas fa-comment-alt"></i> Observações Gerais</label>
+                <textarea id="input-observacoes" placeholder="Ex: Caixa avariada, produto com manchas, etc." rows="3"></textarea>
             </div>
             
-        </section>
-        <section>
-            <div class="start-camera-section">
-                <button id="open-camera-btn" disabled>
-                    <i class="fas fa-lock"></i> Liberar Câmera
-                </button>
-            </div>
+            <button class="report-btn camera-btn" id="open-camera-btn" disabled>
+                <i class="fas fa-lock"></i> Preencha as Informações
+            </button>
 
-        </section>
-        <section class="gallery">
-            <h2>Registros Fotográficos</h2>
-            <p>Fotos com a marca d'água serão geradas abaixo.</p>
-            
-            <div class="action-buttons">
+            <div class="photo-controls">
+                <span class="photo-counter">Fotos: <span id="photo-count">0</span></span>
+                
                 <button class="action-btn share-btn" id="share-all" disabled>
-                  <i class="fas fa-share-alt"></i> Compartilhar PDF
+                    <i class="fas fa-share-alt"></i> Compartilhar Relatório
                 </button>
                 <button class="action-btn download-btn" id="download-all" disabled>
-                  <i class="fas fa-download"></i> Baixar Relatório (PDF)
+                    <i class="fas fa-download"></i> Baixar Relatório (PDF)
                 </button>
             </div>
             
@@ -170,12 +141,12 @@
             </div>
             
             <div class="watermark">
-              <i class="fas fa-clock"></i> <span id="date-time">--/--/---- --:--:--</span>
+              <span id="date-time">--/--/---- --:--:--</span>
             </div>
 
             <div class="controls">
-              <button id="switch-btn" class="btn-circle"><i class="fas fa-sync-alt"></i></button>
-              <button id="shutter-btn" class="btn-circle"></button>
+              <button id="switch-btn" class="btn-circle" title="Trocar Câmera"><i class="fas fa-sync-alt"></i></button>
+              <button id="shutter-btn" class="btn-circle" title="Tirar Foto"></button>
             </div>
             
         </div>
@@ -188,11 +159,10 @@
     <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
-    <div class="back-to-top">
+    <div class="back-to-top" title="Voltar ao Topo">
         <i class="fas fa-arrow-up"></i>
     </div>
-
-    <script src="./relatorio.js"></script>
     
+    <script src="./relatorio.js"></script>
 </body>
 </html>

@@ -145,6 +145,7 @@ const inputObservacoes = document.getElementById('input-observacoes');
 // Novos Elementos para a lista de itens
 const addItemBtn = document.getElementById('add-item-btn');
 const itemListElement = document.getElementById('report-items-list'); // ID corrigido para o HTML
+const clearReportBtn = document.getElementById('clear-report-btn'); // NOVO: Botão de limpar relatório
 
 let currentStream = null;
 let usingFrontCamera = false;
@@ -344,6 +345,29 @@ function updateItemListUI() {
     });
 }
 
+/**
+ * @description Limpa a lista de itens, a galeria de fotos e o Tipo de Relatório, preservando Promotor/Rede/Loja.
+ */
+function clearReportData() {
+    // 1. Limpa a lista de itens
+    items = [];
+    updateItemListUI();
+
+    // 2. Limpa a galeria de fotos
+    photos = [];
+    updateGallery();
+
+    // 3. Limpa o Tipo de Relatório (e remove a persistência, embora já estivesse desativada)
+    if (selectReportType) {
+        selectReportType.value = ""; // Define o valor como vazio para voltar ao placeholder
+    }
+
+    // 4. Garante que os botões de câmera/PDF sejam atualizados
+    checkCameraAccess();
+    
+    // O restante dos campos (Promotor, Rede, Loja, Observações) é preservado.
+    alert("Dados do Relatório (Itens, Fotos e Tipo) foram limpos com sucesso.");
+}
 
 // ==================================================================
 // --- LÓGICA DE VALIDAÇÃO PARA ACESSO À CÂMERA E PDF ---
@@ -630,8 +654,8 @@ async function generatePDFReport(action) {
     }
     
     const { jsPDF } = jspdf; 
-    alert("Iniciando geração do PDF. Isso pode levar um momento.");
-
+    // alert("Iniciando geração do PDF. Isso pode levar um momento."); // LINHA REMOVIDA
+    
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -795,6 +819,11 @@ if (inputObservacoes) {
 // Listener para Adicionar Item
 if (addItemBtn) {
     addItemBtn.addEventListener('click', handleAddItem);
+}
+
+// Listener para Limpar Relatório
+if (clearReportBtn) {
+    clearReportBtn.addEventListener('click', clearReportData);
 }
 
 // Listeners da Câmera
