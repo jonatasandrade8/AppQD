@@ -2,7 +2,7 @@
 // Defina suas tarefas, horários e a mensagem exata de forma centralizada.
 const DAILY_TASKS = [
     { time: "09:00", message: "É hora de tirar foto da bancada!", tag: "bancada_foto" },
-    { time: "15:15", message: "É hora de passar o estoque!", tag: "estoque_registro" },
+    { time: "15:18", message: "É hora de passar o estoque!", tag: "estoque_registro" },
     { time: "00:00", message: "Registro de caixas secas programado para meia-noite!", tag: "caixas_registro" }
 ];
 
