@@ -4,7 +4,7 @@ const DAILY_TASKS = [
     { time: "07:00", message: "Bom dia! Tenha um excelente dia de trabalho", tag: "bancada_foto" },
     { time: "09:00", message: "Bom dia! É hora de tirar fotos da bancada!", tag: "bancada_foto" },
     { time: "13:00", message: "Boa tarde! É hora de passar o estoque!", tag: "estoque_registro" },
-    { time: "15:25", message: "Lembre se de tirar fotos da bancada antes de finalizar a jornada!", tag: "caixas_registro" }
+    { time: "15:30", message: "Lembre se de tirar fotos da bancada antes de finalizar a jornada!", tag: "caixas_registro" }
 ];
 
 // ==================== FUNÇÕES DE ALERTA, VOZ E SOM ====================

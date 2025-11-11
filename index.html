@@ -9,50 +9,50 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<script>
+<script src="script.js"></script>
+    <script src="alerts.js"></script> 
+
+    <script>
         // Função global para atualizar o status do botão e texto (chamada pelo alerts.js)
         window.updateAlertUI = function() {
+            const section = document.getElementById('alert-activation-section');
             const statusElement = document.getElementById('alert-status');
             const buttonElement = document.getElementById('activate-alerts-btn');
 
-            if (!statusElement || !buttonElement) return;
-
-            if (!("Notification" in window)) {
-                statusElement.innerHTML = '⚠️ Seu navegador não suporta a API de Notificações.';
-                buttonElement.style.display = 'none';
-                return;
-            }
+            if (!section || !statusElement || !buttonElement) return;
 
             const permission = Notification.permission;
             
             if (permission === 'granted') {
-                statusElement.innerHTML = '✅ **Alertas ativos e agendados!** Você será notificado.';
-                buttonElement.disabled = true; // Botão INATIVO após sucesso
-                buttonElement.innerHTML = '<i class="fas fa-check-circle"></i> Alertas Ativos';
-                buttonElement.style.backgroundColor = '#4CAF50'; 
-            } else if (permission === 'denied') {
-                statusElement.innerHTML = '❌ Alertas bloqueados. Reative nas configurações do seu navegador.';
-                buttonElement.disabled = true; // Botão INATIVO se negado permanentemente
-                buttonElement.innerHTML = '<i class="fas fa-ban"></i> Bloqueado';
-                buttonElement.style.backgroundColor = '#f44336'; 
-            } else { // 'default' (Aguardando permissão)
-                statusElement.innerHTML = 'Clique no botão abaixo para permitir o agendamento de lembretes diários.';
-                buttonElement.disabled = false;
-                buttonElement.innerHTML = '<i class="fas fa-bell"></i> Clique para Ativar Notificações e Voz';
-                buttonElement.style.backgroundColor = 'var(--secondary-color)';
+                // Se está ativo, esconde a seção para não poluir a tela.
+                section.style.display = 'none'; 
+            } else {
+                // Se não está ativo, mostra a seção para que o usuário possa interagir.
+                section.style.display = 'block';
+
+                if (permission === 'denied') {
+                    statusElement.innerHTML = '❌ Alertas bloqueados. Reative nas configurações do seu navegador.';
+                    buttonElement.disabled = true; 
+                    buttonElement.innerHTML = '<i class="fas fa-ban"></i> Bloqueado Permanentemente';
+                    buttonElement.style.backgroundColor = '#f44336'; 
+                } else { // 'default' (Aguardando permissão ou tentativa falhou)
+                    statusElement.innerHTML = 'A permissão de notificação falhou ou foi bloqueada. **Clique no botão abaixo** para forçar a ativação.';
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = '<i class="fas fa-bell"></i> Clique para Ativar Notificações e Voz';
+                    buttonElement.style.backgroundColor = 'var(--secondary-color)';
+                }
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('activate-alerts-btn');
             if (btn) {
-                // Adiciona o listener para chamar a função global do alerts.js
+                // Adiciona o listener para o clique de recuperação/primeira ativação
                 btn.addEventListener('click', () => {
                     requestNotificationPermission(); 
                 });
             }
-            // Chama o update inicial para configurar o estado do botão (importante para o status 'denied')
-            updateAlertUI();
+            // A função updateAlertUI é chamada automaticamente pelo alerts.js
         });
     </script>
 </body>
