@@ -9,52 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<script src="script.js"></script>
-    <script src="alerts.js"></script> 
-
-    <script>
-        // Função global para atualizar o status do botão e texto (chamada pelo alerts.js)
-        window.updateAlertUI = function() {
-            const section = document.getElementById('alert-activation-section');
-            const statusElement = document.getElementById('alert-status');
-            const buttonElement = document.getElementById('activate-alerts-btn');
-
-            if (!section || !statusElement || !buttonElement) return;
-
-            const permission = Notification.permission;
-            
-            if (permission === 'granted') {
-                // Se está ativo, esconde a seção para não poluir a tela.
-                section.style.display = 'none'; 
-            } else {
-                // Se não está ativo, mostra a seção para que o usuário possa interagir.
-                section.style.display = 'block';
-
-                if (permission === 'denied') {
-                    statusElement.innerHTML = '❌ Alertas bloqueados. Reative nas configurações do seu navegador.';
-                    buttonElement.disabled = true; 
-                    buttonElement.innerHTML = '<i class="fas fa-ban"></i> Bloqueado Permanentemente';
-                    buttonElement.style.backgroundColor = '#f44336'; 
-                } else { // 'default' (Aguardando permissão ou tentativa falhou)
-                    statusElement.innerHTML = 'A permissão de notificação falhou ou foi bloqueada. **Clique no botão abaixo** para forçar a ativação.';
-                    buttonElement.disabled = false;
-                    buttonElement.innerHTML = '<i class="fas fa-bell"></i> Clique para Ativar Notificações e Voz';
-                    buttonElement.style.backgroundColor = 'var(--secondary-color)';
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('activate-alerts-btn');
-            if (btn) {
-                // Adiciona o listener para o clique de recuperação/primeira ativação
-                btn.addEventListener('click', () => {
-                    requestNotificationPermission(); 
-                });
-            }
-            // A função updateAlertUI é chamada automaticamente pelo alerts.js
-        });
-    </script>
 </body>
 </html>
 <body>
@@ -150,7 +104,62 @@
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
-    
+    <script>
+        // Função global para atualizar o status do botão e texto (chamada pelo alerts.js)
+        window.updateAlertUI = function() {
+            const section = document.getElementById('alert-activation-section');
+            const statusElement = document.getElementById('alert-status');
+            const buttonElement = document.getElementById('activate-alerts-btn');
+
+            if (!section || !statusElement || !buttonElement) return;
+
+            const permission = Notification.permission;
+            
+            if (permission === 'granted') {
+                section.style.display = 'block'; // Mostra a seção para o botão de teste/recuperação
+                
+                statusElement.innerHTML = '✅ **Alertas Ativos!** Para garantir a voz após recarregar, use o botão abaixo ou clique na tela.';
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = '<i class="fas fa-volume-up"></i> Testar/Desbloquear Áudio Agora';
+                buttonElement.style.backgroundColor = '#007bff'; // Cor azul para ação de teste
+                
+            } else {
+                // Se a permissão está pendente ('default') ou foi negada ('denied')
+                section.style.display = 'block'; 
+
+                if (permission === 'denied') {
+                    statusElement.innerHTML = '❌ Alertas bloqueados. Reative nas configurações do seu navegador. O alerta visual não funcionará.';
+                    buttonElement.disabled = true; 
+                    buttonElement.innerHTML = '<i class="fas fa-ban"></i> Bloqueado Permanentemente';
+                    buttonElement.style.backgroundColor = '#f44336'; 
+                } else { // 'default' (Aguardando a tentativa inicial de permissão)
+                    statusElement.innerHTML = 'Aguardando a primeira tentativa de permissão de notificação do navegador.';
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = '<i class="fas fa-bell"></i> Clique para Conceder Permissão';
+                    buttonElement.style.backgroundColor = 'var(--secondary-color)';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('activate-alerts-btn');
+            
+            if (btn) {
+                // O botão agora tem duas funções:
+                // 1. Conceder permissão se estiver em 'default'.
+                // 2. Servir como interação para desbloquear o áudio se estiver em 'granted'.
+                btn.addEventListener('click', () => {
+                    if (Notification.permission === 'granted') {
+                        // Se já concedido, dispara um alerta de teste (e desbloqueia o áudio)
+                        sendNotificationAndSpeak({ message: "Teste de voz e som concluído com sucesso!", tag: "audio_test" });
+                    } else {
+                        // Se não concedido (default), solicita a permissão
+                        requestNotificationPermission(); 
+                    }
+                });
+            }
+        });
+    </script>
     <script src="script.js"></script>
     <script src="alert.js"></script>
 </body>
