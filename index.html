@@ -9,6 +9,54 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
+<script>
+        // Função global para atualizar o status do botão e texto (chamada pelo alerts.js)
+        window.updateAlertUI = function() {
+            const statusElement = document.getElementById('alert-status');
+            const buttonElement = document.getElementById('activate-alerts-btn');
+
+            if (!statusElement || !buttonElement) return;
+
+            if (!("Notification" in window)) {
+                statusElement.innerHTML = '⚠️ Seu navegador não suporta a API de Notificações.';
+                buttonElement.style.display = 'none';
+                return;
+            }
+
+            const permission = Notification.permission;
+            
+            if (permission === 'granted') {
+                statusElement.innerHTML = '✅ **Alertas ativos e agendados!** Você será notificado.';
+                buttonElement.disabled = true; // Botão INATIVO após sucesso
+                buttonElement.innerHTML = '<i class="fas fa-check-circle"></i> Alertas Ativos';
+                buttonElement.style.backgroundColor = '#4CAF50'; 
+            } else if (permission === 'denied') {
+                statusElement.innerHTML = '❌ Alertas bloqueados. Reative nas configurações do seu navegador.';
+                buttonElement.disabled = true; // Botão INATIVO se negado permanentemente
+                buttonElement.innerHTML = '<i class="fas fa-ban"></i> Bloqueado';
+                buttonElement.style.backgroundColor = '#f44336'; 
+            } else { // 'default' (Aguardando permissão)
+                statusElement.innerHTML = 'Clique no botão abaixo para permitir o agendamento de lembretes diários.';
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = '<i class="fas fa-bell"></i> Clique para Ativar Notificações e Voz';
+                buttonElement.style.backgroundColor = 'var(--secondary-color)';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('activate-alerts-btn');
+            if (btn) {
+                // Adiciona o listener para chamar a função global do alerts.js
+                btn.addEventListener('click', () => {
+                    requestNotificationPermission(); 
+                });
+            }
+            // Chama o update inicial para configurar o estado do botão (importante para o status 'denied')
+            updateAlertUI();
+        });
+    </script>
+</body>
+</html>
 <body>
     
     <div class="menu-overlay"></div>
@@ -46,10 +94,12 @@
     
     <main>
        
-        <section>
-            <h1>Bem vindo à Área do Promotor</h1>
-                     
-        
+       <section style="margin-top: 20px; padding: 20px; border: 1px solid var(--tertiary-color); border-radius: var(--border-radius); text-align: center;">
+    <h2>Ativação de Alertas Diários 🔔</h2>
+    <p id="alert-status" style="margin-bottom: 15px; font-weight: bold;">Aguardando permissão para iniciar lembretes de voz.</p>
+    <button id="activate-alerts-btn" class="action-btn" style="background-color: var(--secondary-color); color: white;">
+        <i class="fas fa-bell"></i> Clique para Ativar Notificações e Voz
+    </button>
         </section>
         <section class ="missao" >
             <h2>Nossa Missão:</h2>
