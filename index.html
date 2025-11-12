@@ -8,7 +8,61 @@
     <title>Home - Qdelícia Frutas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-</head>
+
+    <style>
+        /* Estilos para o Toggle Switch */
+        .alert-toggle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* Cor quando desligado */
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4CAF50; /* Cor verde quando ligado */
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        input:disabled + .slider {
+            background-color: #f44336; /* Cor vermelha para bloqueado */
+            cursor: not-allowed;
+        }
+    </style>
+    </head>
 </body>
 </html>
 <body>
@@ -18,8 +72,6 @@
         <a href="index.html" class="active"><i class="fas fa-home"></i> Início</a>
         <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> Estoque</a>
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
-        <!--<a href="vendas.html"><i class="fas fa-chart-line"></i> Vendas</a>
-        <a href="avarias.html"><i class="fas fa-trash-can"></i> Avarias</a>-->
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
         <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
         
@@ -39,8 +91,6 @@
         <a href="index.html" class="active">Início</a>
         <a href="estoque.html">Estoque</a>
         <a href="caixas.html">Caixas</a>
-        <!--<a href="vendas.html">Vendas</a>
-        <a href="avarias.html">Avarias</a>-->
         <a href="camera.html">Câmera</a>
         <a href="relatorio.html">Relatório/Qualidade</a>
         
@@ -48,13 +98,24 @@
     
     <main>
        
-       <section id="alert-activation-section" style="margin-top: 20px; padding: 20px; border: 1px solid var(--tertiary-color); border-radius: var(--border-radius); text-align: center; display: none;">
-    <h2>Ativação de Alertas Diários 🔔</h2>
-    <p id="alert-status" style="margin-bottom: 15px; font-weight: bold;">Aguardando permissão para iniciar lembretes de voz.</p>
-    <button id="activate-alerts-btn" class="action-btn" style="background-color: var(--secondary-color); color: white;">
-        <i class="fas fa-bell"></i> Clique para Ativar Notificações e Voz
-    </button>
-</section>
+       <section id="alert-activation-section" style="margin-top: 20px; padding: 20px; border: 1px solid var(--tertiary-color); border-radius: var(--border-radius); text-align: center;">
+            <h2>Ativação de Alertas Diários 🔔</h2>
+            
+            <div class="alert-toggle-container">
+                <span id="toggle-label-off" style="font-weight: bold; color: #777;">Desativado</span>
+                <label class="switch">
+                    <input type="checkbox" id="alert-toggle-switch">
+                    <span class="slider"></span>
+                </label>
+                <span id="toggle-label-on" style="font-weight: bold; color: #4CAF50;">Ativado</span>
+            </div>
+
+            <p id="alert-status" style="margin-bottom: 15px; font-weight: bold;">Verificando status...</p>
+            
+            <button id="test-audio-btn" class="action-btn" style="background-color: #007bff; color: white; display: none;">
+                <i class="fas fa-volume-up"></i> Testar / Desbloquear Áudio
+            </button>
+        </section>
         <section class ="missao" >
             <h2>Nossa Missão:</h2>
             <ul >
@@ -104,63 +165,88 @@
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
+    
     <script>
-        // Função global para atualizar o status do botão e texto (chamada pelo alerts.js)
-        window.updateAlertUI = function() {
-            const section = document.getElementById('alert-activation-section');
+        // Função global (usada pelo alert.js) para atualizar a UI com base na permissão
+        window.updateAlertUI = function(permission) {
             const statusElement = document.getElementById('alert-status');
-            const buttonElement = document.getElementById('activate-alerts-btn');
-
-            if (!section || !statusElement || !buttonElement) return;
-
-            const permission = Notification.permission;
+            const toggle = document.getElementById('alert-toggle-switch');
+            const testBtn = document.getElementById('test-audio-btn');
             
-            if (permission === 'granted') {
-                section.style.display = 'block'; // Mostra a seção para o botão de teste/recuperação
-                
-                statusElement.innerHTML = '✅ **Alertas Ativos!** Para garantir a voz após recarregar, use o botão abaixo ou clique na tela.';
-                buttonElement.disabled = false;
-                buttonElement.innerHTML = '<i class="fas fa-volume-up"></i> Testar/Desbloquear Áudio Agora';
-                buttonElement.style.backgroundColor = '#007bff'; // Cor azul para ação de teste
-                
-            } else {
-                // Se a permissão está pendente ('default') ou foi negada ('denied')
-                section.style.display = 'block'; 
+            permission = permission || Notification.permission;
 
-                if (permission === 'denied') {
-                    statusElement.innerHTML = '❌ Alertas bloqueados. Reative nas configurações do seu navegador. O alerta visual não funcionará.';
-                    buttonElement.disabled = true; 
-                    buttonElement.innerHTML = '<i class="fas fa-ban"></i> Bloqueado Permanentemente';
-                    buttonElement.style.backgroundColor = '#f44336'; 
-                } else { // 'default' (Aguardando a tentativa inicial de permissão)
-                    statusElement.innerHTML = 'Aguardando a primeira tentativa de permissão de notificação do navegador.';
-                    buttonElement.disabled = false;
-                    buttonElement.innerHTML = '<i class="fas fa-bell"></i> Clique para Conceder Permissão';
-                    buttonElement.style.backgroundColor = 'var(--secondary-color)';
+            if (permission === 'granted') {
+                const alertsEnabled = localStorage.getItem('alertsEnabled') === 'true';
+                toggle.checked = alertsEnabled;
+                toggle.disabled = false;
+                testBtn.style.display = 'inline-block'; // Mostra o botão de teste
+
+                if (alertsEnabled) {
+                    statusElement.innerHTML = '✅ **Alertas Ativos!** Clique em "Testar" se o áudio não funcionar nos lembretes.';
+                    document.getElementById('toggle-label-on').style.display = 'inline';
+                    document.getElementById('toggle-label-off').style.display = 'none';
+                } else {
+                    statusElement.innerHTML = 'Alertas pausados. Ligue o interruptor para reativar.';
+                    document.getElementById('toggle-label-on').style.display = 'none';
+                    document.getElementById('toggle-label-off').style.display = 'inline';
                 }
+
+            } else if (permission === 'denied') {
+                statusElement.innerHTML = '❌ Alertas bloqueados permanentemente nas configurações do navegador.';
+                toggle.checked = false;
+                toggle.disabled = true; // Desativa o toggle
+                testBtn.style.display = 'none';
+                document.getElementById('toggle-label-on').style.display = 'none';
+                document.getElementById('toggle-label-off').style.display = 'inline';
+
+            } else { // 'default'
+                statusElement.innerHTML = 'Ligue o interruptor para ativar os lembretes de voz e notificações.';
+                toggle.checked = false;
+                toggle.disabled = false;
+                testBtn.style.display = 'none';
+                document.getElementById('toggle-label-on').style.display = 'none';
+                document.getElementById('toggle-label-off').style.display = 'inline';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('activate-alerts-btn');
-            
-            if (btn) {
-                // O botão agora tem duas funções:
-                // 1. Conceder permissão se estiver em 'default'.
-                // 2. Servir como interação para desbloquear o áudio se estiver em 'granted'.
-                btn.addEventListener('click', () => {
-                    if (Notification.permission === 'granted') {
-                        // Se já concedido, dispara um alerta de teste (e desbloqueia o áudio)
-                        sendNotificationAndSpeak({ message: "Teste de voz e som concluído com sucesso!", tag: "audio_test" });
-                    } else {
-                        // Se não concedido (default), solicita a permissão
-                        requestNotificationPermission(); 
+            const toggle = document.getElementById('alert-toggle-switch');
+            const testBtn = document.getElementById('test-audio-btn');
+
+            // Listener para o Toggle Switch
+            toggle.addEventListener('change', () => {
+                if (toggle.checked) {
+                    // O usuário está LIGANDO
+                    console.log('Usuário ativou o toggle.');
+                    // Chama a função de permissão/ativação do alert.js
+                    // Ela cuidará de pedir permissão e iniciar o sistema
+                    if (typeof window.enableAlerts === 'function') {
+                        window.enableAlerts(); 
                     }
-                });
-            }
+                } else {
+                    // O usuário está DESLIGANDO
+                    console.log('Usuário desativou o toggle.');
+                    if (typeof window.disableAlerts === 'function') {
+                        window.disableAlerts();
+                    }
+                }
+            });
+
+            // Listener para o Botão de Teste
+            testBtn.addEventListener('click', () => {
+                console.log('Botão de teste clicado. Desbloqueando áudio...');
+                // Chama a função de teste do alert.js
+                // Este clique é VITAL para smartphones
+                if (typeof window.unlockAndTestAudio === 'function') {
+                    window.unlockAndTestAudio();
+                }
+            });
+
+            // Atualiza a UI no carregamento da página
+            // O alert.js chamará isso de novo após verificar as permissões
+            window.updateAlertUI(Notification.permission);
         });
     </script>
     <script src="script.js"></script>
-    <script src="alert.js"></script>
-</body>
+    <script src="alert.js"></script> </body>
 </html>
