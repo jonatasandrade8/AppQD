@@ -1,35 +1,38 @@
 // ==================== CONFIGURAÇÃO DE TAREFAS ====================
 const DAILY_TASKS = [
-    { time: "07:00", message: "Bom dia! Tenha um excelente dia de trabalho", tag: "bom_dia" },
-    { time: "09:00", message: "Bom dia! É hora de tirar fotos da bancada!", tag: "bancada_foto_manha" },
+    // ATENÇÃO: Verifique se o horário 14:40 estava correto. O delay na mensagem de erro era de 38 segundos.
+    { time: "07:00", message: "Bom dia! Tenha um excelente dia de trabalho", tag: "bancada_foto" },
+    { time: "09:00", message: "Bom dia! É hora de tirar fotos da bancada!", tag: "bancada_foto" },
     { time: "13:00", message: "Boa tarde! É hora de passar o estoque!", tag: "estoque_registro" },
-    { time: "16:00", message: "Lembre se de tirar fotos da bancada antes de finalizar a jornada!", tag: "bancada_foto_tarde" }
+    { time: "16:00", message: "Lembre se de tirar fotos da bancada antes de finalizar a jornada!", tag: "caixas_registro" }
 ];
 
 // ==================== FUNÇÕES DE ALERTA, VOZ E SOM ====================
 
 /**
- * @description Toca um som de alerta. Crucialmente, o .catch() impede a voz se o áudio falhar.
- * @param {function} callback - Função (a voz) a ser executada APENAS se o som tocar.
+ * @description Toca um som de alerta persistente por 3 segundos antes de iniciar o callback (voz).
+ * @param {function} callback - Função a ser executada após o som parar.
  */
 function playPersistentAlert(callback) {
+    // ATENÇÃO: O erro 404 (Not Found) indica que este arquivo está faltando ou o caminho está errado.
+    // Crie a pasta 'sounds' e coloque o arquivo 'alert.mp3' nela.
     const audioUrl = './sounds/alert.mp3'; 
     const alertDurationMs = 4000; 
     const audio = new Audio(audioUrl);
     
     // Tenta tocar o som
     audio.play().then(() => {
-        // SUCESSO: (Desktop ou celular desbloqueado)
-        console.log("Som de alerta tocando.");
+        // Se tocou com sucesso, agenda a parada
         setTimeout(() => {
             audio.pause();
             audio.currentTime = 0; 
             callback(); // Inicia a voz
         }, alertDurationMs);
     }).catch(error => {
-        // FALHA: (Celular bloqueado ou arquivo de som faltando)
-        // ESSENCIAL: Não chama o callback (voz) se o som falhou.
-        console.warn("⚠️ Som bloqueado pelo navegador. A voz não será iniciada. Clique no botão 'Testar Áudio'.", error.message);
+        // ESSA É A CAUSA DO ERRO: Navegador bloqueia o play() sem interação.
+        console.warn("⚠️ Som bloqueado pelo navegador. A voz será iniciada em 1s.", error);
+        // Avança para a voz após um pequeno atraso para dar tempo de ler a notificação.
+        setTimeout(callback, 1000); 
     });
 }
 
@@ -39,13 +42,10 @@ function playPersistentAlert(callback) {
  */
 function speakAlert(text) {
     if ('speechSynthesis' in window) {
-        // Garante que não haja falas anteriores na fila
-        window.speechSynthesis.cancel();
-        
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'pt-BR'; 
         utterance.volume = 1.0; 
-        utterance.rate = 1.0; // 1.1 pode ser muito rápido
+        utterance.rate = 1.1; 
         utterance.pitch = 1.0; 
         
         window.speechSynthesis.speak(utterance);
@@ -55,28 +55,20 @@ function speakAlert(text) {
 }
 
 /**
- * @description Sequencia a Notificação Visual, o Som e a Voz.
+ * @description Sequencia a Notificação Visual, o Som Persistente e, por fim, a Voz.
  */
 function sendNotificationAndSpeak(task) {
-    // VERIFICAÇÃO PRINCIPAL: O usuário desativou no toggle?
-    if (localStorage.getItem('alertsEnabled') !== 'true') {
-        console.log(`Alertas desativados. Ignorando tarefa: ${task.message}`);
-        return;
-    }
-
-    console.log(`Disparando alerta: ${task.message}`);
-
     // 1. Notificação Visual (Roda imediatamente)
     if ("Notification" in window && Notification.permission === "granted") {
         new Notification("🚨 Lembrete: Qdelícia Frutas", {
             body: task.message,
             icon: './images/logo-qdelicia.png', 
             tag: task.tag, 
-            renotify: true // Permite que a mesma tag notifique de novo
+            renotify: true
         });
     }
 
-    // 2. Inicia o som. A voz (callback) só é chamada se o som funcionar.
+    // 2. Inicia o som. A voz é iniciada após o som parar.
     playPersistentAlert(() => {
         speakAlert(task.message);
     });
@@ -84,32 +76,15 @@ function sendNotificationAndSpeak(task) {
 
 // ==================== LÓGICA DE AGENDAMENTO DIÁRIO ====================
 
-let scheduledTimeouts = []; // Armazena os IDs dos timeouts
-
 /**
- * @description Limpa todos os timeouts de alertas agendados.
- */
-function clearAllScheduledAlerts() {
-    console.log(`Limpando ${scheduledTimeouts.length} alertas agendados.`);
-    scheduledTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
-    scheduledTimeouts = [];
-}
-
-/**
- * @description Inicia o agendamento de todas as tarefas.
+ * @description Inicia o agendamento de todas as tarefas após a permissão ser concedida.
  */
 function startAlertSystem() {
-    // Limpa agendamentos antigos antes de criar novos
-    clearAllScheduledAlerts();
-
-    if (Notification.permission === "granted" && localStorage.getItem('alertsEnabled') === 'true') {
-        console.log("✅ Sistema de alertas ativado e agendando tarefas...");
+    if (Notification.permission === "granted") {
         DAILY_TASKS.forEach(scheduleDailyNotification);
-    } else {
-        console.log("Sistema de alertas não iniciado (permissão ou toggle desativado).");
-    }
-    
-    // Atualiza a UI (botões, texto)
+        console.log("✅ Sistema de alertas ativado e agendado.");
+    } 
+    // CHAMA A FUNÇÃO DE ATUALIZAÇÃO DA UI (definida no HTML)
     if (typeof window.updateAlertUI === 'function') {
         window.updateAlertUI();
     }
@@ -127,7 +102,6 @@ function scheduleDailyNotification(task) {
         target.setHours(targetHour, targetMinute, 0, 0); 
 
         if (target.getTime() <= now.getTime()) {
-            // Se o horário já passou hoje, agenda para amanhã
             target.setDate(target.getDate() + 1); 
         }
         return target.getTime() - now.getTime();
@@ -135,108 +109,59 @@ function scheduleDailyNotification(task) {
     
     const delay = calculateDelay();
 
-    const timeoutId = setTimeout(() => {
+    setTimeout(() => {
         sendNotificationAndSpeak(task);
-        // Re-agenda a tarefa para o próximo dia (removendo o ID antigo)
-        scheduledTimeouts = scheduledTimeouts.filter(id => id !== timeoutId);
         scheduleDailyNotification(task); 
     }, delay);
 
-    // Armazena o ID para poder cancelar depois (se o usuário desligar o toggle)
-    scheduledTimeouts.push(timeoutId);
-
-    console.log(`Tarefa agendada: ${task.message} para ${task.time}. (Próxima em ${Math.round(delay / 1000 / 60)} min)`);
+    console.log(`Tarefa agendada: ${task.message} para ${task.time}. Delay: ${delay / 1000} segundos.`);
 }
 
 
-// ==================== FUNÇÕES DE CONTROLE (Chamadas pelo index.html) ====================
-
 /**
- * @description (Chamada pelo Toggle ON) Pede permissão e inicia o sistema.
+ * @description Função PRINCIPAL: Requer um CLIQUE do usuário para funcionar em navegadores modernos.
  */
-window.enableAlerts = function() {
+window.requestNotificationPermission = function() {
     if (!("Notification" in window)) {
         console.warn("Aviso: Notificações não são suportadas.");
-        localStorage.setItem('alertsEnabled', 'false');
-        if (typeof window.updateAlertUI === 'function') window.updateAlertUI();
+        if (typeof window.updateAlertUI === 'function') {
+            window.updateAlertUI();
+        }
         return;
     }
 
     if (Notification.permission === "granted") {
-        console.log("Permissão já concedida. Ativando alertas.");
-        localStorage.setItem('alertsEnabled', 'true');
-        startAlertSystem();
+        startAlertSystem(); 
         return;
     }
     
     if (Notification.permission !== "denied") {
-        // Tenta solicitar. Esta função SÓ será bem-sucedida se chamada por um CLIQUE (o toggle).
+        // Tenta solicitar. Esta função SÓ será bem-sucedida se chamada por um CLIQUE.
         Notification.requestPermission(function (permission) {
             if (permission === "granted") {
-                console.log("Permissão concedida!");
-                localStorage.setItem('alertsEnabled', 'true');
-                startAlertSystem();
+                startAlertSystem(); 
             } else {
-                console.warn("Permissão de notificação negada.");
-                localStorage.setItem('alertsEnabled', 'false');
-                if (typeof window.updateAlertUI === 'function') window.updateAlertUI('denied');
+                console.warn("Permissão de notificação negada/bloqueada.");
+                if (typeof window.updateAlertUI === 'function') {
+                    window.updateAlertUI();
+                }
             }
         });
     } else {
-         // Permissão está 'denied'
          console.warn("Aviso: A permissão de notificações foi permanentemente negada.");
-         localStorage.setItem('alertsEnabled', 'false');
-         if (typeof window.updateAlertUI === 'function') window.updateAlertUI('denied');
+         if (typeof window.updateAlertUI === 'function') {
+             window.updateAlertUI();
+         }
     }
 }
 
-/**
- * @description (Chamada pelo Toggle OFF) Para o sistema e limpa agendamentos.
- */
-window.disableAlerts = function() {
-    console.log("Desativando sistema de alertas.");
-    localStorage.setItem('alertsEnabled', 'false');
-    clearAllScheduledAlerts(); // Cancela os timeouts futuros
+// Inicialização: TENTA verificar o status no load. Se já está 'granted', inicia.
+document.addEventListener('DOMContentLoaded', () => {
+    if (Notification.permission === 'granted') {
+        startAlertSystem(); 
+    }
+    // Garante que a UI esteja correta, mesmo que a permissão não tenha sido solicitada.
     if (typeof window.updateAlertUI === 'function') {
         window.updateAlertUI();
-    }
-}
-
-/**
- * @description (Chamada pelo Botão de Teste) Desbloqueia o áudio em navegadores móveis.
- */
-window.unlockAndTestAudio = function() {
-    console.log("Tentativa de desbloqueio de áudio por clique.");
-    
-    // 1. Envia uma notificação de teste
-    if ("Notification" in window && Notification.permission === "granted") {
-        new Notification("🚨 Teste de Alerta", {
-            body: "Este é um teste de notificação visual.",
-            icon: './images/logo-qdelicia.png', 
-            tag: "audio_test",
-            renotify: true
-        });
-    }
-
-    // 2. Toca som e voz (isso desbloqueia para a sessão)
-    playPersistentAlert(() => {
-        speakAlert("Teste de voz e som concluído com sucesso!");
-    });
-}
-
-
-// ==================== INICIALIZAÇÃO ====================
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Verifica o status no load. Se já está 'granted' E 'enabled', inicia.
-    if (Notification.permission === 'granted' && localStorage.getItem('alertsEnabled') === 'true') {
-        startAlertSystem(); 
-    } else if (Notification.permission === 'denied') {
-        // Se está bloqueado, garante que o localStorage esteja 'false'
-        localStorage.setItem('alertsEnabled', 'false');
-        if (typeof window.updateAlertUI === 'function') window.updateAlertUI('denied');
-    } else {
-        // Se está 'default' ou 'granted' mas 'disabled', apenas atualiza a UI
-        if (typeof window.updateAlertUI === 'function') window.updateAlertUI();
     }
 });
