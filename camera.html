@@ -66,31 +66,61 @@
     position: absolute;
     bottom: 20px; /* Posição inferior */
     left: 20px; /* Posição no canto esquerdo */
-    width: 50px;
-    height: 50px;
+    min-width: 80px; /* Largura mínima para o texto */
+    padding: 5px 10px; /* Preenchimento interno */
     background-color: rgba(0, 0, 0, 0.5);
     border: 2px solid white;
-    border-radius: 50%;
+    border-radius: 25px; /* Mais arredondado para parecer um "pill" */
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 20px;
+    font-size: 14px; /* Tamanho da fonte menor para o texto */
     z-index: 10;
     transition: transform 0.3s ease-out; /* Para a rotação suave */
+    box-sizing: border-box; /* Inclui padding e border no width/height */
+}
+
+#orientation-indicator i {
+    margin-right: 5px; /* Espaçamento entre a seta e o texto */
 }
 
 /* Ajuste o posicionamento dos controles para garantir que não haja sobreposição */
 .controls {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-around; /* Distribui os itens uniformemente */
     align-items: center;
     width: 100%;
-    padding: 20px 0; /* Aumenta o padding vertical para dar espaço */
+    padding: 20px 0; 
     position: absolute;
     bottom: 0;
+    left: 0;
+    box-sizing: border-box; /* Garante que o padding não cause overflow */
 }
 
+/* Centraliza o shutter-btn e garante que os outros fiquem nas laterais */
+.controls #shutter-btn {
+    order: 2; /* Garante que o shutter-btn esteja no meio */
+    margin: 0 20px; /* Espaçamento lateral do botão central */
+}
+
+.controls #switch-btn {
+    order: 1; /* Esquerda do shutter */
+}
+
+.controls #rotate-btn {
+    order: 3; /* Direita do shutter */
+}
+
+/* Ajustes para a mensagem de limite de fotos */
+#shutter-limit-message {
+    position: absolute; /* Para que não afete o layout flex dos botões */
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 30px; /* Ajuste a posição para não sobrepor outros elementos se necessário */
+    text-align: center;
+    width: 80%; /* Para que a mensagem não seja muito longa */
+}
 
     </style>
 </head>
@@ -191,7 +221,7 @@
             <div id="photo-count">0</div>
             
             <div id="orientation-indicator" title="Direção correta da foto">
-                <i class="fas fa-arrow-up"></i>
+                <i class="fas fa-arrow-up"></i> <span id="orientation-text">Retrato</span>
             </div>
             <div class="camera-controls-right">
                 <button id="zoom-in-btn" class="camera-control-btn" title="Aumentar Zoom">
@@ -212,10 +242,11 @@
             </div>
             
             <div class="controls">
-              <button id="rotate-btn" class="btn-circle" title="Girar 90°"><i class="fas fa-rotate-right"></i></button>
-              
-              <button id="switch-btn" class="btn-circle"><i class="fas fa-sync-alt"></i></button>
-              <button id="shutter-btn" class="btn-circle"></button>
+                <button id="switch-btn" class="btn-circle"><i class="fas fa-sync-alt"></i></button>
+                <button id="shutter-btn" class="btn-circle"></button>
+                <button id="rotate-btn" class="btn-circle" title="Girar 90°">
+                    <img src="https://assets-c4d.s3.amazonaws.com/icons/camera-rotate.png" alt="Rotate" style="width: 24px; height: 24px;">
+                </button>
             </div>
             
         </div>

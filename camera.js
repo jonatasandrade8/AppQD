@@ -86,19 +86,20 @@ const backToGalleryBtn = document.getElementById('back-to-gallery-btn');
 const video = document.getElementById('video');
 const shutterBtn = document.getElementById('shutter-btn');
 const switchBtn = document.getElementById('switch-btn');
-const rotateBtn = document.getElementById('rotate-btn'); // Botão de Rotação Manual
+const rotateBtn = document.getElementById('rotate-btn'); 
 const dateTimeElement = document.getElementById('date-time');
 const photoList = document.getElementById('photo-list');
 const downloadAllBtn = document.getElementById('download-all');
 const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
-const orientationIndicator = document.getElementById('orientation-indicator'); // Indicador Visual de Orientação
+const orientationIndicator = document.getElementById('orientation-indicator'); 
+const orientationText = document.getElementById('orientation-text'); // Elemento para o texto de orientação
 
-// NOVOS ELEMENTOS RELACIONADOS AO LIMITE DE FOTOS (RESTAURADOS)
-const controlsDiv = document.querySelector('.controls'); // Contêiner do shutter/switch
-const shutterMsgDiv = document.createElement('div'); // Elemento para mensagem de limite
+// Elementos relacionados ao limite de fotos
+const controlsDiv = document.querySelector('.controls'); 
+const shutterMsgDiv = document.createElement('div'); 
 shutterMsgDiv.id = 'shutter-limit-message';
-shutterMsgDiv.textContent = 'Feche a Câmera'; // Mensagem de limite
+shutterMsgDiv.textContent = 'Feche a Câmera'; 
 
 // Dropdowns para Marca D'água
 const selectTipoFoto = document.getElementById('select-tipo-foto'); 
@@ -110,9 +111,9 @@ let currentStream = null;
 let usingFrontCamera = false;
 let photos = []; // Array de URLs de fotos (Sempre começará vazio)
 let hasCameraPermission = false; // Inicia como 'false'
-const localStorageKey = 'qdelicia_last_selection_v2'; // Chave para persistência (v2 devido à adição do novo campo)
+const localStorageKey = 'qdelicia_last_selection_v2'; 
 
-// Variáveis para Zoom e Flash
+// Variáveis para Zoom
 let currentZoom = 1; // Zoom inicial
 let maxZoom = 1; // Zoom máximo suportado pelo dispositivo
 let deviceOrientation = 0; // Orientação do dispositivo em graus
@@ -120,7 +121,7 @@ let deviceOrientation = 0; // Orientação do dispositivo em graus
 // Variável para Rotação Manual (0, 90, 180, 270)
 let manualRotation = 0; 
 
-// Constante para o Limite de Fotos (RESTAURADO)
+// Constante para o Limite de Fotos
 const MAX_PHOTOS = 6; 
 
 // Carregar a imagem da logomarca
@@ -335,7 +336,7 @@ async function openCameraFullscreen() {
     // Tenta pedir a permissão
     await requestCameraPermission();
     
-    // VERIFICA O ESTADO DO BOTÃO AO ABRIR (RESTAURADO)
+    // VERIFICA O ESTADO DO BOTÃO AO ABRIR
     updateShutterButtonState(); 
 }
 
@@ -351,7 +352,7 @@ function closeCameraFullscreen() {
     checkCameraAccess(); // Verifica o estado do botão
     window.removeEventListener('deviceorientation', handleDeviceOrientation);
     
-    // Limpa o estado da mensagem de limite se existir (RESTAURADO)
+    // Limpa o estado da mensagem de limite se existir
     if (shutterMsgDiv.parentNode) {
         shutterMsgDiv.parentNode.removeChild(shutterMsgDiv);
     }
@@ -370,24 +371,23 @@ function updatePhotoCounter() {
     if (photoCountElement) {
         photoCountElement.textContent = photos.length;
     }
-    // CHAMA O CONTROLE DE LIMITE (RESTAURADO)
+    // CHAMA O CONTROLE DE LIMITE
     updateShutterButtonState(); 
 }
 
 /**
- * @description Controla a visibilidade do botão de captura baseado no limite (MAX_PHOTOS). (RESTAURADO)
+ * @description Controla a visibilidade do botão de captura baseado no limite (MAX_PHOTOS).
  */
 function updateShutterButtonState() {
-    if (!shutterBtn || !switchBtn || !controlsDiv) return;
+    if (!shutterBtn || !switchBtn || !controlsDiv || !rotateBtn) return; 
 
     if (photos.length >= MAX_PHOTOS) {
-        // Atingiu o limite. Esconde shutter e switch, mostra a mensagem.
+        // Atingiu o limite. Esconde shutter, switch e rotate, mostra a mensagem.
         shutterBtn.style.display = 'none';
         switchBtn.style.display = 'none';
-        if (rotateBtn) rotateBtn.style.display = 'none'; // Esconde o botão de rotação também
+        rotateBtn.style.display = 'none';
         
         if (!document.getElementById('shutter-limit-message')) {
-            // Estilos para a mensagem "Feche a Câmera"
             shutterMsgDiv.style.color = 'white';
             shutterMsgDiv.style.fontSize = '1.2em';
             shutterMsgDiv.style.fontWeight = 'bold';
@@ -395,10 +395,10 @@ function updateShutterButtonState() {
             controlsDiv.appendChild(shutterMsgDiv);
         }
     } else {
-        // Abaixo do limite. Mostra shutter e switch, esconde a mensagem.
+        // Abaixo do limite. Mostra shutter, switch e rotate, esconde a mensagem.
         shutterBtn.style.display = 'block';
         switchBtn.style.display = 'block';
-        if (rotateBtn) rotateBtn.style.display = 'block'; // Mostra o botão de rotação
+        rotateBtn.style.display = 'block';
         
         if (document.getElementById('shutter-limit-message')) {
             controlsDiv.removeChild(shutterMsgDiv);
@@ -754,27 +754,48 @@ function getPhotoRotation() {
 }
 
 /**
- * @description Atualiza a seta indicadora de orientação correta (combina dispositivo + manual).
+ * @description Atualiza a seta indicadora de orientação correta (combina dispositivo + manual) e o texto.
  */
 function updateOrientationIndicator() {
-    if (!orientationIndicator) return;
+    if (!orientationIndicator || !orientationText) return;
     
+    // Seleciona o ícone da seta dentro do indicador
+    const arrowIcon = orientationIndicator.querySelector('i');
+    if (!arrowIcon) return;
+
     const deviceRotation = getPhotoRotation();
     const totalRotation = (deviceRotation + manualRotation) % 360;
-
-    // Aplica a rotação ao elemento HTML.
-    // O indicador precisa de um ajuste de posição fixa, pois seu pai é absoluto.
-    orientationIndicator.style.transform = `rotate(${totalRotation}deg)`; 
+    // Normaliza para 0, 90, 180, 270
+    const normalizedRotation = totalRotation < 0 ? totalRotation + 360 : totalRotation;
     
-    // Alerta visual se o dispositivo estiver de cabeça para baixo (180 graus)
-    if (totalRotation === 180) {
+    let text = "";
+    
+    // 1. Determina o texto de orientação
+    if (normalizedRotation === 0) {
+        text = "Retrato";
+    } else if (normalizedRotation === 90 || normalizedRotation === 270) {
+        text = "Paisagem";
+    } else if (normalizedRotation === 180) {
+        text = "De Cabeça P/ Baixo";
+    } else {
+        text = "Ajuste Posição"; 
+    }
+    
+    orientationText.textContent = text;
+
+    // 2. Aplica a rotação ao ícone da seta
+    // A rotação indica a orientação FINAL da foto
+    arrowIcon.style.transform = `rotate(${normalizedRotation}deg)`;
+    
+    // 3. Atualiza estilos (mantendo o container/pill fixo no canto)
+    if (normalizedRotation === 180) {
         orientationIndicator.style.color = 'red';
         orientationIndicator.style.borderColor = 'red';
-        orientationIndicator.title = "Câmera de Cabeça para Baixo!";
+        orientationIndicator.title = "Câmera de Cabeça Para Baixo! Por favor, ajuste.";
     } else {
         orientationIndicator.style.color = 'white';
         orientationIndicator.style.borderColor = 'white';
-        orientationIndicator.title = "Direção correta da foto";
+        orientationIndicator.title = `Direção da foto: ${text}`;
     }
 }
 
@@ -798,7 +819,7 @@ if (switchBtn) {
     switchBtn.addEventListener('click', switchCamera);
 }
 
-// Listener para o botão de Rotação Manual (PRESERVADO)
+// Listener para o botão de Rotação Manual
 if (rotateBtn) {
     rotateBtn.addEventListener('click', () => {
         // Lógica de rotação cumulativa 0 -> 90 -> 180 -> 270 -> 0
@@ -818,7 +839,7 @@ if (zoomOutBtn) {
     zoomOutBtn.addEventListener('click', zoomOut);
 }
 
-// Botão "Baixar Todas" (PRESERVADO)
+// Botão "Baixar Todas"
 if (downloadAllBtn) {
     downloadAllBtn.addEventListener("click", () => {
         photos.forEach((img, i) => {
@@ -833,7 +854,7 @@ if (downloadAllBtn) {
     });
 }
 
-// Botão "Compartilhar" (PRESERVADO)
+// Botão "Compartilhar"
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
 
@@ -874,7 +895,7 @@ if (shareAllBtn && navigator.share) {
     });
 } else if (shareAllBtn) {
     shareAllBtn.addEventListener("click", () => {
-        alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manually.");
+        alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manualmente.");
     });
 }
 
