@@ -61,12 +61,11 @@
     background-color: rgba(0, 123, 255, 1);
 }
 
-/* NOVO CSS PARA ORIENTATION INDICATOR */
+/* NOVO CSS para o Indicador de Orientação */
 #orientation-indicator {
     position: absolute;
-    bottom: 20px; /* Posição inferior, acima dos controles */
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 20px; /* Posição inferior */
+    left: 20px; /* Posição no canto esquerdo */
     width: 50px;
     height: 50px;
     background-color: rgba(0, 0, 0, 0.5);
@@ -80,6 +79,18 @@
     z-index: 10;
     transition: transform 0.3s ease-out; /* Para a rotação suave */
 }
+
+/* Ajuste o posicionamento dos controles para garantir que não haja sobreposição */
+.controls {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    padding: 20px 0; /* Aumenta o padding vertical para dar espaço */
+    position: absolute;
+    bottom: 0;
+}
+
 
     </style>
 </head>
@@ -201,6 +212,8 @@
             </div>
             
             <div class="controls">
+              <button id="rotate-btn" class="btn-circle" title="Girar 90°"><i class="fas fa-rotate-right"></i></button>
+              
               <button id="switch-btn" class="btn-circle"><i class="fas fa-sync-alt"></i></button>
               <button id="shutter-btn" class="btn-circle"></button>
             </div>
