@@ -91,6 +91,8 @@ const photoList = document.getElementById('photo-list');
 const downloadAllBtn = document.getElementById('download-all');
 const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
+const orientationBtn = document.getElementById('orientation-btn'); // NOVO
+const orientationDisplay = document.getElementById('orientation-display'); // NOVO
 
 // NOVOS ELEMENTOS: Dropdowns para Marca D'água
 const selectTipoFoto = document.getElementById('select-tipo-foto'); // NOVO: Tipo de Foto
@@ -108,6 +110,7 @@ const localStorageKey = 'qdelicia_last_selection_v2'; // Chave para persistênci
 let currentZoom = 1; // Zoom inicial
 let maxZoom = 1; // Zoom máximo suportado pelo dispositivo
 let deviceOrientation = 0; // Orientação do dispositivo em graus
+let captureOrientation = 'portrait'; // NOVO: 'portrait' (padrão) ou 'landscape'
 
 // Carregar a imagem da logomarca
 const logoImage = new Image();
@@ -391,19 +394,22 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // --- LÓGICA DE ROTAÇÃO CORRIGIDA ---
+    // --- LÓGICA DE ROTAÇÃO CORRIGIDA PARA ORIENTAÇÃO ESCOLHIDA ---
 
-    // 1. Obter a rotação e as dimensões do stream
+    // 1. Obter a rotação base (0 para retrato, 90 para paisagem escolhida)
     const rotation = getPhotoRotation();
-    const isSideways = rotation === 90 || rotation === -90;
+    // Verifica se a rotação é 90 (Paisagem) ou -90 (Paisagem invertida, embora estejamos usando 90)
+    const isSideways = Math.abs(rotation) === 90; 
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
 
     // 2. Definir o tamanho do CANVAS para corresponder à orientação final
     if (isSideways) {
+        // Se a foto final será Paisagem, inverte largura e altura do vídeo original
         canvas.width = videoH;
         canvas.height = videoW;
     } else {
+        // Se a foto final será Retrato, usa as dimensões originais do vídeo
         canvas.width = videoW;
         canvas.height = videoH;
     }
@@ -416,9 +422,37 @@ function capturePhoto() {
     if (rotation !== 0) {
         ctx.rotate((rotation * Math.PI) / 180);
     }
+    
+    // CORREÇÃO ESSENCIAL para evitar a foto de cabeça para baixo:
+    // Verifica se o dispositivo está com a orientação 'invertida' (e.g., retrato de cabeça para baixo).
+    // Usamos a rotação de tela do sistema, se disponível, para ajustar o desenho.
+    let deviceRot = 0;
+    if (screen.orientation) {
+        const orientationType = screen.orientation.type;
+        if (orientationType.includes('portrait-secondary')) deviceRot = 180;
+        else if (orientationType.includes('landscape-secondary')) deviceRot = -90;
+    }
 
-    // 5. Desenha o vídeo no contexto girado
-    ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
+    // Se o usuário escolheu retrato (rotation=0) mas o dispositivo está em retrato invertido (180),
+    // ou se o usuário escolheu paisagem (rotation=90) e o dispositivo está em paisagem invertida (-90), 
+    // precisamos ajustar o desenho do vídeo.
+    
+    // A rotação base (rotation) já lida com o giro de 90 graus (retrato <-> paisagem).
+    // Para evitar fotos de cabeça para baixo (180 graus), ajustamos o desenho.
+    if (deviceRot === 180) {
+        // Se a orientação é 180, desenhamos o vídeo invertido.
+        ctx.rotate((180 * Math.PI) / 180);
+        ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
+    } else if (deviceRot === -90 && isSideways) {
+        // Caso específico para paisagem invertida
+        // A lógica de canvas.width/height e rotation=90 já lida com o giro, 
+        // mas em alguns browsers, o vídeo precisa ser desenhado com flip.
+        ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
+    } else {
+        // Desenho normal (o rotation já girou o contexto)
+        ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
+    }
+    
 
     // 6. Restaurar o contexto para que as marcas d'água sejam desenhadas
     // na orientação "normal" do canvas (retrato ou paisagem, mas não girado)
@@ -426,6 +460,7 @@ function capturePhoto() {
 
 
     // --- Configurações Comuns de Estilo e Posição para as marcas d'água ---
+    // canvas.width e canvas.height agora são as dimensões finais da foto
     const padding = Math.max(15, Math.floor(canvas.height / 80)); // Espaçamento
     const textBaseColor = '#FFFFFF';
     const bgColor = 'rgba(0, 0, 0, 0.7)';
@@ -652,12 +687,30 @@ function updateZoomButtons() {
     }
 }
 
+// ==================== FUNCIONALIDADES DE ORIENTAÇÃO MANUAL (NOVO) ====================
+
+/**
+ * @description Alterna entre Retrato e Paisagem para a captura e atualiza o display.
+ */
+function toggleCaptureOrientation() {
+    if (captureOrientation === 'portrait') {
+        captureOrientation = 'landscape';
+        if (orientationDisplay) orientationDisplay.textContent = 'Paisagem';
+    } else {
+        captureOrientation = 'portrait';
+        if (orientationDisplay) orientationDisplay.textContent = 'Retrato';
+    }
+    // Não é necessário reiniciar a câmera, apenas a lógica de captura (canvas) será afetada.
+}
+
+
 // ==================== DETECÇÃO DE ORIENTAÇÃO DO DISPOSITIVO ====================
 
 /**
  * @description Detecta a orientação do dispositivo
  */
 function detectDeviceOrientation() {
+    // Mantido apenas para lógica interna de "de cabeça para baixo"
     if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', handleDeviceOrientation);
     }
@@ -667,37 +720,32 @@ function detectDeviceOrientation() {
  * @description Manipula mudanças na orientação do dispositivo
  */
 function handleDeviceOrientation(event) {
-    const alpha = event.alpha; // Rotação ao redor do eixo Z (0-360)
     const beta = event.beta;   // Rotação ao redor do eixo X (-180 a 180)
     const gamma = event.gamma; // Rotação ao redor do eixo Y (-90 a 90)
 
-    // Determinar orientação baseado no beta (inclinação para frente/trás)
-    if (Math.abs(beta) < 45) {
-        deviceOrientation = 0; // Retrato normal
-    } else if (beta > 45) {
-        deviceOrientation = 180; // Retrato invertido
+    // Lógica simples para detectar se o dispositivo está de cabeça para baixo (180 graus)
+    if (Math.abs(beta) > 135) {
+        deviceOrientation = 180; 
     } else if (gamma > 45) {
-        deviceOrientation = 90; // Paisagem (girado para a direita)
+        deviceOrientation = 90; 
     } else if (gamma < -45) {
-        deviceOrientation = -90; // Paisagem (girado para a esquerda)
+        deviceOrientation = -90;
+    } else {
+        deviceOrientation = 0;
     }
 }
 
 /**
- * @description Calcula a rotação necessária para a foto
+ * @description Calcula a rotação necessária para a foto (usa a escolha do usuário)
+ * @returns {number} Rotação em graus (0 ou 90).
  */
 function getPhotoRotation() {
-    // Usar screen.orientation se disponível
-    if (screen.orientation) {
-        const orientation = screen.orientation.type;
-        if (orientation.includes('portrait-primary')) return 0;
-        if (orientation.includes('portrait-secondary')) return 180;
-        if (orientation.includes('landscape-primary')) return 90;
-        if (orientation.includes('landscape-secondary')) return -90;
+    // Prioriza a escolha do usuário para a orientação final
+    if (captureOrientation === 'landscape') {
+        return 90;
     }
-
-    // Fallback para deviceOrientation
-    return deviceOrientation;
+    // Retrato é o padrão
+    return 0;
 }
 
 
@@ -730,6 +778,12 @@ const zoomOutBtn = document.getElementById('zoom-out-btn');
 if (zoomOutBtn) {
     zoomOutBtn.addEventListener('click', zoomOut);
 }
+
+// Event listener para Orientação Manual (NOVO)
+if (orientationBtn) {
+    orientationBtn.addEventListener('click', toggleCaptureOrientation);
+}
+
 
 // Botão "Baixar Todas"
 if (downloadAllBtn) {
@@ -792,9 +846,11 @@ if (shareAllBtn && navigator.share) {
 
 // Listener de Rotação (Função original mantida)
 function handleOrientationChange() {
+    // Mantido para lidar com a rotação de tela do dispositivo
     if (currentStream && fullscreenCameraContainer && fullscreenCameraContainer.classList.contains('active')) {
         setTimeout(() => {
-            requestCameraPermission();
+            // Não reinicia a câmera, apenas atualiza a orientação do dispositivo
+            detectDeviceOrientation();
         }, 150);
     }
 }
@@ -812,4 +868,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateGalleryView();
     updatePhotoCounter();
     detectDeviceOrientation();
+    // Garante que o display de orientação inicial seja 'Retrato'
+    if (orientationDisplay) orientationDisplay.textContent = 'Retrato';
 });

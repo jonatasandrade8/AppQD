@@ -60,6 +60,42 @@
 .icon-btn.download-single-btn:hover {
     background-color: rgba(0, 123, 255, 1);
 }
+    /* NOVO CSS PARA CONTROLES DA CÂMERA */
+    .camera-controls-left {
+        position: absolute;
+        top: 80px; /* Posiciona abaixo do back-to-gallery-btn */
+        left: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 10px;
+        border-radius: 10px;
+    }
+    .camera-control-btn {
+        /* Estilo existente para o zoom, reusado aqui */
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid white;
+        border-radius: 50%;
+        width: 40px; 
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 16px; 
+        transition: background-color 0.2s ease;
+    }
+    .zoom-level {
+        color: white;
+        font-weight: bold;
+        font-size: 0.9em;
+        text-align: center;
+        width: 60px; /* Para acomodar o texto 'Paisagem' */
+    }
 
     </style>
 </head>
@@ -159,6 +195,12 @@
 
             <div id="photo-count">0</div>
 
+            <div class="camera-controls-left">
+                <button id="orientation-btn" class="camera-control-btn" title="Mudar Orientação">
+                    <i class="fas fa-arrows-rotate"></i>
+                </button>
+                <div id="orientation-display" class="zoom-level">Retrato</div>
+            </div>
             <div class="camera-controls-right">
                 <button id="zoom-in-btn" class="camera-control-btn" title="Aumentar Zoom">
                     <i class="fas fa-plus"></i>
