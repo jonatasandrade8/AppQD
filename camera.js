@@ -821,11 +821,15 @@ if (switchBtn) {
 
 // Listener para o botão de Rotação Manual
 if (rotateBtn) {
-    rotateBtn.addEventListener('click', () => {
-        // Lógica de rotação cumulativa 0 -> 90 -> 180 -> 270 -> 0
-        manualRotation = (manualRotation + 90) % 360;
-        updateOrientationIndicator();
-    });
+	    rotateBtn.addEventListener('click', () => {
+	        // Lógica de rotação: 0 (Retrato) -> 90 (Paisagem) -> 0 (Retrato)
+	        if (manualRotation === 0) {
+	            manualRotation = 90; // Gira para a direita (Paisagem)
+	        } else {
+	            manualRotation = 0; // Volta para o Retrato
+	        }
+	        updateOrientationIndicator();
+	    });
 }
 
 // Event listeners para Zoom
