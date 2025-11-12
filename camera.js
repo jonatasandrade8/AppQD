@@ -873,14 +873,15 @@ if (shareAllBtn && navigator.share) {
         const legendaCompartilhada = `${dataFormatada}\n${tipoFoto}\nPromotor: ${promotor}\nLoja: ${rede} ${loja}`;
 
         // Compartilha as 3 fotos mais recentes (limitado para compatibilidade do WhatsApp)
-        const files = photos.slice(0, 3).map((img, i) => { 
-            const byteString = atob(img.split(",")[1]);
+        const files = photos.slice(0, 3).map((img, i) => {
+            const byteString = atob(img.split(',')[1]);
+            const mimeString = img.split(',')[0].split(':')[1].split(';')[0];
             const ab = new ArrayBuffer(byteString.length);
             const ia = new Uint8Array(ab);
             for (let j = 0; j < byteString.length; j++) {
                 ia[j] = byteString.charCodeAt(j);
             }
-            return new File([ab], `Qdelicia_Foto_${i + 1}.jpg`, { type: "image/jpeg" });
+            return new File([ab], `Qdelicia_Foto_${i + 1}.jpg`, { type: mimeString });
         });
 
         navigator.share({
