@@ -86,23 +86,14 @@ const backToGalleryBtn = document.getElementById('back-to-gallery-btn');
 const video = document.getElementById('video');
 const shutterBtn = document.getElementById('shutter-btn');
 const switchBtn = document.getElementById('switch-btn');
-const rotateBtn = document.getElementById('rotate-btn'); 
 const dateTimeElement = document.getElementById('date-time');
 const photoList = document.getElementById('photo-list');
 const downloadAllBtn = document.getElementById('download-all');
 const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
-const orientationIndicator = document.getElementById('orientation-indicator'); 
-const orientationText = document.getElementById('orientation-text'); // Elemento para o texto de orientação
 
-// Elementos relacionados ao limite de fotos
-const controlsDiv = document.querySelector('.controls'); 
-const shutterMsgDiv = document.createElement('div'); 
-shutterMsgDiv.id = 'shutter-limit-message';
-shutterMsgDiv.textContent = 'Feche a Câmera'; 
-
-// Dropdowns para Marca D'água
-const selectTipoFoto = document.getElementById('select-tipo-foto'); 
+// NOVOS ELEMENTOS: Dropdowns para Marca D'água
+const selectTipoFoto = document.getElementById('select-tipo-foto'); // NOVO: Tipo de Foto
 const selectPromotor = document.getElementById('select-promotor');
 const selectRede = document.getElementById('select-rede');
 const selectLoja = document.getElementById('select-loja');
@@ -111,18 +102,12 @@ let currentStream = null;
 let usingFrontCamera = false;
 let photos = []; // Array de URLs de fotos (Sempre começará vazio)
 let hasCameraPermission = false; // Inicia como 'false'
-const localStorageKey = 'qdelicia_last_selection_v2'; 
+const localStorageKey = 'qdelicia_last_selection_v2'; // Chave para persistência (v2 devido à adição do novo campo)
 
-// Variáveis para Zoom
+// Variáveis para Zoom e Flash
 let currentZoom = 1; // Zoom inicial
 let maxZoom = 1; // Zoom máximo suportado pelo dispositivo
 let deviceOrientation = 0; // Orientação do dispositivo em graus
-
-// Variável para Rotação Manual (0, 90, 180, 270)
-let manualRotation = 0; 
-
-// Constante para o Limite de Fotos
-const MAX_PHOTOS = 6; 
 
 // Carregar a imagem da logomarca
 const logoImage = new Image();
@@ -134,9 +119,11 @@ logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca.
 
 /**
  * @description Salva as seleções atuais no localStorage.
+ * *** Tipo de Foto NÃO é salvo para ser resetado a cada sessão. ***
  */
 function saveSelection() {
     const selection = {
+        // NÃO INCLUI selectTipoFoto.value AQUI
         promotor: selectPromotor.value,
         rede: selectRede.value,
         loja: selectLoja.value
@@ -170,6 +157,8 @@ function loadAndPopulateDropdowns() {
     const savedSelection = JSON.parse(localStorage.getItem(localStorageKey));
 
     if (savedSelection) {
+        // *** NÃO CARREGA O Tipo de Foto A PARTIR DO localStorage ***
+
         if (savedSelection.promotor) {
             selectPromotor.value = savedSelection.promotor;
             // 3. Preenche a Rede baseada no Promotor salvo
@@ -232,13 +221,16 @@ function populateLoja(promotor, rede) {
  * @description Verifica se os dropdowns estão preenchidos para liberar o botão da câmera.
  */
 function checkCameraAccess() {
+    // NOVO: Adicionado selectTipoFoto.value à verificação
     const isReady = selectTipoFoto.value && selectPromotor.value && selectRede.value && selectLoja.value;
 
     if (openCameraBtn) {
         if (isReady) {
+            // Se os dropdowns estiverem preenchidos, o botão está pronto para TENTAR abrir.
             openCameraBtn.disabled = false;
             openCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Abrir Câmera';
         } else {
+            // Dropdowns não preenchidos, botão bloqueado.
             openCameraBtn.disabled = true;
             openCameraBtn.innerHTML = '<i class="fas fa-lock"></i> Preencha as Informações';
         }
@@ -247,7 +239,9 @@ function checkCameraAccess() {
 
 
 // EVENT LISTENERS para os Dropdowns
+// NOVO: Adicionado listener para o Tipo de Foto
 if (selectTipoFoto) {
+    // Apenas salva/checa, mas não é persistido (o valor será resetado ao recarregar a página)
     selectTipoFoto.addEventListener('change', saveSelection);
 }
 if (selectPromotor) {
@@ -267,7 +261,7 @@ if (selectLoja) {
 }
 
 
-// --- LÓGICA DA CÂMERA ---
+// --- LÓGICA DA CÂMERA (requestCameraPermission agora chama checkCameraAccess) ---
 
 /**
  * @description Solicita permissão da câmera e inicia o stream com qualidade otimizada.
@@ -278,6 +272,7 @@ async function requestCameraPermission() {
     }
 
     try {
+        // Configuração otimizada para melhor qualidade e menor zoom
         const constraints = {
             video: {
                 facingMode: usingFrontCamera ? "user" : "environment",
@@ -309,35 +304,30 @@ async function requestCameraPermission() {
 
         // Detectar orientação do dispositivo
         detectDeviceOrientation();
-        
-        // Atualiza o indicador de orientação
-        updateOrientationIndicator();
 
     } catch (err) {
         console.error("Erro ao acessar câmera:", err);
+        // Se o usuário negar, hasCameraPermission continuará 'false'
         hasCameraPermission = false;
 
+        // Alerta o usuário e fecha a tela cheia se algo der errado
         alert("Não foi possível iniciar a câmera. Verifique as permissões de acesso no seu navegador.");
         closeCameraFullscreen(); // Fecha a interface da câmera
     }
 }
 
 async function openCameraFullscreen() {
+    // Verificação de validação extra para garantir que o botão só é clicado quando pronto
     if (openCameraBtn && openCameraBtn.disabled) return;
+
     if (!fullscreenCameraContainer) return;
-    
-    // Resetar rotação manual ao abrir
-    manualRotation = 0; 
 
     // Mostra a interface da câmera
     fullscreenCameraContainer.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // Tenta pedir a permissão
+    // Tenta pedir a permissão (só é chamado aqui, no clique)
     await requestCameraPermission();
-    
-    // VERIFICA O ESTADO DO BOTÃO AO ABRIR
-    updateShutterButtonState(); 
 }
 
 function closeCameraFullscreen() {
@@ -349,13 +339,8 @@ function closeCameraFullscreen() {
         currentStream = null;
     }
     hasCameraPermission = false; // Reinicia o estado da permissão
-    checkCameraAccess(); // Verifica o estado do botão
+    checkCameraAccess(); // Verifica o estado do botão (que voltará a checar os dropdowns)
     window.removeEventListener('deviceorientation', handleDeviceOrientation);
-    
-    // Limpa o estado da mensagem de limite se existir
-    if (shutterMsgDiv.parentNode) {
-        shutterMsgDiv.parentNode.removeChild(shutterMsgDiv);
-    }
 }
 
 
@@ -371,93 +356,50 @@ function updatePhotoCounter() {
     if (photoCountElement) {
         photoCountElement.textContent = photos.length;
     }
-    // CHAMA O CONTROLE DE LIMITE
-    updateShutterButtonState(); 
-}
-
-/**
- * @description Controla a visibilidade do botão de captura baseado no limite (MAX_PHOTOS).
- */
-function updateShutterButtonState() {
-    if (!shutterBtn || !switchBtn || !controlsDiv || !rotateBtn) return; 
-
-    if (photos.length >= MAX_PHOTOS) {
-        // Atingiu o limite. Esconde shutter, switch e rotate, mostra a mensagem.
-        shutterBtn.style.display = 'none';
-        switchBtn.style.display = 'none';
-        rotateBtn.style.display = 'none';
-        
-        if (!document.getElementById('shutter-limit-message')) {
-            shutterMsgDiv.style.color = 'white';
-            shutterMsgDiv.style.fontSize = '1.2em';
-            shutterMsgDiv.style.fontWeight = 'bold';
-            shutterMsgDiv.style.padding = '10px';
-            controlsDiv.appendChild(shutterMsgDiv);
-        }
-    } else {
-        // Abaixo do limite. Mostra shutter, switch e rotate, esconde a mensagem.
-        shutterBtn.style.display = 'block';
-        switchBtn.style.display = 'block';
-        rotateBtn.style.display = 'block';
-        
-        if (document.getElementById('shutter-limit-message')) {
-            controlsDiv.removeChild(shutterMsgDiv);
-        }
-    }
 }
 
 
 // --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ---
 
 /**
- * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva com rotação automática e manual combinada.
+ * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva com rotação automática.
  */
 function capturePhoto() {
-    // 1. Verificar o limite de fotos 
-    if (photos.length >= MAX_PHOTOS) {
-        alert(`Limite máximo de ${MAX_PHOTOS} fotos atingido. Por favor, feche a câmera.`);
-        return;
-    }
-
-    // Validações
+    // NOVO: Adicionada verificação para o novo campo
     if (!selectTipoFoto.value || !selectPromotor.value || !selectRede.value || !selectLoja.value) {
         alert("Por favor, preencha Tipo de Foto, Promotor, Rede e Loja antes de tirar a foto.");
         return;
     }
+
+    // A verificação de permissão é crucial aqui
     if (!hasCameraPermission || !video || video.readyState < 2) {
         alert("Câmera não está pronta ou permissão não concedida.");
         return;
     }
 
     // Captura os dados da Marca D'água para impressão
-    const tipoFotoText = `Tipo: ${selectTipoFoto.value}`; 
+    const tipoFotoText = `Tipo: ${selectTipoFoto.value}`; // NOVO CAMPO PARA MARCA D'ÁGUA
     const promotorText = `Promotor: ${selectPromotor.value}`;
     const redeText = `Rede: ${selectRede.value}`;
     const lojaText = `Loja: ${selectLoja.value}`;
     const dateText = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
 
     // Linhas de texto a serem impressas no canto inferior direito, em ordem inversa de desenho (de baixo para cima)
+    // NOVO: tipoFotoText é adicionado ao topo da lista
     const watermarkLines = [dateText, lojaText, redeText, promotorText, tipoFotoText];
 
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // --- LÓGICA DE ROTAÇÃO CORRIGIDA (COMBINA DISPOSITIVO + MANUAL) ---
+    // --- LÓGICA DE ROTAÇÃO CORRIGIDA ---
 
-    // 1. Obter a rotação do dispositivo (0, 90, 180, 270)
-    const deviceRotation = getPhotoRotation(); 
-    
-    // 2. Calcular a rotação TOTAL (dispositivo + manual)
-    const totalRotation = (deviceRotation + manualRotation) % 360; 
-    
-    // Converte rotação negativa (como -90) para positiva (270), se necessário
-    const normalizedRotation = totalRotation < 0 ? totalRotation + 360 : totalRotation; 
-
-    const isSideways = normalizedRotation === 90 || normalizedRotation === 270;
+    // 1. Obter a rotação e as dimensões do stream
+    const rotation = getPhotoRotation();
+    const isSideways = rotation === 90 || rotation === -90;
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
 
-    // 3. Definir o tamanho do CANVAS para corresponder à orientação final
+    // 2. Definir o tamanho do CANVAS para corresponder à orientação final
     if (isSideways) {
         canvas.width = videoH;
         canvas.height = videoW;
@@ -466,19 +408,20 @@ function capturePhoto() {
         canvas.height = videoH;
     }
 
-    // 4. Salvar o estado original do contexto antes de transformar
+    // 3. Salvar o estado original do contexto antes de transformar
     ctx.save();
 
-    // 5. Centralizar o contexto e aplicar a rotação TOTAL
+    // 4. Centralizar o contexto e aplicar a rotação
     ctx.translate(canvas.width / 2, canvas.height / 2);
-    if (normalizedRotation !== 0) {
-        ctx.rotate((normalizedRotation * Math.PI) / 180);
+    if (rotation !== 0) {
+        ctx.rotate((rotation * Math.PI) / 180);
     }
-    
-    // Desenha o vídeo no contexto girado/corrigido
+
+    // 5. Desenha o vídeo no contexto girado
     ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
 
     // 6. Restaurar o contexto para que as marcas d'água sejam desenhadas
+    // na orientação "normal" do canvas (retrato ou paisagem, mas não girado)
     ctx.restore();
 
 
@@ -499,28 +442,28 @@ function capturePhoto() {
     // Calcula a largura máxima e a altura total
     watermarkLines.forEach(line => {
         maxWidth = Math.max(maxWidth, ctx.measureText(line).width);
-        totalHeight += defaultFontSize * 0.9 + (padding / 2); 
+        totalHeight += defaultFontSize * 0.9 + (padding / 2); // Altura da linha + espaço extra
     });
-    totalHeight -= (padding / 2); 
+    totalHeight -= (padding / 2); // Remove o último espaço extra
 
     // Desenha o fundo único para todas as linhas
     ctx.fillStyle = bgColor;
     ctx.fillRect(
-        canvas.width - maxWidth - 2 * padding, 
-        canvas.height - totalHeight - 2 * padding, 
+        canvas.width - maxWidth - 2 * padding, // Posição X (começa da direita para a esquerda)
+        canvas.height - totalHeight - 2 * padding, // Posição Y (de baixo para cima)
         maxWidth + 2 * padding,
         totalHeight + 2 * padding
     );
 
     // Desenha as linhas de texto
     ctx.fillStyle = textBaseColor;
-    let lineY = canvas.height - 2 * padding; 
+    let lineY = canvas.height - 2 * padding; // Posição inicial para o primeiro texto (dateText)
 
     // Percorre as linhas e desenha de baixo para cima
     for (let i = 0; i < watermarkLines.length; i++) {
         const line = watermarkLines[i];
         ctx.fillText(line, canvas.width - padding, lineY);
-        lineY -= (defaultFontSize * 0.9 + (padding / 2)); 
+        lineY -= (defaultFontSize * 0.9 + (padding / 2)); // Move para a linha acima
     }
 
 
@@ -543,17 +486,19 @@ function capturePhoto() {
 
 /**
  * @description Remove uma foto específica da galeria pelo seu índice.
+ * @param {number} index - O índice da foto a ser removida.
  */
 function removePhoto(index) {
     if (confirm("Tem certeza que deseja remover esta foto?")) {
-        photos.splice(index, 1); 
+        photos.splice(index, 1); // Remove 1 elemento a partir do índice
         updatePhotoCounter();
-        updateGalleryView(); 
+        updateGalleryView(); // Re-renderiza a galeria
     }
 }
 
 /**
  * @description Baixa uma foto individual da galeria.
+ * @param {number} index - O índice da foto a ser baixada.
  */
 function downloadSinglePhoto(index) {
     const photoURL = photos[index];
@@ -562,6 +507,7 @@ function downloadSinglePhoto(index) {
     const link = document.createElement("a");
     link.href = photoURL;
     const date = new Date().toISOString().replace(/:/g, '-').slice(0, 19);
+    // O nome do arquivo incluirá o índice (ex: Foto 1, Foto 2)
     link.download = `Qdelicia_Foto_${date}_${index + 1}.jpg`;
     document.body.appendChild(link);
     link.click();
@@ -594,7 +540,7 @@ function updateGalleryView() {
         const photoItem = document.createElement('div');
         photoItem.className = 'photo-item';
 
-        // HTML ATUALIZADO COM OS DOIS BOTÕES
+        // --- HTML ATUALIZADO COM OS DOIS BOTÕES ---
         photoItem.innerHTML = `
             <img src="${photoURL}" alt="Foto ${index + 1}">
 
@@ -608,26 +554,31 @@ function updateGalleryView() {
             </div>
 
             <div class="photo-info">Foto ${index + 1} (${selectTipoFoto.value})</div> `;
+        // --- FIM DA ATUALIZAÇÃO DO HTML ---
 
         photoList.appendChild(photoItem);
     });
 
-    // ATUALIZAÇÃO DOS EVENT LISTENERS
+    // --- ATUALIZAÇÃO DOS EVENT LISTENERS ---
+
+    // Adiciona event listeners para os botões de LIXEIRA (agora .remove-single-btn)
     document.querySelectorAll('.remove-single-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             event.stopPropagation();
             const indexToRemove = parseInt(event.currentTarget.dataset.index);
-            removePhoto(indexToRemove); 
+            removePhoto(indexToRemove); // Reutiliza a função existente
         });
     });
 
+    // Adiciona event listeners para os botões de DOWNLOAD (NOVOS)
     document.querySelectorAll('.download-single-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             event.stopPropagation();
             const indexToDownload = parseInt(event.currentTarget.dataset.index);
-            downloadSinglePhoto(indexToDownload); 
+            downloadSinglePhoto(indexToDownload); // Chama a nova função
         });
     });
+    // --- FIM DA ATUALIZAÇÃO DOS LISTENERS ---
 }
 
 /**
@@ -635,6 +586,7 @@ function updateGalleryView() {
  */
 function switchCamera() {
     usingFrontCamera = !usingFrontCamera;
+    // Reinicia a câmera com a nova configuração
     requestCameraPermission();
 }
 
@@ -715,88 +667,37 @@ function detectDeviceOrientation() {
  * @description Manipula mudanças na orientação do dispositivo
  */
 function handleDeviceOrientation(event) {
-    const beta = event.beta;   
-    const gamma = event.gamma; 
+    const alpha = event.alpha; // Rotação ao redor do eixo Z (0-360)
+    const beta = event.beta;   // Rotação ao redor do eixo X (-180 a 180)
+    const gamma = event.gamma; // Rotação ao redor do eixo Y (-90 a 90)
 
-    if (Math.abs(gamma) < 45 && Math.abs(beta) < 45) { // Retrato (dispositivo plano ou pouco inclinado)
-        deviceOrientation = 0; 
-    } else if (Math.abs(beta) > 135) { // Retrato invertido (de cabeça para baixo)
-        deviceOrientation = 180;
+    // Determinar orientação baseado no beta (inclinação para frente/trás)
+    if (Math.abs(beta) < 45) {
+        deviceOrientation = 0; // Retrato normal
+    } else if (beta > 45) {
+        deviceOrientation = 180; // Retrato invertido
     } else if (gamma > 45) {
         deviceOrientation = 90; // Paisagem (girado para a direita)
     } else if (gamma < -45) {
-        deviceOrientation = 270; // Paisagem (girado para a esquerda, usando 270 para consistência)
+        deviceOrientation = -90; // Paisagem (girado para a esquerda)
     }
-    
-    updateOrientationIndicator(); 
 }
 
 /**
- * @description Calcula a rotação necessária para a foto (valor ABSOLUTO do dispositivo)
- * @returns {number} Rotação em graus (0, 90, 180, 270).
+ * @description Calcula a rotação necessária para a foto
  */
 function getPhotoRotation() {
-    let rotation = 0;
-    
-    // 1. Prioriza screen.orientation (mais robusto)
+    // Usar screen.orientation se disponível
     if (screen.orientation) {
         const orientation = screen.orientation.type;
-        if (orientation.includes('portrait-primary')) rotation = 0;
-        else if (orientation.includes('portrait-secondary')) rotation = 180;
-        else if (orientation.includes('landscape-primary')) rotation = 90;
-        else if (orientation.includes('landscape-secondary')) rotation = 270; 
-    } else {
-        // 2. Fallback para deviceOrientation
-        rotation = deviceOrientation;
+        if (orientation.includes('portrait-primary')) return 0;
+        if (orientation.includes('portrait-secondary')) return 180;
+        if (orientation.includes('landscape-primary')) return 90;
+        if (orientation.includes('landscape-secondary')) return -90;
     }
-    
-    return rotation;
-}
 
-/**
- * @description Atualiza a seta indicadora de orientação correta (combina dispositivo + manual) e o texto.
- */
-function updateOrientationIndicator() {
-    if (!orientationIndicator || !orientationText) return;
-    
-    // Seleciona o ícone da seta dentro do indicador
-    const arrowIcon = orientationIndicator.querySelector('i');
-    if (!arrowIcon) return;
-
-    const deviceRotation = getPhotoRotation();
-    const totalRotation = (deviceRotation + manualRotation) % 360;
-    // Normaliza para 0, 90, 180, 270
-    const normalizedRotation = totalRotation < 0 ? totalRotation + 360 : totalRotation;
-    
-    let text = "";
-    
-    // 1. Determina o texto de orientação
-    if (normalizedRotation === 0) {
-        text = "Retrato";
-    } else if (normalizedRotation === 90 || normalizedRotation === 270) {
-        text = "Paisagem";
-    } else if (normalizedRotation === 180) {
-        text = "De Cabeça P/ Baixo";
-    } else {
-        text = "Ajuste Posição"; 
-    }
-    
-    orientationText.textContent = text;
-
-    // 2. Aplica a rotação ao ícone da seta
-    // A rotação indica a orientação FINAL da foto
-    arrowIcon.style.transform = `rotate(${normalizedRotation}deg)`;
-    
-    // 3. Atualiza estilos (mantendo o container/pill fixo no canto)
-    if (normalizedRotation === 180) {
-        orientationIndicator.style.color = 'red';
-        orientationIndicator.style.borderColor = 'red';
-        orientationIndicator.title = "Câmera de Cabeça Para Baixo! Por favor, ajuste.";
-    } else {
-        orientationIndicator.style.color = 'white';
-        orientationIndicator.style.borderColor = 'white';
-        orientationIndicator.title = `Direção da foto: ${text}`;
-    }
+    // Fallback para deviceOrientation
+    return deviceOrientation;
 }
 
 
@@ -817,19 +718,6 @@ if (shutterBtn) {
 
 if (switchBtn) {
     switchBtn.addEventListener('click', switchCamera);
-}
-
-// Listener para o botão de Rotação Manual
-if (rotateBtn) {
-	    rotateBtn.addEventListener('click', () => {
-	        // Lógica de rotação: 0 (Retrato) -> 90 (Paisagem) -> 0 (Retrato)
-	        if (manualRotation === 0) {
-	            manualRotation = 90; // Gira para a direita (Paisagem)
-	        } else {
-	            manualRotation = 0; // Volta para o Retrato
-	        }
-	        updateOrientationIndicator();
-	    });
 }
 
 // Event listeners para Zoom
@@ -858,12 +746,12 @@ if (downloadAllBtn) {
     });
 }
 
-// Botão "Compartilhar"
+// Botão "Compartilhar" (Função original mantida e ATUALIZADA)
 if (shareAllBtn && navigator.share) {
     shareAllBtn.addEventListener("click", () => {
 
         // 1. Captura os dados dos dropdowns para a legenda
-        const tipoFoto = selectTipoFoto.options[selectTipoFoto.selectedIndex].text; 
+        const tipoFoto = selectTipoFoto.options[selectTipoFoto.selectedIndex].text; // NOVO
         const promotor = selectPromotor.options[selectPromotor.selectedIndex].text;
         const rede = selectRede.options[selectRede.selectedIndex].text;
         const loja = selectLoja.options[selectLoja.selectedIndex].text;
@@ -871,21 +759,19 @@ if (shareAllBtn && navigator.share) {
         // 2. Cria a legenda dinâmica
         const now = new Date();
         const dateOptions = { weekday: 'long', year: '2-digit', month: '2-digit', day: '2-digit' };
-        const dataFormatada = now.toLocaleDateString('pt-BR', dateOptions).replace(/,/, '').replace(/\b\d\b/g, '0$&'); 
+        const dataFormatada = now.toLocaleDateString('pt-BR', dateOptions).replace(/,/, '').replace(/\b\d\b/g, '0$&'); // "Segunda-feira, 03/11/25"
 
         // Legenda com 3 linhas: Data, Tipo de Foto, Promotor/Loja
         const legendaCompartilhada = `${dataFormatada}\n${tipoFoto}\nPromotor: ${promotor}\nLoja: ${rede} ${loja}`;
 
-        // Compartilha as 3 fotos mais recentes (limitado para compatibilidade do WhatsApp)
-        const files = photos.slice(0, 3).map((img, i) => {
-            const byteString = atob(img.split(',')[1]);
-            const mimeString = img.split(',')[0].split(':')[1].split(';')[0];
+        const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
+            const byteString = atob(img.split(",")[1]);
             const ab = new ArrayBuffer(byteString.length);
             const ia = new Uint8Array(ab);
             for (let j = 0; j < byteString.length; j++) {
                 ia[j] = byteString.charCodeAt(j);
             }
-            return new File([ab], `Qdelicia_Foto_${i + 1}.jpg`, { type: mimeString });
+            return new File([ab], `Qdelicia_Foto_${i + 1}.jpg`, { type: "image/jpeg" });
         });
 
         navigator.share({
@@ -900,7 +786,7 @@ if (shareAllBtn && navigator.share) {
     });
 } else if (shareAllBtn) {
     shareAllBtn.addEventListener("click", () => {
-        alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manualmente.");
+        alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manually.");
     });
 }
 

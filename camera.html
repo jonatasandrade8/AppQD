@@ -7,262 +7,60 @@
     <title>Câmera - Qdelícia Frutas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./style.css">
-	
     <style>
-        /* ===================== ESTILOS ESPECÍFICOS DA CÂMERA E GALERIA ===================== */
+    
+    .photo-item {
+    position: relative;
+    overflow: hidden; /* Para os botões não vazarem */
+    }
 
-        /* Estilos para a Galeria de Fotos */
-        .photo-item {
-            position: relative;
-            overflow: hidden; /* Para os botões não vazarem */
-        }
+    /* Container para os botões (inspirado no camera_geral.html) */
+    .photo-controls {
+    position: absolute;
+    top: 8px; /* Distância do topo */
+    right: 8px; /* Distância da direita */
+    display: flex;
+    flex-direction: column; /* Empilha os botões verticalmente */
+    gap: 8px; /* Espaçamento entre os botões */
+    z-index: 5; /* Garante que fiquem acima da info e da imagem */
+    }
 
-        /* Container para os botões de controle da foto individual */
-        .photo-controls {
-            position: absolute;
-            top: 8px; /* Distância do topo */
-            right: 8px; /* Distância da direita */
-            display: flex;
-            flex-direction: column; /* Empilha os botões verticalmente */
-            gap: 8px; /* Espaçamento entre os botões */
-            z-index: 5; /* Garante que fiquem acima da info e da imagem */
-        }
+    /* Estilo base para os botões de ícone (inspirado no camera_geral.html) */
+    .icon-btn {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%; /* Botões redondos */
+    width: 35px; 
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px; /* Tamanho do ícone */
+    transition: background-color 0.2s ease;
+}
 
-        /* Estilo base para os botões de ícone */
-        .icon-btn {
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: none;
-            border-radius: 50%; /* Botões redondos */
-            width: 35px; 
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 14px; /* Tamanho do ícone */
-            transition: background-color 0.2s ease;
-        }
+.icon-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
 
-        .icon-btn:hover {
-            background-color: rgba(0, 0, 0, 0.8);
-        }
+/* Variação de cor para o botão de remover (lixeira) */
+.icon-btn.remove-single-btn {
+    background-color: rgba(220, 53, 69, 0.8); /* Vermelho */
+}
+.icon-btn.remove-single-btn:hover {
+    background-color: rgba(220, 53, 69, 1);
+}
 
-        /* Variação de cor para o botão de remover (lixeira) */
-        .icon-btn.remove-single-btn {
-            background-color: rgba(220, 53, 69, 0.8); /* Vermelho */
-        }
-        .icon-btn.remove-single-btn:hover {
-            background-color: rgba(220, 53, 69, 1);
-        }
+/* Variação de cor para o botão de download */
+.icon-btn.download-single-btn {
+    background-color: rgba(0, 123, 255, 0.8); /* Azul */
+}
+.icon-btn.download-single-btn:hover {
+    background-color: rgba(0, 123, 255, 1);
+}
 
-        /* Variação de cor para o botão de download */
-        .icon-btn.download-single-btn {
-            background-color: rgba(0, 123, 255, 0.8); /* Azul */
-        }
-        .icon-btn.download-single-btn:hover {
-            background-color: rgba(0, 123, 255, 1);
-        }
-
-        /* Indicador de Orientação */
-        #orientation-indicator {
-            position: absolute;
-            top: 15px; /* Posição superior, alinhado com o botão de fechar */
-            left: 50%;
-            transform: translateX(-50%);
-            min-width: 80px; /* Largura mínima para o texto */
-            padding: 5px 10px; /* Preenchimento interno */
-            background-color: rgba(0, 0, 0, 0.5);
-            border: 2px solid white;
-            border-radius: 25px; /* Mais arredondado para parecer um "pill" */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px; /* Tamanho da fonte menor para o texto */
-            z-index: 10;
-            transition: transform 0.3s ease-out; /* Para a rotação suave */
-            box-sizing: border-box; /* Inclui padding e border no width/height */
-        }
-
-        #orientation-indicator i {
-            margin-right: 5px; /* Espaçamento entre a seta e o texto */
-        }
-
-        /* Controles da Câmera (Inferior) */
-        .controls {
-            display: flex;
-            justify-content: space-between; /* Distribui os itens nas extremidades */
-            align-items: center;
-            width: 100%;
-            padding: 20px 15px; /* Adiciona padding lateral para afastar dos cantos */
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            box-sizing: border-box; 
-        }
-
-        /* Centraliza o shutter-btn e garante que os outros fiquem nas laterais */
-        .controls #shutter-btn {
-            order: 2; /* Garante que o shutter-btn esteja no meio */
-        }
-
-        .controls #switch-btn {
-            order: 1; /* Esquerda do shutter */
-        }
-
-        .controls #rotate-btn {
-            order: 3; /* Direita do shutter */
-        }
-
-        /* Ajustes para a mensagem de limite de fotos */
-        #shutter-limit-message {
-            position: absolute; /* Para que não afete o layout flex dos botões */
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 30px; /* Ajuste a posição para não sobrepor outros elementos se necessário */
-            text-align: center;
-            width: 80%; /* Para que a mensagem não seja muito longa */
-        }
-        
-        /* Controles de Zoom (Lado Direito) */
-        .camera-controls-right {
-            position: absolute;
-            right: 15px;
-            top: 70px; /* Posição inicial */
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 20;
-        }
-        
-        .camera-controls-right .camera-control-btn {
-            background-color: rgba(93, 63, 211, 0.9); /* Cor principal */
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px; 
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        
-        .camera-controls-right .zoom-level {
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 14px;
-            text-align: center;
-        }
-        
-        /* Botão de Fechar (Canto Superior Esquerdo) */
-        #back-to-gallery-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px; 
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 20;
-        }
-        
-        /* Contador de Fotos (Canto Superior Direito) */
-        #photo-count {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(93, 63, 211, 0.95); 
-            color: white;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            min-width: 45px; 
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            z-index: 10;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(4px);
-        }
-        
-        /* Marca d'água (Data/Hora) */
-        .watermark {
-            position: absolute;
-            top: 15px; 
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(4px);
-        }
-        
-        /* Estilos para o video e container */
-        .fullscreen-camera-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 9999;
-            display: none; 
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .fullscreen-camera-container.active {
-            display: flex;
-        }
-        
-        .camera-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-        }
-        
-        .camera-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        #video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-        }
-        
     </style>
 </head>
 <body class="camera-page">
@@ -288,7 +86,14 @@
         <p>Câmera para Registros</p>
     </header>
     
-
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="caixas.html">Caixas</a>
+        <a href="camera.html" class="active">Câmera</a>
+        <a href="relatorio.html">Relatório/Qualidade</a>
+        
+    </nav>
     
     <main class="camera-main-content">
         
@@ -353,7 +158,6 @@
             <button id="back-to-gallery-btn"><i class="fas fa-times"></i></button>
 
             <div id="photo-count">0</div>
-            
 
             <div class="camera-controls-right">
                 <button id="zoom-in-btn" class="camera-control-btn" title="Aumentar Zoom">
@@ -369,20 +173,13 @@
                 <video id="video" autoplay playsinline></video>
             </div>
             
-	            <div class="watermark" id="orientation-indicator" title="Direção correta da foto">
-	                <i class="fas fa-arrow-up"></i> <span id="orientation-text">Retrato</span>
-	            </div>
-	            
-	            <div class="watermark" style="top: 65px;">
-	              <i class="fas fa-clock"></i> <span id="date-time">--/--/---- --:--:--</span>
-	            </div>
+            <div class="watermark">
+              <i class="fas fa-clock"></i> <span id="date-time">--/--/---- --:--:--</span>
+            </div>
             
             <div class="controls">
-                <button id="switch-btn" class="btn-circle"><i class="fas fa-sync-alt"></i></button>
-                <button id="shutter-btn" class="btn-circle"></button>
-                <button id="rotate-btn" class="btn-circle" title="Girar 90°">
-                    <img src="https://assets-c4d.s3.amazonaws.com/icons/camera-rotate.png" alt="Rotate" style="width: 24px; height: 24px;">
-                </button>
+              <button id="switch-btn" class="btn-circle"><i class="fas fa-sync-alt"></i></button>
+              <button id="shutter-btn" class="btn-circle"></button>
             </div>
             
         </div>
