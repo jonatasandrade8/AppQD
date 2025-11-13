@@ -56,6 +56,7 @@ const RELATORIO_DATA = {
         "Muito Madura",
         "Muito Arranhada",
         "Tamanho Fora do Padrão",
+        "Baixa Qualidade",
         "Atraso na Entrega",
         "Peso Alterado",
         "Encruada"
@@ -67,7 +68,8 @@ const RELATORIO_DATA = {
         "Leite",
         "Nanica",
         "Goiaba",
-        "Abacaxi"
+        "Abacaxi",
+        "Coco Verde"
         
     ]
 };
