@@ -92,6 +92,13 @@ const downloadAllBtn = document.getElementById('download-all');
 const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
 
+// --- Elementos para Rotação e Orientação (ATUALIZADO) ---
+const rotateBtn = document.getElementById('rotate-btn'); // Botão de Rotação Manual
+const orientationArrow = document.getElementById('orientation-arrow'); // Seta de Orientação
+const portraitGuide = document.getElementById('portrait-guide'); // Guia Retrato (Rodapé)
+const landscapeGuide = document.getElementById('landscape-guide'); // Guia Paisagem (Lateral)
+
+
 // NOVOS ELEMENTOS: Dropdowns para Marca D'água
 const selectTipoFoto = document.getElementById('select-tipo-foto'); // NOVO: Tipo de Foto
 const selectPromotor = document.getElementById('select-promotor');
@@ -108,6 +115,7 @@ const localStorageKey = 'qdelicia_last_selection_v2'; // Chave para persistênci
 let currentZoom = 1; // Zoom inicial
 let maxZoom = 1; // Zoom máximo suportado pelo dispositivo
 let deviceOrientation = 0; // Orientação do dispositivo em graus
+let manualRotation = 0; // 0 (Retrato) ou 90 (Paisagem) - Inicialmente Retrato
 
 // Carregar a imagem da logomarca
 const logoImage = new Image();
@@ -146,14 +154,6 @@ function loadAndPopulateDropdowns() {
         selectTipoFoto.appendChild(option);
     });
 
-    // 2. Preenche o Promotor
-    Object.keys(APP_DATA).forEach(promotor => {
-        const option = document.createElement('option');
-        option.value = promotor;
-        option.textContent = promotor;
-        selectPromotor.appendChild(option);
-    });
-
     const savedSelection = JSON.parse(localStorage.getItem(localStorageKey));
 
     if (savedSelection) {
@@ -171,6 +171,20 @@ function loadAndPopulateDropdowns() {
             }
         }
     }
+
+    // Preenche o Promotor sempre após carregar as seleções salvas
+    selectPromotor.innerHTML = '<option value="" disabled selected>Selecione na lista</option>';
+    Object.keys(APP_DATA).forEach(promotor => {
+        const option = document.createElement('option');
+        option.value = promotor;
+        option.textContent = promotor;
+        selectPromotor.appendChild(option);
+    });
+    // Se havia um promotor salvo, garante que ele seja selecionado novamente
+    if (savedSelection && savedSelection.promotor) {
+        selectPromotor.value = savedSelection.promotor;
+    }
+
 
     // Força a validação inicial do botão
     checkCameraAccess();
@@ -328,6 +342,9 @@ async function openCameraFullscreen() {
 
     // Tenta pedir a permissão (só é chamado aqui, no clique)
     await requestCameraPermission();
+
+    // Inicializa os indicadores de rotação ao abrir a câmera
+    updateRotationButton();
 }
 
 function closeCameraFullscreen() {
@@ -394,7 +411,7 @@ function capturePhoto() {
     // --- LÓGICA DE ROTAÇÃO CORRIGIDA ---
 
     // 1. Obter a rotação e as dimensões do stream
-    const rotation = getPhotoRotation();
+    const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL SE DEFINIDA
     const isSideways = rotation === 90 || rotation === -90;
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
@@ -591,6 +608,65 @@ function switchCamera() {
 }
 
 
+// ==================== FUNCIONALIDADES DE ROTAÇÃO MANUAL (NOVO) ====================
+
+/**
+ * @description Alterna a rotação manual entre Retrato (0) e Paisagem (90).
+ */
+function toggleManualRotation() {
+    // Alterna entre Retrato (0) e Paisagem (90)
+    manualRotation = manualRotation === 0 ? 90 : 0;
+    updateRotationButton();
+}
+
+/**
+ * @description Atualiza o ícone do botão de rotação e a seta de orientação, e exibe as guias.
+ */
+function updateRotationButton() {
+    const landscapeText = landscapeGuide ? landscapeGuide.querySelector('.landscape-text') : null;
+    const portraitText = portraitGuide ? portraitGuide.querySelector('.portrait-text') : null;
+
+    if (rotateBtn) {
+        if (manualRotation === 0) {
+            // Retrato
+            rotateBtn.innerHTML = '<i class="fas fa-mobile-screen"></i>';
+            rotateBtn.title = 'Modo Retrato Ativo';
+
+            if (orientationArrow) {
+                orientationArrow.style.display = 'block';
+                // Para apontar para CIMA (rotaciona o ícone 'fa-arrow-right' em -90deg)
+                orientationArrow.style.transform = 'rotate(-90deg)';
+            }
+            if (portraitGuide) portraitGuide.style.display = 'block';
+            if (landscapeGuide) landscapeGuide.style.display = 'none';
+            if (portraitText) {
+                // Modo Retrato Padrão
+                portraitText.textContent = '------------ modo retrato ------------';
+                portraitText.style.transform = 'rotate(0deg)';
+            }
+
+        } else {
+            // Paisagem (90 graus)
+            rotateBtn.innerHTML = '<i class="fas fa-mobile-screen-button"></i>';
+            rotateBtn.title = 'Modo Paisagem Ativo'; // O título do tooltip pode ser mantido
+
+            if (orientationArrow) {
+                orientationArrow.style.display = 'block';
+                // Para apontar para DIREITA (rotação padrão do ícone 'fa-arrow-right' é 0deg)
+                orientationArrow.style.transform = 'rotate(0deg)';
+            }
+            if (portraitGuide) portraitGuide.style.display = 'none';
+            if (landscapeGuide) landscapeGuide.style.display = 'block';
+            if (landscapeText) {
+                // NOVO TEXTO E ROTAÇÃO DE 180º SOLICITADA
+                landscapeText.textContent = '------------ modo paisagem ------------';
+                landscapeText.style.transform = 'rotate(0deg)';
+            }
+        }
+    }
+}
+
+
 // ==================== FUNCIONALIDADES DE ZOOM ====================
 
 /**
@@ -687,7 +763,13 @@ function handleDeviceOrientation(event) {
  * @description Calcula a rotação necessária para a foto
  */
 function getPhotoRotation() {
-    // Usar screen.orientation se disponível
+    // 1. PRIORIZA A ROTAÇÃO MANUAL DO USUÁRIO
+    if (manualRotation === 90) {
+        return 90; // Rotação manual para Paisagem
+    }
+    // O manualRotation === 0 retorna 0 (Retrato), que é o fallback default abaixo
+
+    // 2. Fallback para screen.orientation (Melhor Detecção do Browser)
     if (screen.orientation) {
         const orientation = screen.orientation.type;
         if (orientation.includes('portrait-primary')) return 0;
@@ -696,7 +778,7 @@ function getPhotoRotation() {
         if (orientation.includes('landscape-secondary')) return -90;
     }
 
-    // Fallback para deviceOrientation
+    // 3. Fallback para deviceOrientation (Sensores)
     return deviceOrientation;
 }
 
@@ -718,6 +800,11 @@ if (shutterBtn) {
 
 if (switchBtn) {
     switchBtn.addEventListener('click', switchCamera);
+}
+
+// Event listener para Rotação Manual
+if (rotateBtn) {
+    rotateBtn.addEventListener('click', toggleManualRotation);
 }
 
 // Event listeners para Zoom
@@ -812,4 +899,5 @@ document.addEventListener('DOMContentLoaded', () => {
     updateGalleryView();
     updatePhotoCounter();
     detectDeviceOrientation();
+    updateRotationButton(); // Chama para iniciar os indicadores no modo Retrato
 });

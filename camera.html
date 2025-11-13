@@ -61,6 +61,79 @@
     background-color: rgba(0, 123, 255, 1);
 }
 
+/* --- NOVO CSS PARA ROTAÇÃO E GUIAS (AJUSTADO) --- */
+
+/* Posicionamento do botão de Rotação (Novo: Inferior Esquerdo) */
+.camera-controls-bottom-left {
+    position: absolute;
+    bottom: 55px; /* Acima dos controles de foto/troca */
+    left: 40px;
+    z-index: 10;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid var(--primary-color);
+    cursor: pointer;
+    font-size: 1.2rem;
+    background: var(--white);
+    transition: transform 0.2s;
+    
+}
+
+.orientation-arrow {
+    position: absolute;
+    bottom: 60px;
+    right: 25px;
+    transform: translateX(-50%) rotate(-90deg); /* Padrão Retrato */
+    color: yellow;
+    font-size: 2em;
+    z-index: 5;
+    display: none;
+    transition: transform 0.3s ease;
+}
+
+.guide-line {
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    pointer-events: none;
+    z-index: 5;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none;
+}
+
+.portrait-guide {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 5px 0;
+}
+
+.landscape-guide {
+    left: 0; /* ALTERADO: Mover para o lado esquerdo */
+    top: 0;
+    height: 100%;
+    width: 30px;
+    /* Faz o texto correr verticalmente */
+    writing-mode: vertical-rl;
+    padding: 10px 0;
+}
+
+.landscape-text {
+    /* É o elemento que será girado em 180deg pelo JS */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center center;
+    transition: transform 0.3s ease;
+}
     </style>
 </head>
 <body class="camera-page">
@@ -158,7 +231,12 @@
             <button id="back-to-gallery-btn"><i class="fas fa-times"></i></button>
 
             <div id="photo-count">0</div>
-
+            
+            <div class="camera-controls-bottom-left">
+                <button id="rotate-btn" class="camera-control-btn" title="Alternar Rotação">
+                    <i class="fas fa-mobile-screen"></i>
+                </button>
+            </div>
             <div class="camera-controls-right">
                 <button id="zoom-in-btn" class="camera-control-btn" title="Aumentar Zoom">
                     <i class="fas fa-plus"></i>
@@ -171,8 +249,18 @@
 
             <div class="camera-container">
                 <video id="video" autoplay playsinline></video>
-            </div>
+                
+                <div id="orientation-arrow" class="orientation-arrow" title="Gire o dispositivo nesta direção">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                </div>
             
+            <div id="portrait-guide" class="guide-line portrait-guide">
+                <div class="portrait-text">------------ modo retrato ------------</div>
+            </div>
+            <div id="landscape-guide" class="guide-line landscape-guide">
+                 <div class="landscape-text">------------ modo paisagem ------------</div>
+            </div>
             <div class="watermark">
               <i class="fas fa-clock"></i> <span id="date-time">--/--/---- --:--:--</span>
             </div>
