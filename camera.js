@@ -430,24 +430,23 @@ function capturePhoto() {
 
     // 4. Centralizar o contexto e aplicar a rotação
     ctx.translate(canvas.width / 2, canvas.height / 2);
+    
     if (rotation !== 0) {
         ctx.rotate((rotation * Math.PI) / 180);
     }
 
-    // 5. Desenha o vídeo no contexto girado
-    
-    // **CORREÇÃO:** Aplicar espelhamento vertical se a rotação for 90 (Paisagem)
-    // para corrigir o vídeo de cabeça para baixo
+    // --- INÍCIO DA CORREÇÃO ROBUSTA (APLICADA AQUI) ---
+    // Se a rotação for 90 (Paisagem Manual), aplicamos uma rotação
+    // ADICIONAL de 180 graus (PI radianos) para corrigir a inversão
+    // vertical ("de cabeça para baixo") da imagem do vídeo.
     if (rotation === 90) {
-        // Aplica espelhamento no eixo Y (vertical)
-        ctx.scale(1, -1); 
-        // Compensação na coordenada Y devido à escala de -1.
-        // Desenha a imagem na posição compensada.
-        ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
-    } else {
-        // Desenho padrão para outras rotações (0, 180, -90)
-        ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
+        ctx.rotate(Math.PI); // Adiciona 180 graus
     }
+    // --- FIM DA CORREÇÃO ROBUSTA ---
+
+
+    // 5. Desenha o vídeo no contexto girado (agora corrigido)
+    ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
 
     // 6. Restaurar o contexto para que as marcas d'água sejam desenhadas
     // na orientação "normal" do canvas (retrato ou paisagem, mas não girado)
