@@ -47,12 +47,14 @@ const APP_DATA = {
     "Markson": {
         "Nordestão": ["Loja 08"],
         "Mar Vermelho": ["Parnamirim"],
-        "Atacadão": ["BR-101 Sul"]
+        "Mar Vermelho": ["Natal"],
+        "Superfácil": ["Emaús"],
     },
     "Jordão": {
-        "Superfácil": ["Olho d'Água", "Emaús"],
-        "Assaí": ["Ponta Negra"],
-        "Mar Vermelho": ["BR-101 Sul"]
+        "Superfácil": ["Emaús"],
+        "Atacadão": ["Prudente"],
+        
+
     },
     "Mateus": {
         "Nordestão": ["Loja 04"],
