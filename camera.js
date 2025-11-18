@@ -410,23 +410,19 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // --- LÓGICA DE ROTAÇÃO CORRIGIDA E ROBUSTA ---
+    // --- LÓGICA DE ROTAÇÃO CORRIGIDA ---
 
     // 1. Obter a rotação e as dimensões do stream
-    const rotation = getPhotoRotation(); // Usa a rotação manual (0 ou 90)
+    const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL SE DEFINIDA
+    const isSideways = rotation === 90 || rotation === -90;
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
-    
-    // Determina se a imagem final DEVE ser Retrato (0 ou 180)
-    const isPortraitTarget = rotation === 0 || rotation === 180;
 
     // 2. Definir o tamanho do CANVAS para corresponder à orientação final
-    // Se o alvo é Retrato (ex: 0 ou 180), trocamos Largura e Altura (Ex: 1080x1920)
-    if (isPortraitTarget) {
+    if (isSideways) {
         canvas.width = videoH;
         canvas.height = videoW;
     } else {
-        // Se o alvo é Paisagem (90 ou -90), mantemos Largura e Altura originais (Ex: 1920x1080)
         canvas.width = videoW;
         canvas.height = videoH;
     }
@@ -434,28 +430,28 @@ function capturePhoto() {
     // 3. Salvar o estado original do contexto antes de transformar
     ctx.save();
 
-    // 4. Centralizar o contexto
+    // 4. Centralizar o contexto e aplicar a rotação
     ctx.translate(canvas.width / 2, canvas.height / 2);
+    
+    if (rotation !== 0) {
+        ctx.rotate((rotation * Math.PI) / 180);
+    }
 
-    let finalRotationAngle = rotation;
-    
-    // Se a captura é Retrato, precisamos adicionar 90 graus de rotação
-    // para transformar o stream de vídeo (que é wide) em Retrato.
-    if (isPortraitTarget) {
-        finalRotationAngle += 90; 
+    // --- INÍCIO DA CORREÇÃO ROBUSTA (APLICADA AQUI) ---
+    // Se a rotação for 90 (Paisagem Manual), aplicamos uma rotação
+    // ADICIONAL de 180 graus (PI radianos) para corrigir a inversão
+    // vertical ("de cabeça para baixo") da imagem do vídeo.
+    if (rotation === 90) {
+        ctx.rotate(Math.PI); // Adiciona 180 graus
     }
-    
-    // 5. Aplicar a rotação final
-    if (finalRotationAngle !== 0) {
-        ctx.rotate((finalRotationAngle * Math.PI) / 180);
-    }
-    
-    // 6. Desenha o vídeo no contexto girado
-    // O vídeo é desenhado usando suas dimensões originais (W x H) a partir do centro do canvas.
+    // --- FIM DA CORREÇÃO ROBUSTA ---
+
+
+    // 5. Desenha o vídeo no contexto girado (agora corrigido)
     ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
 
-    // 7. Restaurar o contexto para que as marcas d'água sejam desenhadas
-    // na orientação "normal" do canvas (topo-esquerda no 0,0)
+    // 6. Restaurar o contexto para que as marcas d'água sejam desenhadas
+    // na orientação "normal" do canvas (retrato ou paisagem, mas não girado)
     ctx.restore();
 
 
