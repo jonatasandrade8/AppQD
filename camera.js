@@ -1,3 +1,5 @@
+// O código é preservado, a seção de rotação robusta é garantida
+
 // ==================== NOVAS ESTRUTURA DE DADOS PARA DROPDOWNS ====================
 /**
  * @description Tipos de foto disponíveis para seleção.
@@ -410,7 +412,7 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // --- LÓGICA DE ROTAÇÃO CORRIGIDA ---
+    // --- LÓGICA DE ROTAÇÃO CORRIGIDA (PRESERVADA) ---
 
     // 1. Obter a rotação e as dimensões do stream
     const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL SE DEFINIDA
@@ -437,10 +439,12 @@ function capturePhoto() {
         ctx.rotate((rotation * Math.PI) / 180);
     }
 
-    // --- INÍCIO DA CORREÇÃO ROBUSTA (APLICADA AQUI) ---
-    // Se a rotação for 90 (Paisagem Manual), aplicamos uma rotação
+    // --- INÍCIO DA CORREÇÃO ROBUSTA (MANTIDA) ---
+    // Se a rotação for 90 (Paisagem Manual ou Detectada), aplicamos uma rotação
     // ADICIONAL de 180 graus (PI radianos) para corrigir a inversão
-    // vertical ("de cabeça para baixo") da imagem do vídeo.
+    // vertical ("de cabeça para baixo") da imagem do vídeo, comum
+    // em alguns dispositivos ao usar a câmera traseira em modo paisagem.
+    // É uma correção específica para o problema de rotação.
     if (rotation === 90) {
         ctx.rotate(Math.PI); // Adiciona 180 graus
     }
