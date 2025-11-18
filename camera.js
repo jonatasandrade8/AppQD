@@ -7,6 +7,7 @@
 const PHOTO_TYPES = {
     "Bancadas": "Bancadas",
     "Ponto Extra": "Ponto Extra",
+    "Caixas Secas": "Caixas Secas",
     "Ação de Degustação": "Ação de Degustação",
 };
 
@@ -45,14 +46,14 @@ const APP_DATA = {
 
     },
     "Markson": {
-        "Nordestão": ["Loja 08"],
+        "Atacadão": ["Prudente"],
         "Mar Vermelho": ["Parnamirim"],
         "Mar Vermelho": ["Natal"],
         "Superfácil": ["Emaús"],
     },
     "Jordão": {
         "Superfácil": ["Emaús"],
-        "Atacadão": ["Prudente"],
+        "Nordestão": ["Loja 08"],
         
 
     },
