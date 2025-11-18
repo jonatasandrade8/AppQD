@@ -413,16 +413,15 @@ function capturePhoto() {
     // --- LÓGICA DE ROTAÇÃO CORRIGIDA E ROBUSTA ---
 
     // 1. Obter a rotação e as dimensões do stream
-    const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL SE DEFINIDA
+    const rotation = getPhotoRotation(); // Usa a rotação manual (0 ou 90)
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
     
     // Determina se a imagem final DEVE ser Retrato (0 ou 180)
-    // O problema de inversão ocorre porque o stream é geralmente Landscape (W>H)
     const isPortraitTarget = rotation === 0 || rotation === 180;
 
     // 2. Definir o tamanho do CANVAS para corresponder à orientação final
-    // Se o alvo é Retrato, trocamos Largura e Altura (Ex: 1080x1920)
+    // Se o alvo é Retrato (ex: 0 ou 180), trocamos Largura e Altura (Ex: 1080x1920)
     if (isPortraitTarget) {
         canvas.width = videoH;
         canvas.height = videoW;
@@ -440,23 +439,23 @@ function capturePhoto() {
 
     let finalRotationAngle = rotation;
     
-    // Se a captura é Retrato (rotation=0 ou 180), precisamos adicionar 90 graus de rotação
-    // para transformar o stream de vídeo (que é geralmente Landscape) em Retrato.
+    // Se a captura é Retrato, precisamos adicionar 90 graus de rotação
+    // para transformar o stream de vídeo (que é wide) em Retrato.
     if (isPortraitTarget) {
-        finalRotationAngle += 90;
+        finalRotationAngle += 90; 
     }
     
-    // Aplicar a rotação final (incluindo a correção de 90 graus para retrato)
+    // 5. Aplicar a rotação final
     if (finalRotationAngle !== 0) {
         ctx.rotate((finalRotationAngle * Math.PI) / 180);
     }
     
-    // 5. Desenha o vídeo no contexto girado (agora corrigido)
-    // O vídeo é desenhado com o centro do contexto no 0,0 do vídeo.
+    // 6. Desenha o vídeo no contexto girado
+    // O vídeo é desenhado usando suas dimensões originais (W x H) a partir do centro do canvas.
     ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
 
-    // 6. Restaurar o contexto para que as marcas d'água sejam desenhadas
-    // na orientação "normal" do canvas (retrato ou paisagem, mas não girado)
+    // 7. Restaurar o contexto para que as marcas d'água sejam desenhadas
+    // na orientação "normal" do canvas (topo-esquerda no 0,0)
     ctx.restore();
 
 
