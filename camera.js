@@ -1,5 +1,3 @@
-// O código é preservado, a seção de rotação robusta é garantida
-
 // ==================== NOVAS ESTRUTURA DE DADOS PARA DROPDOWNS ====================
 /**
  * @description Tipos de foto disponíveis para seleção.
@@ -412,19 +410,24 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // --- LÓGICA DE ROTAÇÃO CORRIGIDA (PRESERVADA) ---
+    // --- LÓGICA DE ROTAÇÃO CORRIGIDA E ROBUSTA ---
 
     // 1. Obter a rotação e as dimensões do stream
     const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL SE DEFINIDA
-    const isSideways = rotation === 90 || rotation === -90;
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
+    
+    // Determina se a imagem final DEVE ser Retrato (0 ou 180)
+    // O problema de inversão ocorre porque o stream é geralmente Landscape (W>H)
+    const isPortraitTarget = rotation === 0 || rotation === 180;
 
     // 2. Definir o tamanho do CANVAS para corresponder à orientação final
-    if (isSideways) {
+    // Se o alvo é Retrato, trocamos Largura e Altura (Ex: 1080x1920)
+    if (isPortraitTarget) {
         canvas.width = videoH;
         canvas.height = videoW;
     } else {
+        // Se o alvo é Paisagem (90 ou -90), mantemos Largura e Altura originais (Ex: 1920x1080)
         canvas.width = videoW;
         canvas.height = videoH;
     }
@@ -432,26 +435,24 @@ function capturePhoto() {
     // 3. Salvar o estado original do contexto antes de transformar
     ctx.save();
 
-    // 4. Centralizar o contexto e aplicar a rotação
+    // 4. Centralizar o contexto
     ctx.translate(canvas.width / 2, canvas.height / 2);
+
+    let finalRotationAngle = rotation;
     
-    if (rotation !== 0) {
-        ctx.rotate((rotation * Math.PI) / 180);
+    // Se a captura é Retrato (rotation=0 ou 180), precisamos adicionar 90 graus de rotação
+    // para transformar o stream de vídeo (que é geralmente Landscape) em Retrato.
+    if (isPortraitTarget) {
+        finalRotationAngle += 90;
     }
-
-    // --- INÍCIO DA CORREÇÃO ROBUSTA (MANTIDA) ---
-    // Se a rotação for 90 (Paisagem Manual ou Detectada), aplicamos uma rotação
-    // ADICIONAL de 180 graus (PI radianos) para corrigir a inversão
-    // vertical ("de cabeça para baixo") da imagem do vídeo, comum
-    // em alguns dispositivos ao usar a câmera traseira em modo paisagem.
-    // É uma correção específica para o problema de rotação.
-    if (rotation === 90) {
-        ctx.rotate(Math.PI); // Adiciona 180 graus
+    
+    // Aplicar a rotação final (incluindo a correção de 90 graus para retrato)
+    if (finalRotationAngle !== 0) {
+        ctx.rotate((finalRotationAngle * Math.PI) / 180);
     }
-    // --- FIM DA CORREÇÃO ROBUSTA ---
-
-
+    
     // 5. Desenha o vídeo no contexto girado (agora corrigido)
+    // O vídeo é desenhado com o centro do contexto no 0,0 do vídeo.
     ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
 
     // 6. Restaurar o contexto para que as marcas d'água sejam desenhadas
