@@ -117,11 +117,8 @@ const localStorageKey = 'qdelicia_last_selection_v2'; // Chave para persistênci
 // Variáveis para Zoom e Flash
 let currentZoom = 1; // Zoom inicial
 let maxZoom = 1; // Zoom máximo suportado pelo dispositivo
-let deviceOrientation = 0; // Orientação do dispositivo em graus (sensor)
+let deviceOrientation = 0; // Orientação do dispositivo em graus
 let manualRotation = 0; // 0 (Retrato) ou 90 (Paisagem) - Inicialmente Retrato
-
-// ==================== NOVO ESTADO DE ROTAÇÃO ====================
-let autoRotateEnabled = true; // Assumimos ativado até a primeira verificação
 
 // Carregar a imagem da logomarca
 const logoImage = new Image();
@@ -322,8 +319,7 @@ async function requestCameraPermission() {
         currentZoom = 1;
         applyZoom();
 
-        // Detectar orientação do dispositivo E verificar auto-rotação
-        checkAutoRotationStatus(); // NOVO: Verifica o status
+        // Detectar orientação do dispositivo
         detectDeviceOrientation();
 
     } catch (err) {
@@ -337,7 +333,7 @@ async function requestCameraPermission() {
     }
 }
 
-function openCameraFullscreen() {
+async function openCameraFullscreen() {
     // Verificação de validação extra para garantir que o botão só é clicado quando pronto
     if (openCameraBtn && openCameraBtn.disabled) return;
 
@@ -348,7 +344,7 @@ function openCameraFullscreen() {
     document.body.style.overflow = 'hidden';
 
     // Tenta pedir a permissão (só é chamado aqui, no clique)
-    requestCameraPermission();
+    await requestCameraPermission();
 
     // Inicializa os indicadores de rotação ao abrir a câmera
     updateRotationButton();
@@ -415,10 +411,10 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // --- LÓGICA DE ROTAÇÃO CORRIGIDA (Refatorada) ---
+    // --- LÓGICA DE ROTAÇÃO CORRIGIDA (AGORA SEM O GIRO DE 180º QUE CAUSAVA O PROBLEMA) ---
 
     // 1. Obter a rotação e as dimensões do stream
-    const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL SE DEFINIDA
+    const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL OU DO SO
     const isSideways = rotation === 90 || rotation === -90;
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
@@ -439,22 +435,23 @@ function capturePhoto() {
     ctx.translate(canvas.width / 2, canvas.height / 2);
     
     // Calcula a rotação necessária em radianos
-    let rotationRad = (rotation * Math.PI) / 180;
+    const rotationRad = (rotation * Math.PI) / 180;
     
-    // ** CORREÇÃO CHAVE: Aplica a rotação do dispositivo/manual/SO. **
+    // Aplica a rotação do dispositivo/manual/SO (Ex: 90 graus no Paisagem Automático)
     ctx.rotate(rotationRad);
 
-    // ** CORREÇÃO ROBUSTA DE 180°: Corrige a inversão vertical em câmeras traseiras (environment)
-    //    quando a foto é tirada em paisagem (90 ou -90 graus), resolvendo o problema das imagens 3 e 4. **
-    if (!usingFrontCamera && (Math.abs(rotation) === 90)) {
-        ctx.rotate(Math.PI); // Adiciona 180 graus para virar
-    }
+    // *NOTA: A CORREÇÃO ROBUSTA DE 180º FOI REMOVIDA DAQUI, POIS ELA ESTAVA CAUSANDO
+    // UM GIRO TOTAL DE 270º NO SEU DISPOSITIVO QUANDO EM MODO AUTOMÁTICO PAISAGEM. *
     
+    // Se, após este ajuste, a imagem ficar de cabeça para baixo ao tirar fotos em paisagem
+    // com a câmera traseira, reative o bloco abaixo, mas com a condição correta:
+    // if (!usingFrontCamera && (Math.abs(rotation) === 90)) { ctx.rotate(Math.PI); }
+    
+
     // 5. Desenha o vídeo no contexto girado (agora corrigido)
     ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
 
     // 6. Restaurar o contexto para que as marcas d'água sejam desenhadas
-    // na orientação "normal" do canvas (retrato ou paisagem, mas não girado)
     ctx.restore();
 
 
@@ -505,7 +502,6 @@ function capturePhoto() {
         const logoHeight = Math.max(50, Math.floor(canvas.height / 10));
         const logoWidth = (logoImage.naturalWidth / logoImage.naturalHeight) * logoHeight;
 
-        // Desenha a logo
         ctx.drawImage(logoImage, padding, padding, logoWidth, logoHeight);
     }
 
@@ -625,24 +621,7 @@ function switchCamera() {
 }
 
 
-// ==================== FUNCIONALIDADES DE ROTAÇÃO MANUAL E GUIAS (ATUALIZADO) ====================
-
-/**
- * @description Verifica se a rotação automática do dispositivo está habilitada.
- * Se screen.orientation for suportado, definimos como true, mas a confirmação real
- * é dada pelo evento 'change' (handleOrientationChange).
- */
-function checkAutoRotationStatus() {
-    if (screen.orientation && screen.orientation.type) {
-        // Assume verdadeiro se o recurso for suportado, mas pode ser desativado pelo SO
-        autoRotateEnabled = true;
-    } else {
-        // Se não suportar, forçamos a lógica de sugestão manual
-        autoRotateEnabled = false;
-    }
-    updateRotationButton(); // Atualiza a interface com o estado inicial
-}
-
+// ==================== FUNCIONALIDADES DE ROTAÇÃO MANUAL (NOVO) ====================
 
 /**
  * @description Alterna a rotação manual entre Retrato (0) e Paisagem (90).
@@ -655,74 +634,47 @@ function toggleManualRotation() {
 
 /**
  * @description Atualiza o ícone do botão de rotação e a seta de orientação, e exibe as guias.
- * Implementa a lógica de SUGERIR rotação manual quando a auto-rotação do SO está DESATIVADA.
  */
 function updateRotationButton() {
     const landscapeText = landscapeGuide ? landscapeGuide.querySelector('.landscape-text') : null;
     const portraitText = portraitGuide ? portraitGuide.querySelector('.portrait-text') : null;
 
     if (rotateBtn) {
-        // Estado visual do botão de Rotação Manual
         if (manualRotation === 0) {
-            // Retrato Manual ATIVO
+            // Retrato
             rotateBtn.innerHTML = '<i class="fas fa-mobile-screen"></i>';
-            rotateBtn.title = 'Modo Retrato Manual Ativo';
-        } else {
-            // Paisagem Manual ATIVO
-            rotateBtn.innerHTML = '<i class="fas fa-mobile-screen-button"></i>';
-            rotateBtn.title = 'Modo Paisagem Manual Ativo';
-        }
-        
-        // As guias de orientação (seta e texto) SÓ aparecem se a Rotação Automática estiver DESATIVADA
-        if (!autoRotateEnabled) {
-            // Lógica para Sugerir Rotação Manual
-            
-            // Verifica se o sensor indica inclinação para Paisagem (cerca de 90 graus)
-            const isSensorLandscape = Math.abs(deviceOrientation) > 45 && Math.abs(deviceOrientation) < 135;
-            
-            if (isSensorLandscape && manualRotation === 0) {
-                // Sensor Paisagem, mas modo manual em Retrato: SUGERIR ROTAÇÃO MANUAL
-                if (orientationArrow) {
-                    orientationArrow.style.display = 'block';
-                    orientationArrow.style.color = 'yellow';
-                    // Aponta para a direção que o usuário DEVE clicar no botão (para a direita)
-                    orientationArrow.style.transform = 'rotate(0deg)'; 
-                }
-                if (portraitGuide) portraitGuide.style.display = 'none';
-                if (landscapeGuide) landscapeGuide.style.display = 'block';
-                if (landscapeText) {
-                    landscapeText.textContent = '------------ Gire o dispositivo e toque no botão para MUDAR MODO ------------';
-                    landscapeText.style.transform = 'rotate(0deg)';
-                }
-                
-            } else {
-                // Modo manual correto ou sensor em Retrato. Exibe o modo manual ATIVO.
-                if (orientationArrow) orientationArrow.style.display = 'none';
-                
-                if (manualRotation === 0) {
-                    // Retrato
-                    if (portraitGuide) portraitGuide.style.display = 'block';
-                    if (landscapeGuide) landscapeGuide.style.display = 'none';
-                    if (portraitText) {
-                        portraitText.textContent = '------------ modo retrato ------------';
-                        portraitText.style.transform = 'rotate(0deg)';
-                    }
-                } else {
-                    // Paisagem Manual
-                    if (portraitGuide) portraitGuide.style.display = 'none';
-                    if (landscapeGuide) landscapeGuide.style.display = 'block';
-                    if (landscapeText) {
-                        landscapeText.textContent = '------------ modo paisagem ------------';
-                        landscapeText.style.transform = 'rotate(0deg)';
-                    }
-                }
+            rotateBtn.title = 'Modo Retrato Ativo';
+
+            if (orientationArrow) {
+                orientationArrow.style.display = 'block';
+                // Para apontar para CIMA (rotaciona o ícone 'fa-arrow-right' em -90deg)
+                orientationArrow.style.transform = 'rotate(-90deg)';
             }
-            
-        } else {
-            // Rotação Automática ATIVADA (padrão) - Interface de sugestão OCULTA.
-            if (orientationArrow) orientationArrow.style.display = 'none';
-            if (portraitGuide) portraitGuide.style.display = 'none';
+            if (portraitGuide) portraitGuide.style.display = 'block';
             if (landscapeGuide) landscapeGuide.style.display = 'none';
+            if (portraitText) {
+                // Modo Retrato Padrão
+                portraitText.textContent = '------------ modo retrato ------------';
+                portraitText.style.transform = 'rotate(0deg)';
+            }
+
+        } else {
+            // Paisagem (90 graus)
+            rotateBtn.innerHTML = '<i class="fas fa-mobile-screen-button"></i>';
+            rotateBtn.title = 'Modo Paisagem Ativo'; // O título do tooltip pode ser mantido
+
+            if (orientationArrow) {
+                orientationArrow.style.display = 'block';
+                // Para apontar para DIREITA (rotação padrão do ícone 'fa-arrow-right' é 0deg)
+                orientationArrow.style.transform = 'rotate(0deg)';
+            }
+            if (portraitGuide) portraitGuide.style.display = 'none';
+            if (landscapeGuide) landscapeGuide.style.display = 'block';
+            if (landscapeText) {
+                // NOVO TEXTO E ROTAÇÃO DE 180º SOLICITADA
+                landscapeText.textContent = '------------ modo paisagem ------------';
+                landscapeText.style.transform = 'rotate(0deg)';
+            }
         }
     }
 }
@@ -789,53 +741,49 @@ function updateZoomButtons() {
     }
 }
 
-// ==================== DETECÇÃO DE ORIENTAÇÃO DO DISPOSITIVO (SENSOR) ====================
+// ==================== DETECÇÃO DE ORIENTAÇÃO DO DISPOSITIVO ====================
 
 /**
- * @description Detecta a orientação do dispositivo (Sensor)
+ * @description Detecta a orientação do dispositivo
  */
 function detectDeviceOrientation() {
-    // Remove qualquer listener anterior para evitar duplicação
-    window.removeEventListener('deviceorientation', handleDeviceOrientation);
-    
     if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', handleDeviceOrientation);
     }
 }
 
 /**
- * @description Manipula mudanças na orientação do dispositivo (Sensor)
+ * @description Manipula mudanças na orientação do dispositivo
  */
 function handleDeviceOrientation(event) {
-    // Utilizamos 'gamma' (inclinação lateral) para detectar Paisagem
+    const alpha = event.alpha; // Rotação ao redor do eixo Z (0-360)
+    const beta = event.beta;   // Rotação ao redor do eixo X (-180 a 180)
     const gamma = event.gamma; // Rotação ao redor do eixo Y (-90 a 90)
 
-    // Detecção simplificada da orientação do dispositivo (sensor)
-    if (Math.abs(gamma) < 45) {
+    // Determinar orientação baseado no beta (inclinação para frente/trás)
+    if (Math.abs(beta) < 45) {
         deviceOrientation = 0; // Retrato normal
+    } else if (beta > 45) {
+        deviceOrientation = 180; // Retrato invertido
     } else if (gamma > 45) {
         deviceOrientation = 90; // Paisagem (girado para a direita)
     } else if (gamma < -45) {
         deviceOrientation = -90; // Paisagem (girado para a esquerda)
     }
-    
-    // ATUALIZA O BOTÃO DE ROTAÇÃO E GUIAS (A CADA MUDANÇA DO SENSOR)
-    updateRotationButton(); 
 }
 
 /**
  * @description Calcula a rotação necessária para a foto
- * PRIORIDADE: Rotação Manual -> Rotação do SO (se ativa) -> 0 (Fallback)
  */
 function getPhotoRotation() {
     // 1. PRIORIZA A ROTAÇÃO MANUAL DO USUÁRIO
     if (manualRotation === 90) {
         return 90; // Rotação manual para Paisagem
     }
-    // Se manualRotation é 0, a execução continua.
+    // O manualRotation === 0 retorna 0 (Retrato), que é o fallback default abaixo
 
-    // 2. Tenta usar a orientação do navegador (se a rotação automática estiver ativa ou suportada)
-    if (screen.orientation && autoRotateEnabled) {
+    // 2. Fallback para screen.orientation (Melhor Detecção do Browser)
+    if (screen.orientation) {
         const orientation = screen.orientation.type;
         if (orientation.includes('portrait-primary')) return 0;
         if (orientation.includes('portrait-secondary')) return 180;
@@ -843,8 +791,8 @@ function getPhotoRotation() {
         if (orientation.includes('landscape-secondary')) return -90;
     }
 
-    // 3. Fallback: Retorna 0 (Retrato padrão)
-    return 0;
+    // 3. Fallback para deviceOrientation (Sensores)
+    return deviceOrientation;
 }
 
 
@@ -942,26 +890,18 @@ if (shareAllBtn && navigator.share) {
     });
 }
 
-// Listener de Rotação (Função ATUALIZADA)
+// Listener de Rotação (Função original mantida)
 function handleOrientationChange() {
-    // ATENÇÃO: Quando a orientação MUDAR, significa que a rotação automática ESTÁ ATIVA.
-    // Se este evento disparar, definimos o estado global como ativo.
-    autoRotateEnabled = true;
-    
     if (currentStream && fullscreenCameraContainer && fullscreenCameraContainer.classList.contains('active')) {
         setTimeout(() => {
-            // Reinicia a câmera para garantir que a proporção do vídeo se ajuste
-            requestCameraPermission(); 
+            requestCameraPermission();
         }, 150);
     }
-    updateRotationButton(); // Atualiza a interface
 }
 
 try {
-    // Evento mais moderno e confiável para rotação do SO
     screen.orientation.addEventListener("change", handleOrientationChange);
 } catch (e) {
-    // Fallback para navegadores mais antigos
     window.addEventListener("orientationchange", handleOrientationChange);
 }
 
@@ -971,6 +911,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAndPopulateDropdowns();
     updateGalleryView();
     updatePhotoCounter();
-    // A detecção do sensor (deviceorientation) é iniciada em requestCameraPermission()
+    detectDeviceOrientation();
     updateRotationButton(); // Chama para iniciar os indicadores no modo Retrato
 });
