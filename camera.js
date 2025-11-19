@@ -123,7 +123,6 @@ let manualRotation = 0; // 0 (Retrato) ou 90 (Paisagem) - Inicialmente Retrato
 // ==================== NOVO ESTADO DE ROTAÇÃO ====================
 let autoRotateEnabled = true; // Assumimos ativado até a primeira verificação
 
-
 // Carregar a imagem da logomarca
 const logoImage = new Image();
 logoImage.src = './images/logo-qdelicia.png';
@@ -442,15 +441,13 @@ function capturePhoto() {
     // Calcula a rotação necessária em radianos
     let rotationRad = (rotation * Math.PI) / 180;
     
-    // ** CORREÇÃO CHAVE: Aplica a rotação do dispositivo/manual. **
+    // ** CORREÇÃO CHAVE: Aplica a rotação do dispositivo/manual/SO. **
     ctx.rotate(rotationRad);
 
-    // ** CORREÇÃO ESPECÍFICA PARA CÂMERAS TRASEIRAS COM ROTACAO 90/-90 **
-    // Em muitos dispositivos, a câmera traseira (environment) tem uma orientação nativa que 
-    // inverte o vídeo quando rotacionado 90 ou -90 graus. Aplicamos uma rotação adicional 
-    // de 180 graus (Math.PI) para corrigir essa inversão vertical.
+    // ** CORREÇÃO ROBUSTA DE 180°: Corrige a inversão vertical em câmeras traseiras (environment)
+    //    quando a foto é tirada em paisagem (90 ou -90 graus), resolvendo o problema das imagens 3 e 4. **
     if (!usingFrontCamera && (Math.abs(rotation) === 90)) {
-        ctx.rotate(Math.PI); 
+        ctx.rotate(Math.PI); // Adiciona 180 graus para virar
     }
     
     // 5. Desenha o vídeo no contexto girado (agora corrigido)
@@ -632,27 +629,17 @@ function switchCamera() {
 
 /**
  * @description Verifica se a rotação automática do dispositivo está habilitada.
- * A principal forma é checar se screen.orientation.type muda quando o dispositivo é girado.
- * Retorna true se estiver ativo.
+ * Se screen.orientation for suportado, definimos como true, mas a confirmação real
+ * é dada pelo evento 'change' (handleOrientationChange).
  */
 function checkAutoRotationStatus() {
-    // 1. Tenta verificar se o evento 'change' da screen.orientation funciona.
-    // Se o tipo de orientação for 'portrait' ou 'landscape', consideramos ativo,
-    // pois o navegador está registrando a rotação do SO.
     if (screen.orientation && screen.orientation.type) {
-        // Se a orientação atual é diferente de 'default' ou 'null', presumimos que funciona.
-        // A presença de screen.orientation.type já é um bom indicador.
-        // Contudo, faremos uma checagem mais simples: se a largura e altura são diferentes, e o navegador sabe disso.
-        // O valor padrão será true até que detectemos o contrário.
+        // Assume verdadeiro se o recurso for suportado, mas pode ser desativado pelo SO
         autoRotateEnabled = true;
     } else {
-        // Fallback: Se não houver screen.orientation, a auto-rotação web é improvável.
+        // Se não suportar, forçamos a lógica de sugestão manual
         autoRotateEnabled = false;
     }
-    
-    // Uma heurística mais simples para o propósito é: se a orientação é "natural" ou "default" (sem info), 
-    // ou se o navegador não suporta screen.orientation, assumimos que precisamos do sensor.
-    // Mas, manteremos a flag 'autoRotateEnabled' inicialmente como TRUE.
     updateRotationButton(); // Atualiza a interface com o estado inicial
 }
 
@@ -668,6 +655,7 @@ function toggleManualRotation() {
 
 /**
  * @description Atualiza o ícone do botão de rotação e a seta de orientação, e exibe as guias.
+ * Implementa a lógica de SUGERIR rotação manual quando a auto-rotação do SO está DESATIVADA.
  */
 function updateRotationButton() {
     const landscapeText = landscapeGuide ? landscapeGuide.querySelector('.landscape-text') : null;
@@ -687,14 +675,13 @@ function updateRotationButton() {
         
         // As guias de orientação (seta e texto) SÓ aparecem se a Rotação Automática estiver DESATIVADA
         if (!autoRotateEnabled) {
-            // Seta e Guias são ativadas e usam a orientação do SENSOR (deviceOrientation)
-            // Lógica para Sugerir Rotação Manual (quando Auto-rotação do SO está desligada)
+            // Lógica para Sugerir Rotação Manual
             
             // Verifica se o sensor indica inclinação para Paisagem (cerca de 90 graus)
             const isSensorLandscape = Math.abs(deviceOrientation) > 45 && Math.abs(deviceOrientation) < 135;
             
             if (isSensorLandscape && manualRotation === 0) {
-                // Sensor Paisagem, mas modo manual em Retrato: SUGERIR ROTAÇÃO
+                // Sensor Paisagem, mas modo manual em Retrato: SUGERIR ROTAÇÃO MANUAL
                 if (orientationArrow) {
                     orientationArrow.style.display = 'block';
                     orientationArrow.style.color = 'yellow';
@@ -702,15 +689,14 @@ function updateRotationButton() {
                     orientationArrow.style.transform = 'rotate(0deg)'; 
                 }
                 if (portraitGuide) portraitGuide.style.display = 'none';
-                // Mostra a guia Paisagem para o usuário entender o que deve fazer
                 if (landscapeGuide) landscapeGuide.style.display = 'block';
                 if (landscapeText) {
-                    landscapeText.textContent = '------------ Gire o dispositivo e toque para MUDAR MODO ------------';
+                    landscapeText.textContent = '------------ Gire o dispositivo e toque no botão para MUDAR MODO ------------';
                     landscapeText.style.transform = 'rotate(0deg)';
                 }
                 
             } else {
-                // Modo manual correto ou sensor em Retrato. O modo manual ATIVO é que vale.
+                // Modo manual correto ou sensor em Retrato. Exibe o modo manual ATIVO.
                 if (orientationArrow) orientationArrow.style.display = 'none';
                 
                 if (manualRotation === 0) {
@@ -733,7 +719,7 @@ function updateRotationButton() {
             }
             
         } else {
-            // Rotação Automática ATIVADA (padrão) - Interface de rotação desativada/oculta, apenas o ícone de modo manual permanece.
+            // Rotação Automática ATIVADA (padrão) - Interface de sugestão OCULTA.
             if (orientationArrow) orientationArrow.style.display = 'none';
             if (portraitGuide) portraitGuide.style.display = 'none';
             if (landscapeGuide) landscapeGuide.style.display = 'none';
@@ -832,8 +818,6 @@ function handleDeviceOrientation(event) {
     } else if (gamma < -45) {
         deviceOrientation = -90; // Paisagem (girado para a esquerda)
     }
-    // O Retrato invertido (beta > 45) geralmente não afeta a orientação da foto, 
-    // mas pode ser adicionado se necessário. Focamos em Paisagem/Retrato.
     
     // ATUALIZA O BOTÃO DE ROTAÇÃO E GUIAS (A CADA MUDANÇA DO SENSOR)
     updateRotationButton(); 
@@ -860,8 +844,6 @@ function getPhotoRotation() {
     }
 
     // 3. Fallback: Retorna 0 (Retrato padrão)
-    // O sensor (deviceOrientation) é usado APENAS para sugerir a rotação (em updateRotationButton), 
-    // mas não para girar a imagem automaticamente se a rotação do SO estiver desativada.
     return 0;
 }
 
@@ -960,10 +942,10 @@ if (shareAllBtn && navigator.share) {
     });
 }
 
-// Listener de Rotação (Função original mantida, mas ajustada)
+// Listener de Rotação (Função ATUALIZADA)
 function handleOrientationChange() {
     // ATENÇÃO: Quando a orientação MUDAR, significa que a rotação automática ESTÁ ATIVA.
-    // Se este evento disparar, definimos o estado global.
+    // Se este evento disparar, definimos o estado global como ativo.
     autoRotateEnabled = true;
     
     if (currentStream && fullscreenCameraContainer && fullscreenCameraContainer.classList.contains('active')) {
