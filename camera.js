@@ -411,10 +411,10 @@ function capturePhoto() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // --- LÓGICA DE ROTAÇÃO CORRIGIDA (AGORA SEM O GIRO DE 180º QUE CAUSAVA O PROBLEMA) ---
+    // --- LÓGICA DE ROTAÇÃO CORRIGIDA (Versão Robusta) ---
 
     // 1. Obter a rotação e as dimensões do stream
-    const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL OU DO SO
+    const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL OU AUTOMÁTICA
     const isSideways = rotation === 90 || rotation === -90;
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
@@ -434,24 +434,25 @@ function capturePhoto() {
     // 4. Centralizar o contexto e aplicar a rotação
     ctx.translate(canvas.width / 2, canvas.height / 2);
     
-    // Calcula a rotação necessária em radianos
-    const rotationRad = (rotation * Math.PI) / 180;
-    
-    // Aplica a rotação do dispositivo/manual/SO (Ex: 90 graus no Paisagem Automático)
-    ctx.rotate(rotationRad);
+    // Aplica a rotação do dispositivo/manual/SO
+    if (rotation !== 0) {
+        ctx.rotate((rotation * Math.PI) / 180);
+    }
 
-    // *NOTA: A CORREÇÃO ROBUSTA DE 180º FOI REMOVIDA DAQUI, POIS ELA ESTAVA CAUSANDO
-    // UM GIRO TOTAL DE 270º NO SEU DISPOSITIVO QUANDO EM MODO AUTOMÁTICO PAISAGEM. *
-    
-    // Se, após este ajuste, a imagem ficar de cabeça para baixo ao tirar fotos em paisagem
-    // com a câmera traseira, reative o bloco abaixo, mas com a condição correta:
-    // if (!usingFrontCamera && (Math.abs(rotation) === 90)) { ctx.rotate(Math.PI); }
-    
+    // --- CORREÇÃO ROBUSTA CONTRA INVERSÃO (CABEÇA PARA BAIXO) ---
+    // A escala vertical de -1 (ctx.scale(1, -1)) inverte o eixo Y e compensa
+    // a inversão vertical (de cabeça para baixo) que ocorre em muitos 
+    // dispositivos ao capturar um frame de vídeo rotacionado (90, -90, 180).
+    ctx.scale(1, -1);
+    // ----------------------------------------------------------------
 
-    // 5. Desenha o vídeo no contexto girado (agora corrigido)
+
+    // 5. Desenha o vídeo no contexto girado e corrigido pela escala
+    // As coordenadas -videoW/2 e -videoH/2 garantem que o vídeo permaneça centralizado.
     ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
 
     // 6. Restaurar o contexto para que as marcas d'água sejam desenhadas
+    // na orientação "normal" do canvas (sem rotação/inversão)
     ctx.restore();
 
 
