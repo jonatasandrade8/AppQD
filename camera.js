@@ -382,7 +382,8 @@ function updatePhotoCounter() {
 // --- LÓGICA DA MARCA D'ÁGUA (capturePhoto) ---
 
 /**
- * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva com rotação automática.
+ * @description Captura o frame atual do vídeo, aplica a marca d'água formatada e salva **sem** rotação automática complexa.
+ * // ** LÓGICA DE ROTAÇÃO ANTIGA DELETADA E SUBSTITUÍDA PELO MÉTODO MAIS SIMPLES **
  */
 function capturePhoto() {
     // NOVO: Adicionada verificação para o novo campo
@@ -405,59 +406,27 @@ function capturePhoto() {
     const dateText = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
 
     // Linhas de texto a serem impressas no canto inferior direito, em ordem inversa de desenho (de baixo para cima)
-    // NOVO: tipoFotoText é adicionado ao topo da lista
     const watermarkLines = [dateText, lojaText, redeText, promotorText, tipoFotoText];
 
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // --- LÓGICA DE ROTAÇÃO CORRIGIDA (Versão Robusta) ---
+    // --- NOVA LÓGICA DE CAPTURA SIMPLIFICADA E MARCA D'ÁGUA ---
 
-    // 1. Obter a rotação e as dimensões do stream
-    const rotation = getPhotoRotation(); // USA A ROTAÇÃO MANUAL OU AUTOMÁTICA
-    const isSideways = rotation === 90 || rotation === -90;
+    // 1. Usar dimensões reais do vídeo para máxima qualidade e desenhar diretamente (sem rotação complexa)
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
-
-    // 2. Definir o tamanho do CANVAS para corresponder à orientação final
-    if (isSideways) {
-        canvas.width = videoH;
-        canvas.height = videoW;
-    } else {
-        canvas.width = videoW;
-        canvas.height = videoH;
-    }
-
-    // 3. Salvar o estado original do contexto antes de transformar
-    ctx.save();
-
-    // 4. Centralizar o contexto e aplicar a rotação
-    ctx.translate(canvas.width / 2, canvas.height / 2);
     
-    // Aplica a rotação do dispositivo/manual/SO
-    if (rotation !== 0) {
-        ctx.rotate((rotation * Math.PI) / 180);
-    }
+    // Definir o tamanho do CANVAS para as dimensões do vídeo
+    canvas.width = videoW;
+    canvas.height = videoH;
 
-    // --- CORREÇÃO ROBUSTA CONTRA INVERSÃO (CABEÇA PARA BAIXO) ---
-    // A escala vertical de -1 (ctx.scale(1, -1)) inverte o eixo Y e compensa
-    // a inversão vertical (de cabeça para baixo) que ocorre em muitos 
-    // dispositivos ao capturar um frame de vídeo rotacionado (90, -90, 180).
-    ctx.scale(1, -1);
-    // ----------------------------------------------------------------
-
-
-    // 5. Desenha o vídeo no contexto girado e corrigido pela escala
-    // As coordenadas -videoW/2 e -videoH/2 garantem que o vídeo permaneça centralizado.
-    ctx.drawImage(video, -videoW / 2, -videoH / 2, videoW, videoH);
-
-    // 6. Restaurar o contexto para que as marcas d'água sejam desenhadas
-    // na orientação "normal" do canvas (sem rotação/inversão)
-    ctx.restore();
-
+    // Desenha o frame do vídeo no canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     // --- Configurações Comuns de Estilo e Posição para as marcas d'água ---
-    const padding = Math.max(15, Math.floor(canvas.height / 80)); // Espaçamento
+    // Valores adaptados para maior qualidade em resoluções grandes
+    const padding = Math.max(15, Math.floor(canvas.height / 80)); // Espaçamento adaptativo
     const textBaseColor = '#FFFFFF';
     const bgColor = 'rgba(0, 0, 0, 0.7)';
     const defaultFontSize = Math.max(20, Math.floor(canvas.height / 40));
@@ -505,8 +474,9 @@ function capturePhoto() {
 
         ctx.drawImage(logoImage, padding, padding, logoWidth, logoHeight);
     }
-
-    const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+    
+    // Usar a melhor qualidade (0.9)
+    const dataURL = canvas.toDataURL('image/jpeg', 0.9);
 
     photos.unshift(dataURL); // Adiciona a nova foto no início
     updatePhotoCounter();
@@ -775,6 +745,7 @@ function handleDeviceOrientation(event) {
 
 /**
  * @description Calcula a rotação necessária para a foto
+ * * ** NOTA: A ROTAÇÃO DE FATO FOI DELETADA, ESTA FUNÇÃO SÓ É MANTIDA POR COMPATIBILIDADE **
  */
 function getPhotoRotation() {
     // 1. PRIORIZA A ROTAÇÃO MANUAL DO USUÁRIO
