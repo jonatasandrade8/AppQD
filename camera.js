@@ -625,7 +625,7 @@ function updateRotationButton() {
             if (landscapeGuide) landscapeGuide.style.display = 'none';
             if (portraitText) {
                 // Modo Retrato Padrão
-                portraitText.textContent = '------------ modo retrato ------------';
+                portraitText.textContent = '------------ Linha de Referência ------------';
                 portraitText.style.transform = 'rotate(0deg)';
             }
 
