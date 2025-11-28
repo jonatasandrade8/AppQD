@@ -1,29 +1,27 @@
 // ==================== ESTRUTURA DE DADOS PARA DROPDOWNS (PROMOTORES/REDES) ====================
 // RESTAURADO: A lista de promotores e lojas foi restaurada para a versão anterior.
 const APP_DATA = {
-    "Neto": {
-        "Superfácil": ["Emaús"],
-    },
-    "David": {
-        "Superfácil": ["Emaús"],
-    },
     "Miqueias": {
         "Assaí": ["Ponta Negra"],
     },
     "Cosme": {
-        "Assaí": ["Zona Norte"],        
+        "Assaí": ["Zona Norte"],
+    },
+    "David": {
+        "Superfácil": ["Emaús"],
+
     },
     "Erivan": {
         "Assaí": ["Maria Lacerda"],
-        
+
     },
     "Inacio": {
         "Atacadão": ["Prudente"],
-        
+
     },
     "Vivian": {
         "Atacadão": ["BR-101 Sul"],
-        
+
     },
     "Amarildo": {
         "Atacadão": ["Zona Norte"],
@@ -31,21 +29,34 @@ const APP_DATA = {
     },
     "Nilson": {
         "Atacadão": ["Parnamirim"],
-        
+
     },
     "Markson": {
-        "Nordestão": ["Loja 08"],
-        "Nordestão": ["Loja 03"],
+         "Nordestão": ["Loja 03"],
         "Mar Vermelho": ["Parnamirim"],
-        "Atacadão": ["BR-101 Sul"]
+        "Mar Vermelho": ["Natal"],
+        
     },
+    
     "Mateus": {
         "Nordestão": ["Loja 04"],
         "Carrefour": ["Zona Sul"]
     },
     "Cristiane": {
-        "Nordestãor": ["Loja 03"],
-        
+        "Nordestão": ["Loja 07"],
+
+    },
+    "J Mauricio": {
+        "Atacadão": ["Prudente"],
+
+    },
+    "Neto": {
+        "Superfácil": ["Emaús"],
+
+    },
+    "Antonio": {
+        "Superfácil": ["Nazaré"],
+
     }
 };
 
