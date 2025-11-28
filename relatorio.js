@@ -1,15 +1,17 @@
 // ==================== ESTRUTURA DE DADOS PARA DROPDOWNS (PROMOTORES/REDES) ====================
 // RESTAURADO: A lista de promotores e lojas foi restaurada para a versão anterior.
 const APP_DATA = {
+    "Neto": {
+        "Superfácil": ["Emaús"],
+    },
+    "David": {
+        "Superfácil": ["Emaús"],
+    },
     "Miqueias": {
         "Assaí": ["Ponta Negra"],
     },
     "Cosme": {
-        "Assaí": ["Zona Norte"],
-    },
-    "David": {
-        "Assaí": ["Zona Sul"],
-        
+        "Assaí": ["Zona Norte"],        
     },
     "Erivan": {
         "Assaí": ["Maria Lacerda"],
@@ -33,19 +35,16 @@ const APP_DATA = {
     },
     "Markson": {
         "Nordestão": ["Loja 08"],
+        "Nordestão": ["Loja 03"],
         "Mar Vermelho": ["Parnamirim"],
         "Atacadão": ["BR-101 Sul"]
-    },
-    "Jordão": {
-        "Superfácil": ["Olho d'Água", "Emaús"],
-        "Mar Vermelho": ["BR-101 Sul"]
     },
     "Mateus": {
         "Nordestão": ["Loja 04"],
         "Carrefour": ["Zona Sul"]
     },
     "Cristiane": {
-        "Carrefour": ["Zona Norte"],
+        "Nordestãor": ["Loja 03"],
         
     }
 };
@@ -55,6 +54,7 @@ const RELATORIO_DATA = {
     MOTIVOS_DEVOLUCAO: [
         "Muito Madura",
         "Muito Arranhada",
+        "Muito Verde",
         "Tamanho Fora do Padrão",
         "Baixa Qualidade",
         "Atraso na Entrega",
@@ -69,6 +69,7 @@ const RELATORIO_DATA = {
         "Nanica",
         "Goiaba",
         "Abacaxi",
+        "Melão",
         "Coco Verde"
         
     ]
