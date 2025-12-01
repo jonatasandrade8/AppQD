@@ -27,6 +27,11 @@ const APP_DATA = {
     },
     "Erivan": {
         "Assaí": ["Maria Lacerda"],
+    
+    },
+    "Reginaldo": {
+        "Nordestão": ["Loja 8"],
+        "Superfácil": ["Emaús"],
 
     },
     "Inacio": {
