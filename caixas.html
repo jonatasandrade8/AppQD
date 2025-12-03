@@ -44,7 +44,7 @@
     </nav>
     <div>
     <iframe 
-  src="https://script.google.com/macros/s/AKfycbx4Ec4J7hqc8l0j1FmUzyD5vrocl47gNfT6zP-KPi0UUDr02zBlf2GoyASvDjqZLcRv/exec?page=balanco" 
+  src="https://script.google.com/macros/s/AKfycby9s1ZCFkbNB246irMKilXSqLfNBQCC4a4KWB0zo1QCbiPAeShoZY_hoqDdJXJnACLR/exec?page=balanco" 
   width="100%" 
   id="gas-form-iframe" 
   style="border:none; overflow: hidden;"
@@ -80,7 +80,23 @@
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
-    
+     <script>
+          /**
+           * Listener para receber a altura do conteúdo do formulário (iframe)
+           * e ajustar o tamanho do iframe no host.
+           */
+          window.addEventListener('message', function(event) {
+            // Verifica se a mensagem tem o tipo 'setHeight'
+            if (event.data && event.data.type === 'setHeight') {
+              const iframe = document.getElementById('gas-form-iframe');
+              
+              if (iframe) {
+                // Ajusta a altura do iframe para o valor recebido + uma margem
+                iframe.style.height = event.data.height + 'px';
+              }
+            }
+          });
+      </script>
     <script src="script.js"></script>
     <script src="alert.js"></script>
 </body>
