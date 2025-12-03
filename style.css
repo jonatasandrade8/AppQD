@@ -159,11 +159,19 @@ ul{
 
 /* Footer */
 footer {
+    /* (Seu CSS existente) */
     background-color: var(--text-dark);
     color: var(--bg-light);
     text-align: center;
     padding: 15px 0;
     font-size: 0.8rem;
+    
+    /* --- CÓDIGO PARA FIXAR NA PARTE INFERIOR --- */
+    position: fixed; /* Fixa o elemento em relação à janela (viewport) */
+    bottom: 0;       /* Posiciona o topo do footer na parte inferior da janela */
+    left: 0;         /* Alinha à esquerda */
+    width: 100%;     /* Garante que ele ocupe toda a largura da tela */
+    z-index: 1000;   /* (Opcional) Garante que ele fique sobre outros elementos */
 }
 
 /* ===================== BOTÕES FLUTUANTES ===================== */
