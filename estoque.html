@@ -52,23 +52,7 @@
   scrolling="no" 
   title="Formulário GAS">
 </iframe>
-        <script>
-  /**
-   * Listener para receber a altura do conteúdo do formulário (iframe)
-   * e ajustar o tamanho do iframe no host.
-   */
-  window.addEventListener('message', function(event) {
-    // Verifica se a mensagem tem o tipo 'setHeight'
-    if (event.data && event.data.type === 'setHeight') {
-      const iframe = document.getElementById('gas-form-iframe');
-      
-      if (iframe) {
-        // Ajusta a altura do iframe para o valor recebido + uma margem
-        iframe.style.height = event.data.height + 'px';
-      }
-    }
-  });
-</script>    
+           
     </div>
         
     <footer>
@@ -82,7 +66,22 @@
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
-
+    <script>
+  /**
+   * ESTE CÓDIGO DEVE ESTAR NA PÁGINA QUE CONTÉM O IFRAME (O HOST)
+   * Ele recebe a mensagem com a altura e ajusta o iframe.
+   */
+             window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'setHeight') {
+              const iframe = document.getElementById('gas-form-iframe');
+              
+              if (iframe) {
+                // Aplica a altura recebida do formulário + uma margem
+                iframe.style.height = event.data.height + 'px';
+              }
+            }
+          });
+    </script>
     <script src="script.js"></script>
     <script src="alert.js"></script>
 </body>
