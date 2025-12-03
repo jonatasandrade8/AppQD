@@ -52,10 +52,23 @@
   scrolling="no" 
   title="Formulário GAS">
 </iframe>
-            
-            <!--
-            <iframe width="100%" height="480px" src="https://forms.office.com/r/pcKx4krN95?embed=true" frameborder="0" marginwidth="0" marginheight="0" style="border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
-            -->
+        <script>
+  /**
+   * Listener para receber a altura do conteúdo do formulário (iframe)
+   * e ajustar o tamanho do iframe no host.
+   */
+  window.addEventListener('message', function(event) {
+    // Verifica se a mensagem tem o tipo 'setHeight'
+    if (event.data && event.data.type === 'setHeight') {
+      const iframe = document.getElementById('gas-form-iframe');
+      
+      if (iframe) {
+        // Ajusta a altura do iframe para o valor recebido + uma margem
+        iframe.style.height = event.data.height + 'px';
+      }
+    }
+  });
+</script>    
     </div>
         
     <footer>
