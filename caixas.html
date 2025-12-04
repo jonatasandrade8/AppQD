@@ -30,8 +30,27 @@
         .header-form { background: var(--gradient); color: var(--white); padding: 20px; text-align: center; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 1.5rem; }
         .form-content { padding: 25px; }
         .section-label { color: var(--primary-color); font-weight: 800; text-transform: uppercase; font-size: 0.9rem; margin-top: 25px; border-bottom: 2px solid var(--secondary-color); padding-bottom: 5px; margin-bottom: 15px; }
-        .form-control, .form-select { border-radius: var(--border-radius); border: 1px solid var(--tertiary-color); color: var(--text-dark); transition: var(--transition); }
-        .form-control:focus, .form-select:focus { box-shadow: 0 0 0 0.25rem rgba(93, 63, 211, 0.25); border-color: var(--primary-color); background-color: var(--bg-light-form); }
+        
+        /* --- INPUTS E SELECTS --- */
+        .form-control, .form-select {
+            border-radius: var(--border-radius);
+            border: 1px solid var(--tertiary-color);  
+            color: var(--text-dark);
+            transition: var(--transition);
+            /* IMPLEMENTAÇÃO DE ALINHAMENTO PARA TEXTOS (SELECTs) */
+            text-align: left; 
+        }
+        .form-control:focus, .form-select:focus { 
+            box-shadow: 0 0 0 0.25rem rgba(93, 63, 211, 0.25); 
+            border-color: var(--primary-color); 
+            background-color: var(--bg-light-form); 
+        }
+
+        /* IMPLEMENTAÇÃO DE ALINHAMENTO PARA NÚMEROS */
+        input[type="number"].form-control {
+            text-align: right;
+        }
+
         .input-group-text { min-width: 140px; font-size: 0.9rem; background-color: var(--bg-light-form); color: var(--text-dark); border: 1px solid var(--tertiary-color); border-right: none; border-radius: var(--border-radius) 0 0 var(--border-radius); }
         .bg-warning { background-color: #ffc107 !important; color: var(--text-dark) !important; font-weight: bold; }
         .btn-send { height: 50px; font-weight: bold; font-size: 1.1rem; background-color: var(--primary-color); color: var(--white); border: none; border-radius: var(--border-radius); transition: var(--transition); box-shadow: 0 4px 10px rgba(93, 63, 211, 0.4); }
@@ -42,7 +61,6 @@
         .bg-light.rounded.border { background-color: rgba(93, 63, 211, 0.05) !important; border-color: rgba(93, 63, 211, 0.2) !important; }
         .alert-success-custom { background-color: var(--accent-color); color: var(--text-dark); border-color: var(--primary-color); font-weight: bold; text-align: center; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; color: var(--text-dark); line-height: 1.6; font-size: 14px; background-color: #fff; }
-        /* Oculta os elementos de Apps Script não necessários */
         head > base { display: none; }
     </style>
 </head>
@@ -175,7 +193,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ⚠️ SUBSTITUA ESTE VALOR PELO SEU URL DE IMPLANTAÇÃO DO APPS SCRIPT
-        // NOTA: Deve ser o MESMO link do estoque.html.
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNAvWObQC3b_KPo5M591mQra576ncXgjVaKpasghcycQLxKUGchxqpbLEPubFUWyFL/exec";
         
         // --- CONFIGURAÇÃO DE ESTADOS, REDES, PROMOTORES E LOJAS (REUTILIZADA) ---
