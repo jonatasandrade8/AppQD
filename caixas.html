@@ -9,13 +9,13 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* --- VARIÁVEIS DE TEMA (Copiadas de estoque.html) --- */
+        /* --- VARIÁVEIS DE TEMA (Ajustado para Balanco.html) --- */
         :root {
             --primary-color: #5d3fd3; 
             --secondary-color: #8b5cf6; 
             --tertiary-color: #a78bfa; 
             --accent-color: #39ff14; 
-            --bg-light-form: #f3f0ff; 
+            --bg-light: #f3f0ff; /* Alterado para usar --bg-light conforme Balanco.html */
             --white: #ffffff;
             --text-dark: #2c0e5a; 
             --shadow: rgba(0, 0, 0, 0.15); 
@@ -24,12 +24,45 @@
             --gradient: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
         }
 
+        /* --- ESTILOS GLOBAIS E DO BODY (Ajustado para Balanco.html) --- */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+            color: var(--text-dark); 
+            line-height: 1.6; 
+            font-size: 14px; 
+            background-color: var(--bg-light); /* Aplica a cor de fundo do Balanco.html */
+            padding-top: 20px; /* Aplica padding-top do Balanco.html */
+        }
+        head > base { display: none; }
+
         /* Estilos mantidos para o layout Bootstrap */
-        .form-container { padding-top: 20px; background-color: var(--bg-light-form); }
+        .form-container { 
+            padding-top: 0; 
+            background-color: transparent; 
+        }
         .main-card { max-width: 600px; margin: 0 auto 40px auto; background: var(--white); border-radius: var(--border-radius); box-shadow: 0 6px 20px var(--shadow); overflow: hidden; }
-        .header-form { background: var(--gradient); color: var(--white); padding: 20px; text-align: center; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 1.5rem; }
+        
+        /* CABEÇALHO DO CARD (Estilo de .header em Balanco.html) */
+        .header-form { 
+            background: var(--gradient); 
+            color: var(--white); 
+            padding: 20px; 
+            text-align: center; 
+            font-weight: 700; 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1); 
+            font-size: 1.5rem; 
+        }
         .form-content { padding: 25px; }
-        .section-label { color: var(--primary-color); font-weight: 800; text-transform: uppercase; font-size: 0.9rem; margin-top: 25px; border-bottom: 2px solid var(--secondary-color); padding-bottom: 5px; margin-bottom: 15px; }
+        .section-label { 
+            color: var(--primary-color); 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            font-size: 0.9rem; 
+            margin-top: 25px; 
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 5px; 
+            margin-bottom: 15px; 
+        }
         
         /* --- INPUTS E SELECTS --- */
         .form-control, .form-select {
@@ -37,31 +70,74 @@
             border: 1px solid var(--tertiary-color);  
             color: var(--text-dark);
             transition: var(--transition);
-            /* IMPLEMENTAÇÃO DE ALINHAMENTO PARA TEXTOS (SELECTs) */
+            /* ALINHAMENTO DE TEXTO (SELECTs, TEXTAREA, TEXT) */
             text-align: left; 
         }
         .form-control:focus, .form-select:focus { 
             box-shadow: 0 0 0 0.25rem rgba(93, 63, 211, 0.25); 
             border-color: var(--primary-color); 
-            background-color: var(--bg-light-form); 
+            background-color: var(--bg-light); /* Ajustado para var(--bg-light) */
         }
 
-        /* IMPLEMENTAÇÃO DE ALINHAMENTO PARA NÚMEROS */
+        /* ALINHAMENTO DE NÚMEROS */
         input[type="number"].form-control {
             text-align: right;
         }
 
-        .input-group-text { min-width: 140px; font-size: 0.9rem; background-color: var(--bg-light-form); color: var(--text-dark); border: 1px solid var(--tertiary-color); border-right: none; border-radius: var(--border-radius) 0 0 var(--border-radius); }
+        .input-group-text { 
+            min-width: 140px; 
+            font-size: 0.9rem; 
+            background-color: var(--bg-light); 
+            color: var(--text-dark); 
+            border: 1px solid var(--tertiary-color); 
+            border-right: none; 
+            border-radius: var(--border-radius) 0 0 var(--border-radius); 
+        }
         .bg-warning { background-color: #ffc107 !important; color: var(--text-dark) !important; font-weight: bold; }
-        .btn-send { height: 50px; font-weight: bold; font-size: 1.1rem; background-color: var(--primary-color); color: var(--white); border: none; border-radius: var(--border-radius); transition: var(--transition); box-shadow: 0 4px 10px rgba(93, 63, 211, 0.4); }
-        .btn-send:hover, .btn-send:focus { background-color: var(--secondary-color); box-shadow: 0 6px 15px rgba(93, 63, 211, 0.6); transform: translateY(-2px); }
-        .btn-send:disabled { background-color: var(--tertiary-color) !important; box-shadow: none !important; transform: none !important; }
+
+        /* --- BOTÃO DE ENVIO (Estilo Balanco.html) --- */
+        .btn-send { 
+            height: 50px; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            background-color: var(--primary-color); 
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(93, 63, 211, 0.4);
+        }
+        .btn-send:hover, .btn-send:focus { 
+            background-color: var(--secondary-color); 
+            box-shadow: 0 6px 15px rgba(93, 63, 211, 0.6);
+            transform: translateY(-2px);
+        }
+        .btn-send:disabled {
+            background-color: var(--tertiary-color) !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        /* --- ESTILOS DE ALERTA (Copiados do Balanco.html) --- */
+        .alert-success-custom { 
+            background-color: var(--accent-color); 
+            color: var(--text-dark); 
+            border-color: var(--primary-color); 
+            font-weight: bold; 
+            text-align: center; 
+            margin-top: 15px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        .alert-danger {
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        /* Estilos mantidos para elementos externos do site */
         .form-check-input:checked { background-color: var(--primary-color); border-color: var(--primary-color); }
         .form-check-label { color: var(--text-dark); }
         .bg-light.rounded.border { background-color: rgba(93, 63, 211, 0.05) !important; border-color: rgba(93, 63, 211, 0.2) !important; }
-        .alert-success-custom { background-color: var(--accent-color); color: var(--text-dark); border-color: var(--primary-color); font-weight: bold; text-align: center; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; color: var(--text-dark); line-height: 1.6; font-size: 14px; background-color: #fff; }
-        head > base { display: none; }
     </style>
 </head>
 <body>
@@ -97,13 +173,13 @@
         <div class="main-card">
             
             <div class="header-form">
-                <h4 class="mb-0">Balanço de Caixas (Cheias e Secas)</h4>
+                <h4 class="mb-0">Balanço Geral de Caixas Cheias e Secas</h4>
             </div>
             
             <div class="form-content">
                 <form id="balancoForm" onsubmit="handleFormSubmit(this)">
                     
-                    <div class="section-label">Dados do Promotor e Localização</div>
+                    <div class="section-label">Dados de Localização e Promotor</div>
                     
                     <div class="mb-3">
                         <label class="form-label fw-bold">Estado</label>
@@ -115,60 +191,41 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Rede</label>
                         <select class="form-select" id="rede" name="rede" required disabled onchange="updatePromotor()">
-                            <option value="" disabled selected>Selecione a Rede...</option>
+                            <option value="" disabled selected>Escolha a Rede...</option>
                         </select>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Promotor</label>
                         <select class="form-select" id="nome" name="nome" required disabled onchange="updateLoja()">
-                            <option value="" disabled selected>Selecione o Promotor...</option>
+                            <option value="" disabled selected>Escolha o Promotor...</option>
                         </select>
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label fw-bold">Loja</label>
                         <select class="form-select" id="loja" name="loja" required disabled>
-                            <option value="" disabled selected>Selecione a Loja...</option>
+                            <option value="" disabled selected>Escolha a Loja...</option>
                         </select>
                     </div>
 
-                    <div class="section-label">Contagem de Caixas</div>
-                    <p class="text-muted small">Insira a quantidade de caixas cheias e secas por tipo. (Deixe 0 se não houver)</p>
+                    <hr>
 
-                    <div class="fw-bold mt-3 text-primary">Caixas Padrão Pequenas:</div>
-                    <div class="input-group mb-2">
-                        <span class="input-group-text">Cheias P</span>
-                        <input type="number" class="form-control" name="cheiaP" placeholder="0" min="0">
-                    </div>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Secas P</span>
-                        <input type="number" class="form-control" name="secaP" placeholder="0" min="0">
-                    </div>
-
-                    <div class="fw-bold mt-3 text-primary">Caixas Padrão Grandes:</div>
-                    <div class="input-group mb-2">
-                        <span class="input-group-text">Cheias G</span>
-                        <input type="number" class="form-control" name="cheiaG" placeholder="0" min="0">
-                    </div>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Secas G</span>
-                        <input type="number" class="form-control" name="secaG" placeholder="0" min="0">
-                    </div>
+                    <div class="section-label">Caixas Cheias (Com Produto)</div>
                     
-                    <div class="fw-bold mt-3 text-primary">Caixas IFCO:</div>
-                    <div class="input-group mb-2">
-                        <span class="input-group-text">Cheias IFCO</span>
-                        <input type="number" class="form-control" name="cheiaIfco" placeholder="0" min="0">
-                    </div>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Secas IFCO</span>
-                        <input type="number" class="form-control" name="secaIfco" placeholder="0" min="0">
-                    </div>
+                    <div class="input-group mb-2"><span class="input-group-text">Caixas P</span><input type="number" class="form-control" name="cheiaP" placeholder="0" min="0"></div>
+                    <div class="input-group mb-2"><span class="input-group-text">Caixas G</span><input type="number" class="form-control" name="cheiaG" placeholder="0" min="0"></div>
+                    <div class="input-group mb-3"><span class="input-group-text">Caixas IFCO</span><input type="number" class="form-control" name="cheiaIfco" placeholder="0" min="0"></div>
+
+                    <div class="section-label">Caixas Secas (Vazias)</div>
+                    
+                    <div class="input-group mb-2"><span class="input-group-text">Caixas P</span><input type="number" class="form-control" name="secaP" placeholder="0" min="0"></div>
+                    <div class="input-group mb-2"><span class="input-group-text">Caixas G</span><input type="number" class="form-control" name="secaG" placeholder="0" min="0"></div>
+                    <div class="input-group mb-3"><span class="input-group-text">Caixas IFCO</span><input type="number" class="form-control" name="secaIfco" placeholder="0" min="0"></div>
                     
                     <div id="statusMessage" class="alert d-none" role="alert"></div>
 
-                    <div class="d-grid gap-2">
+                    <div class="d-grid gap-2 mt-4">
                         <button type="submit" id="btnSubmit" class="btn btn-send">ENVIAR BALANÇO</button>
                     </div>
                 </form>
@@ -284,9 +341,9 @@
         }
 
         function updateRede() {
-          updateDropdown(selRede, [], "Selecione a Rede...");
-          updateDropdown(selNome, [], "Selecione o Promotor...");
-          updateDropdown(selLoja, [], "Selecione a Loja...");
+          updateDropdown(selRede, [], "Escolha a Rede...");
+          updateDropdown(selNome, [], "Escolha o Promotor...");
+          updateDropdown(selLoja, [], "Escolha a Loja...");
           
           selRede.disabled = true; selNome.disabled = true; selLoja.disabled = true;
           
@@ -294,13 +351,13 @@
             selRede.disabled = false;
             let redes = db[selEstado.value];
             let redesArray = Object.keys(redes);
-            updateDropdown(selRede, redesArray, "Selecione a Rede...");
+            updateDropdown(selRede, redesArray, "Escolha a Rede...");
           }
         }
 
         function updatePromotor() {
-          updateDropdown(selNome, [], "Selecione o Promotor...");
-          updateDropdown(selLoja, [], "Selecione a Loja...");
+          updateDropdown(selNome, [], "Escolha o Promotor...");
+          updateDropdown(selLoja, [], "Escolha a Loja...");
           
           selNome.disabled = true; selLoja.disabled = true;
           
@@ -308,19 +365,19 @@
             selNome.disabled = false;
             let promotoresObj = db[selEstado.value][selRede.value];
             let promotoresArray = Object.keys(promotoresObj);
-            updateDropdown(selNome, promotoresArray, "Selecione o Promotor...");
+            updateDropdown(selNome, promotoresArray, "Escolha o Promotor...");
           }
         }
 
         function updateLoja() {
-          updateDropdown(selLoja, [], "Selecione a Loja...");
+          updateDropdown(selLoja, [], "Escolha a Loja...");
           
           selLoja.disabled = true;
           
           if (selNome.value) {
             selLoja.disabled = false;
             let lojasArray = db[selEstado.value][selRede.value][selNome.value];
-            updateDropdown(selLoja, lojasArray, "Selecione a Loja...");
+            updateDropdown(selLoja, lojasArray, "Escolha a Loja...");
           }
         }
 
@@ -401,6 +458,7 @@
                     
                     // Redirecionamento após 2 segundos
                     setTimeout(function() {
+                        // Atenção: O Balanco.html original usava window.top.location.href, mas para manter a estrutura do site, mantive o window.location.href
                         window.location.href = "caixas.html"; // Auto-refresh na mesma página
                     }, 2000); 
 
