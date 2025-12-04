@@ -1,87 +1,65 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Registro de estoque diário - Qdelícia Frutas.">
-    <title>Estoque - Qdelícia Frutas</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <style>
-        /* Estilo básico para o botão. Idealmente, isso iria para o seu style.css */
-        .button-container {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        .redirect-button {
-            display: inline-block;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            color: white;
-            background-color: #4CAF50; /* Cor verde para o botão */
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .redirect-button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Registro de estoque diário - Qdelícia Frutas.">
+    <title>Estoque - Qdelícia Frutas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
-    <div class="menu-overlay"></div>
-    <aside class="side-menu">
-        <a href="index.html"><i class="fas fa-home"></i> Início</a>
-        <a href="estoque.html" class="active"><i class="fas fa-boxes-stacked"></i> Estoque</a>
-        <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
-                <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
-        <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
-        
-    </aside>
-    <header id="cabecalho-principal">
-        <button class="menu-toggle" aria-label="Abrir Menu">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="logo-placeholder">
-            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
-        </div>
-        <h1>Qdelícia Frutas</h1>
-        <p>Registro de estoque diário</p>
-    </header>
+    
+    <div class="menu-overlay"></div>
+    <aside class="side-menu">
+        <a href="index.html"><i class="fas fa-home"></i> Início</a>
+        <a href="estoque.html" class="active"><i class="fas fa-boxes-stacked"></i> Estoque</a>
+        <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
+        <!--<a href="vendas.html"><i class="fas fa-chart-line"></i> Vendas</a>
+        <a href="avarias.html"><i class="fas fa-trash-can"></i> Avarias</a>-->
+        <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
+        <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
+        
+    </aside>
+    <header id="cabecalho-principal">
+        <button class="menu-toggle" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
+        </div>
+        <h1>Qdelícia Frutas</h1>
+        <p>Registro de estoque diário</p>
+    </header>
 
-    <nav>
-        <a href="index.html">Início</a>
-        <a href="estoque.html" class="active">Estoque</a>
-        <a href="caixas.html">Caixas</a>
-                <a href="camera.html">Câmera</a>
-        <a href="relatorio.html">Relatório/Qualidade</a>
-        
-    </nav>
-    
-        <div class="button-container">
-        <a class="redirect-button" 
-            href="https://script.google.com/macros/s/AKfycbwBw__-ldbUS2Zc3lkhz1gGIiFSaiyq8cXz1ZpEQDpBq7cX6yfrUwbEo-5Q3GEnsTBB/exec" 
-            target="_blank" 
-            rel="noopener noreferrer">
-            <i class="fas fa-external-link-alt"></i> Abrir Formulário de Estoque Diário
-        </a>
-    </div>
-        <footer>
-        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
-    </footer>
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="estoque.html" class="active">Estoque</a>
+        <a href="caixas.html">Caixas</a>
+        <!--<a href="vendas.html">Vendas</a>
+        <a href="avarias.html">Avarias</a>-->
+        <a href="camera.html">Câmera</a>
+        <a href="relatorio.html">Relatório/Qualidade</a>
+        
+        
+    </nav>
+    <div>
+        <iframe width="100%" height="480px" src="https://script.google.com/macros/s/AKfycbz51Xm4HQgLsEXz1NIfscgNC0ZS1ZCmkSUXInhGsH1HeXZ1h0tsEG6r_NE8yYlsM1BL/exec" frameborder="0" marginwidth="0" marginheight="0" style="border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
+    </div>
+        
+    <footer>
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+    </footer>
 
-    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    
-    <div class="back-to-top">
-        <i class="fas fa-arrow-up"></i>
-    </div>
+    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
-    <script src="script.js"></script>
-    <script src="alert.js"></script>
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="alert.js"></script>
 </body>
 </html>
