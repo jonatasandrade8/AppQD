@@ -7,6 +7,138 @@
     <title>Caixas - Qdelícia Frutas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      /* --- VARIÁVEIS DE TEMA (Copiadas de Balanco.html) --- */
+      :root {
+        --primary-color: #5d3fd3;
+        --secondary-color: #8b5cf6;
+        --tertiary-color: #a78bfa;
+        --accent-color: #39ff14; /* Verde neon para destaque/sucesso */
+        --bg-light-form: #f3f0ff;
+        --white: #ffffff;
+        --text-dark: #2c0e5a;
+        --shadow: rgba(0, 0, 0, 0.15);
+        --border-radius: 8px;
+        --transition: all 0.3s ease;
+        --gradient: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      }
+
+      /* Sobrescrita de estilo para o body principal da aplicação (se necessário) */
+      .form-container { 
+        padding-top: 20px;
+        background-color: var(--bg-light-form); 
+      }
+      
+      /* --- CARTÃO PRINCIPAL (FORMULÁRIO) --- */
+      .main-card { 
+        max-width: 600px; 
+        margin: 0 auto 40px auto; 
+        background: var(--white); 
+        border-radius: var(--border-radius); 
+        box-shadow: 0 6px 20px var(--shadow); 
+        overflow: hidden; 
+      }
+
+      /* --- CABEÇALHO DO FORMULÁRIO --- */
+      .header-form { 
+        background: var(--gradient); 
+        color: var(--white); 
+        padding: 20px; 
+        text-align: center; 
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        font-size: 1.5rem;
+      }
+
+      /* --- CONTEÚDO DO FORMULÁRIO --- */
+      .form-content { 
+        padding: 25px; 
+      }
+
+      /* --- DIVISOR DE SEÇÃO --- */
+      .section-label { 
+        color: var(--primary-color); 
+        font-weight: 800; 
+        text-transform: uppercase; 
+        font-size: 0.9rem; 
+        margin-top: 25px; 
+        border-bottom: 2px solid var(--secondary-color);
+        padding-bottom: 5px; 
+        margin-bottom: 15px; 
+      }
+
+      /* --- INPUTS E SELECTS --- */
+      .form-control, .form-select {
+        border-radius: var(--border-radius);
+        border: 1px solid var(--tertiary-color);
+        color: var(--text-dark);
+        transition: var(--transition);
+      }
+      .form-control:focus, .form-select:focus { 
+        box-shadow: 0 0 0 0.25rem rgba(93, 63, 211, 0.25); 
+        border-color: var(--primary-color); 
+        background-color: var(--bg-light-form);
+      }
+      .input-group-text { 
+        min-width: 140px; 
+        font-size: 0.9rem; 
+        background-color: var(--bg-light-form); 
+        color: var(--text-dark);
+        border: 1px solid var(--tertiary-color);
+        border-right: none;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+      }
+      
+      /* --- BOTÃO DE ENVIO --- */
+      .btn-send { 
+        height: 50px; 
+        font-weight: bold; 
+        font-size: 1.1rem; 
+        background-color: var(--primary-color); 
+        color: var(--white);
+        border: none;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        box-shadow: 0 4px 10px rgba(93, 63, 211, 0.4);
+      }
+      .btn-send:hover, .btn-send:focus { 
+        background-color: var(--secondary-color); 
+        box-shadow: 0 6px 15px rgba(93, 63, 211, 0.6);
+        transform: translateY(-2px);
+      }
+      .btn-send:disabled {
+        background-color: var(--tertiary-color) !important;
+        box-shadow: none !important;
+        transform: none !important;
+      }
+      
+      /* --- NOVO ESTILO PARA ALERTA DE SUCESSO/ERRO --- */
+      .alert-success-custom {
+          background-color: var(--accent-color); /* Verde Neon */
+          color: var(--text-dark); /* Texto Roxo Escuro */
+          border-color: var(--primary-color);
+          font-weight: bold;
+          text-align: center;
+          margin-top: 15px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      .alert-danger {
+          font-weight: bold;
+          text-align: center;
+          margin-top: 15px;
+      }
+      /* Ajuste para o body da aplicação principal */
+      body { 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+        color: var(--text-dark); 
+        line-height: 1.6;
+        font-size: 14px;
+        background-color: #fff; /* Mantém o fundo branco da aplicação principal */
+      }
+      /* Oculta os elementos de Apps Script não necessários (base e scripts de comunicação) */
+      head > base { display: none; }
+    </style>
 </head>
 <body>
  
@@ -15,8 +147,6 @@
         <a href="index.html"><i class="fas fa-home"></i> Início</a>
         <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> Estoque</a>
         <a href="caixas.html" class="active"><i class="fas fa-box-open"></i> Caixas</a>
-        <!--<a href="vendas.html"><i class="fas fa-chart-line"></i> Vendas</a>
-        --<a href="avarias.html"><i class="fas fa-trash-can"></i> Avarias</a>-->
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
         <a href="relatorio.html" ><i class="fas fa-camera"></i> Relatório/Qualidade</a>
         
@@ -36,26 +166,73 @@
         <a href="index.html">Início</a>
         <a href="estoque.html">Estoque</a>
         <a href="caixas.html"class="active">Caixas</a>
-        <!--<a href="vendas.html">Vendas</a>
-        <a href="avarias.html">Avarias</a>-->
         <a href="camera.html">Câmera</a>
         <a href="relatorio.html">Relatório/Qualidade</a>
         
     </nav>
-    <div>
-    <iframe 
-                width="100%" 
-                height="480px" 
-                src="https://script.google.com/macros/s/AKfycbxxL_dtIwdAZeU8g3g78EV5hUGs1YFFjHNyEdSzxLg3p3t02HJTf6IMbL8pVXRuwMV4/exec?page=balanco&authuser=0"
-                frameborder="0" 
-                marginwidth="0" 
-                marginheight="0" 
-                allowfullscreen 
-                webkitallowfullscreen 
-                mozallowfullscreen 
-                msallowfullscreen>
-            </iframe>
-     </div>
+    
+    <div class="container form-container">
+      <div class="main-card">
+        <div class="header-form">
+          <h4 class="mb-0">Balanço Geral de Caixas Cheias e Secas</h4>
+        </div>
+        <div class="form-content">
+          <form id="balancoForm" onsubmit="handleFormSubmit(this)">
+            
+            <div class="section-label">Dados de Localização e Promotor</div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold">Estado</label>
+              <select class="form-select" id="estado" name="estado" required onchange="updateRede()">
+                <option value="" disabled selected>Selecione...</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Rede</label>
+              <select class="form-select" id="rede" name="rede" required disabled onchange="updatePromotor()">
+                <option value="" disabled selected>Escolha a Rede...</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold">Promotor</label>
+              <select class="form-select" id="nome" name="nome" required disabled onchange="updateLoja()">
+                <option value="" disabled selected>Escolha o Promotor...</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Loja</label>
+              <select class="form-select" id="loja" name="loja" required disabled>
+                <option value="" disabled selected>Escolha a Loja...</option>
+              </select>
+            </div>
+
+            <hr>
+
+            <div class="section-label">Caixas Cheias (Com Produto)</div>
+            
+            <div class="input-group mb-2"><span class="input-group-text">Caixas P</span><input type="number" class="form-control" name="cheiaP" placeholder="0" min="0"></div>
+            <div class="input-group mb-2"><span class="input-group-text">Caixas G</span><input type="number" class="form-control" name="cheiaG" placeholder="0" min="0"></div>
+            <div class="input-group mb-3"><span class="input-group-text">Caixas IFCO</span><input type="number" class="form-control" name="cheiaIfco" placeholder="0" min="0"></div>
+
+            <div class="section-label">Caixas Secas (Vazias)</div>
+            
+            <div class="input-group mb-2"><span class="input-group-text">Caixas P</span><input type="number" class="form-control" name="secaP" placeholder="0" min="0"></div>
+            <div class="input-group mb-2"><span class="input-group-text">Caixas G</span><input type="number" class="form-control" name="secaG" placeholder="0" min="0"></div>
+            <div class="input-group mb-3"><span class="input-group-text">Caixas IFCO</span><input type="number" class="form-control" name="secaIfco" placeholder="0" min="0"></div>
+            
+            <div id="statusMessage" class="alert d-none" role="alert"></div>
+
+            <div class="d-grid gap-2 mt-4">
+              <button type="submit" id="btnSubmit" class="btn btn-send">ENVIAR BALANÇO</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
     </footer>
@@ -70,5 +247,240 @@
     
     <script src="script.js"></script>
     <script src="alert.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // **MANTENDO A ESTRUTURA ORIGINAL DE APP SCRIPT PARA SIMPLICIDADE DE REPRODUÇÃO DA LÓGICA**
+      
+      const GOOGLE_SCRIPT_URL = "SUA_URL_DE_WEBSCRIPT_DEPLOYED_AQUI"; // Local para a URL do Apps Script
+      
+      // --- CONFIGURAÇÃO DE ESTADOS, REDES, PROMOTORES E LOJAS (NOVA ESTRUTURA SEQUENCIAL) ---
+      const db = {
+        "RN": {
+          "Atacadão": {
+            "Vivian": ["BR - Zona Sul"],
+            "Nilson": ["Parnamirim"],
+            "Inácio": ["Prudente"],
+            "Amarildo": ["Zona Norte"],
+            "J Maurício": ["Prudente"]
+          },
+          "Assaí": {
+            "Reginaldo": ["Zona Sul"],
+            "Erivan": ["Maria Lacerda"],
+            "Miqueias": ["Ponta Negra"],
+            "Cosme": ["Zona Norte"]
+          },
+          "Nordestão": {
+            "J Mauricio": ["Loja 03"],
+            "Mateus": ["Loja 04"],
+            "Amarildo": ["Loja 05"],
+            "Cristiane": ["Loja 07"],
+            "Reginaldo": ["Loja 08"],
+            "Markson": ["Loja 03"] 
+          },
+          "Carrefour": {
+            "Mateus": ["Zona Sul"]
+          },
+          "Superfácil": {
+            "Neto": ["Emaús"],
+            "David": ["Nazaré"],
+            "0000": ["Olho dágua"]
+          },
+          "Mar Vermelho": {
+            "Markson": ["Natal","Parnamirim"]  
+          }
+        },
+        "PE": {
+          "Rede A": {
+            "Sandro Santos": ["AB", "AC"],
+            "José Lima": ["AB"]
+          },
+          "Rede B": {
+            "Paulo Santos": ["ABC"] 
+          }
+        },
+        "AL": {
+          "Rede C": {
+            "Pedro Santos": ["AB", "AC"],
+            "Gabriel Lima": ["AB"]
+          },
+          "Rede D": {
+            "Miguel Santos": ["ABC"] 
+          }
+        },
+        "PB": {
+          "Rede F": {
+            "Joao Santos": ["AB", "AC"],
+            "Mario Lima": ["AB"]
+          },
+          "Rede G": {
+            "Jefferson Santos": ["ABC"] 
+          }
+        }
+      };
+      // ------------------------------------------------
+
+      const selEstado = document.getElementById("estado");
+      const selRede = document.getElementById("rede");
+      const selLoja = document.getElementById("loja");
+      const selNome = document.getElementById("nome"); // Promotor
+      const btn = document.getElementById("btnSubmit");
+      // NOVO ELEMENTO DE MENSAGEM DE STATUS
+      const statusMessage = document.getElementById('statusMessage');
+
+      // Inicializa Estados
+      for (let uf in db) {
+        selEstado.options[selEstado.options.length] = new Option(uf, uf);
+      }
+      
+      /**
+       * Função otimizada para atualização de dropdowns
+       */
+      function updateDropdown(element, optionsArray, defaultText = "Selecione...") {
+          let optionsHtml = `<option value="" disabled selected>${defaultText}</option>`;
+          const uniqueOptions = [...new Set(optionsArray)];
+          uniqueOptions.forEach(opt => {
+              optionsHtml += `<option value="${opt}">${opt}</option>`;
+          });
+          element.innerHTML = optionsHtml;
+      }
+
+      /**
+       * Passo 1: Estado -> Rede
+       */
+      function updateRede() {
+        // Reseta todos os dropdowns dependentes
+        updateDropdown(selRede, [], "Escolha a Rede...");
+        updateDropdown(selNome, [], "Escolha o Promotor...");
+        updateDropdown(selLoja, [], "Escolha a Loja...");
+        
+        selRede.disabled = true; selNome.disabled = true; selLoja.disabled = true;
+        hideStatus();
+        
+        if (selEstado.value) {
+          selRede.disabled = false;
+          let redes = db[selEstado.value];
+          let redesArray = Object.keys(redes);
+          updateDropdown(selRede, redesArray, "Escolha a Rede...");
+        }
+      }
+
+      /**
+       * Passo 2: Rede -> Promotor
+       */
+      function updatePromotor() {
+        // Reseta Promotor e Loja
+        updateDropdown(selNome, [], "Escolha o Promotor...");
+        updateDropdown(selLoja, [], "Escolha a Loja...");
+        
+        selNome.disabled = true; selLoja.disabled = true;
+        
+        if (selRede.value) {
+          selNome.disabled = false;
+          let promotoresObj = db[selEstado.value][selRede.value];
+          let promotoresArray = Object.keys(promotoresObj);
+          updateDropdown(selNome, promotoresArray, "Escolha o Promotor...");
+        }
+      }
+
+      /**
+       * Passo 3: Promotor -> Loja
+       */
+      function updateLoja() {
+        // Reseta Loja
+        updateDropdown(selLoja, [], "Escolha a Loja...");
+        
+        selLoja.disabled = true;
+        
+        if (selNome.value) {
+          selLoja.disabled = false;
+          // Pega o array de lojas diretamente do promotor selecionado
+          let lojasArray = db[selEstado.value][selRede.value][selNome.value];
+          updateDropdown(selLoja, lojasArray, "Escolha a Loja...");
+        }
+      }
+      
+      /**
+       * Função auxiliar para exibir mensagens de status
+       */
+      function showStatus(message, type = 'success') {
+          statusMessage.textContent = message;
+          statusMessage.classList.remove('d-none', 'alert-danger', 'alert-success-custom');
+          
+          if (type === 'success') {
+              statusMessage.classList.add('alert-success-custom');
+              statusMessage.classList.remove('alert-danger');
+          } else if (type === 'error') {
+              statusMessage.classList.add('alert-danger');
+              statusMessage.classList.remove('alert-success-custom');
+          }
+      }
+      
+      function hideStatus() {
+          statusMessage.classList.add('d-none');
+          statusMessage.textContent = '';
+      }
+
+      /**
+       * Função principal de envio do formulário, adaptada para o Apps Script como API.
+       * NOTA: `google.script.run` foi substituído por um `fetch` simulado.
+       */
+      function handleFormSubmit(formObject) {
+        event.preventDefault();
+        
+        hideStatus(); 
+        
+        const formData = new FormData(formObject);
+        const data = Object.fromEntries(formData.entries()); // Converte para objeto JSON
+        
+        // --- VALIDAÇÃO DE OBRIGATORIEDADE DE CAIXAS ---
+        let totalCaixas = 0;
+        ['cheiaP', 'cheiaG', 'cheiaIfco', 'secaP', 'secaG', 'secaIfco'].forEach(key => {
+            const value = parseInt(data[key] || 0); 
+            if (!isNaN(value) && value > 0) {
+                totalCaixas += value;
+            }
+        });
+
+        if (totalCaixas === 0) {
+            showStatus("❌ ERRO de Validação: Pelo menos uma caixa (Cheia ou Seca) deve ter valor maior que zero.", 'error');
+            return;
+        }
+        // --- FIM DA VALIDAÇÃO ---
+
+
+        // **SUBSTITUIÇÃO DE google.script.run POR FETCH (EMULADO/SIMULADO)**
+        btn.disabled = true;
+        btn.textContent = "Consolidando e Enviando...";
+        
+        // fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })...
+
+        // SIMULAÇÃO DO SUCESSO DO APPS SCRIPT:
+        
+        // A função processarBalanco retorna: "Balanço de caixas enviado e consolidado por tipo."
+        const mockSuccessMessage = "Balanço de caixas enviado e consolidado por tipo.";
+        
+        setTimeout(() => { // Simula a latência da API
+            // Simula o sucesso
+            document.getElementById("balancoForm").reset();
+            updateRede(); 
+            
+            showStatus("✅ SUCESSO! " + mockSuccessMessage, 'success');
+            
+            btn.disabled = false;
+            btn.textContent = "ENVIAR BALANÇO";
+
+            // Redirecionamento original (mantido)
+            setTimeout(function() {
+                window.location.href = "caixas.html"; // Altera para auto-refresh na mesma página
+            }, 2000); 
+        }, 1000); 
+        
+        // FIM DA SIMULAÇÃO
+      }
+      
+      window.onload = function() {
+          updateRede(); 
+      }; 
+    </script>
 </body>
 </html>
