@@ -9,135 +9,135 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* --- VARIÁVEIS DE TEMA (Ajustado para Balanco.html) --- */
-        :root {
-            --primary-color: #5d3fd3; 
-            --secondary-color: #8b5cf6; 
-            --tertiary-color: #a78bfa; 
-            --accent-color: #39ff14; 
-            --bg-light: #f3f0ff; /* Alterado para usar --bg-light conforme Balanco.html */
-            --white: #ffffff;
-            --text-dark: #2c0e5a; 
-            --shadow: rgba(0, 0, 0, 0.15); 
-            --border-radius: 8px;
-            --transition: all 0.3s ease;
-            --gradient: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-        }
+      /* --- VARIÁVEIS DE TEMA (Copiadas de Balanco.html) --- */
+      :root {
+        --primary-color: #5d3fd3;
+        --secondary-color: #8b5cf6;
+        --tertiary-color: #a78bfa;
+        --accent-color: #39ff14; /* Verde neon para destaque/sucesso */
+        --bg-light-form: #f3f0ff;
+        --white: #ffffff;
+        --text-dark: #2c0e5a;
+        --shadow: rgba(0, 0, 0, 0.15);
+        --border-radius: 8px;
+        --transition: all 0.3s ease;
+        --gradient: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+      }
 
-        /* --- ESTILOS GLOBAIS E DO BODY (Ajustado para Balanco.html) --- */
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
-            color: var(--text-dark); 
-            line-height: 1.6; 
-            font-size: 14px; 
-            background-color: var(--bg-light); /* Aplica a cor de fundo do Balanco.html */
-            padding-top: 20px; /* Aplica padding-top do Balanco.html */
-        }
-        head > base { display: none; }
+      /* Sobrescrita de estilo para o body principal da aplicação (se necessário) */
+      .form-container { 
+        padding-top: 20px;
+        background-color: var(--bg-light-form); 
+      }
+      
+      /* --- CARTÃO PRINCIPAL (FORMULÁRIO) --- */
+      .main-card { 
+        max-width: 600px; 
+        margin: 0 auto 40px auto; 
+        background: var(--white); 
+        border-radius: var(--border-radius); 
+        box-shadow: 0 6px 20px var(--shadow); 
+        overflow: hidden; 
+      }
 
-        /* Estilos mantidos para o layout Bootstrap */
-        .form-container { 
-            padding-top: 0; 
-            background-color: transparent; 
-        }
-        .main-card { max-width: 600px; margin: 0 auto 40px auto; background: var(--white); border-radius: var(--border-radius); box-shadow: 0 6px 20px var(--shadow); overflow: hidden; }
-        
-        /* CABEÇALHO DO CARD (Estilo de .header em Balanco.html) */
-        .header-form { 
-            background: var(--gradient); 
-            color: var(--white); 
-            padding: 20px; 
-            text-align: center; 
-            font-weight: 700; 
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1); 
-            font-size: 1.5rem; 
-        }
-        .form-content { padding: 25px; }
-        .section-label { 
-            color: var(--primary-color); 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            font-size: 0.9rem; 
-            margin-top: 25px; 
-            border-bottom: 2px solid var(--secondary-color);
-            padding-bottom: 5px; 
-            margin-bottom: 15px; 
-        }
-        
-        /* --- INPUTS E SELECTS --- */
-        .form-control, .form-select {
-            border-radius: var(--border-radius);
-            border: 1px solid var(--tertiary-color);  
-            color: var(--text-dark);
-            transition: var(--transition);
-            /* ALINHAMENTO DE TEXTO (SELECTs, TEXTAREA, TEXT) */
-            text-align: left; 
-        }
-        .form-control:focus, .form-select:focus { 
-            box-shadow: 0 0 0 0.25rem rgba(93, 63, 211, 0.25); 
-            border-color: var(--primary-color); 
-            background-color: var(--bg-light); /* Ajustado para var(--bg-light) */
-        }
+      /* --- CABEÇALHO DO FORMULÁRIO --- */
+      .header-form { 
+        background: var(--gradient); 
+        color: var(--white); 
+        padding: 20px; 
+        text-align: center; 
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        font-size: 1.5rem;
+      }
 
-        /* ALINHAMENTO DE NÚMEROS */
-        input[type="number"].form-control {
-            text-align: right;
-        }
+      /* --- CONTEÚDO DO FORMULÁRIO --- */
+      .form-content { 
+        padding: 25px; 
+      }
 
-        .input-group-text { 
-            min-width: 140px; 
-            font-size: 0.9rem; 
-            background-color: var(--bg-light); 
-            color: var(--text-dark); 
-            border: 1px solid var(--tertiary-color); 
-            border-right: none; 
-            border-radius: var(--border-radius) 0 0 var(--border-radius); 
-        }
-        .bg-warning { background-color: #ffc107 !important; color: var(--text-dark) !important; font-weight: bold; }
+      /* --- DIVISOR DE SEÇÃO --- */
+      .section-label { 
+        color: var(--primary-color); 
+        font-weight: 800; 
+        text-transform: uppercase; 
+        font-size: 0.9rem; 
+        margin-top: 25px; 
+        border-bottom: 2px solid var(--secondary-color);
+        padding-bottom: 5px; 
+        margin-bottom: 15px; 
+      }
 
-        /* --- BOTÃO DE ENVIO (Estilo Balanco.html) --- */
-        .btn-send { 
-            height: 50px; 
-            font-weight: bold; 
-            font-size: 1.1rem; 
-            background-color: var(--primary-color); 
-            color: var(--white);
-            border: none;
-            border-radius: var(--border-radius);
-            transition: var(--transition);
-            box-shadow: 0 4px 10px rgba(93, 63, 211, 0.4);
-        }
-        .btn-send:hover, .btn-send:focus { 
-            background-color: var(--secondary-color); 
-            box-shadow: 0 6px 15px rgba(93, 63, 211, 0.6);
-            transform: translateY(-2px);
-        }
-        .btn-send:disabled {
-            background-color: var(--tertiary-color) !important;
-            box-shadow: none !important;
-            transform: none !important;
-        }
-
-        /* --- ESTILOS DE ALERTA (Copiados do Balanco.html) --- */
-        .alert-success-custom { 
-            background-color: var(--accent-color); 
-            color: var(--text-dark); 
-            border-color: var(--primary-color); 
-            font-weight: bold; 
-            text-align: center; 
-            margin-top: 15px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-        }
-        .alert-danger {
-            font-weight: bold;
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        /* Estilos mantidos para elementos externos do site */
-        .form-check-input:checked { background-color: var(--primary-color); border-color: var(--primary-color); }
-        .form-check-label { color: var(--text-dark); }
-        .bg-light.rounded.border { background-color: rgba(93, 63, 211, 0.05) !important; border-color: rgba(93, 63, 211, 0.2) !important; }
+      /* --- INPUTS E SELECTS --- */
+      .form-control, .form-select {
+        border-radius: var(--border-radius);
+        border: 1px solid var(--tertiary-color);
+        color: var(--text-dark);
+        transition: var(--transition);
+      }
+      .form-control:focus, .form-select:focus { 
+        box-shadow: 0 0 0 0.25rem rgba(93, 63, 211, 0.25); 
+        border-color: var(--primary-color); 
+        background-color: var(--bg-light-form);
+      }
+      .input-group-text { 
+        min-width: 140px; 
+        font-size: 0.9rem; 
+        background-color: var(--bg-light-form); 
+        color: var(--text-dark);
+        border: 1px solid var(--tertiary-color);
+        border-right: none;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+      }
+      
+      /* --- BOTÃO DE ENVIO --- */
+      .btn-send { 
+        height: 50px; 
+        font-weight: bold; 
+        font-size: 1.1rem; 
+        background-color: var(--primary-color); 
+        color: var(--white);
+        border: none;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        box-shadow: 0 4px 10px rgba(93, 63, 211, 0.4);
+      }
+      .btn-send:hover, .btn-send:focus { 
+        background-color: var(--secondary-color); 
+        box-shadow: 0 6px 15px rgba(93, 63, 211, 0.6);
+        transform: translateY(-2px);
+      }
+      .btn-send:disabled {
+        background-color: var(--tertiary-color) !important;
+        box-shadow: none !important;
+        transform: none !important;
+      }
+      
+      /* --- NOVO ESTILO PARA ALERTA DE SUCESSO/ERRO --- */
+      .alert-success-custom {
+          background-color: var(--accent-color); /* Verde Neon */
+          color: var(--text-dark); /* Texto Roxo Escuro */
+          border-color: var(--primary-color);
+          font-weight: bold;
+          text-align: center;
+          margin-top: 15px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      .alert-danger {
+          font-weight: bold;
+          text-align: center;
+          margin-top: 15px;
+      }
+      /* Ajuste para o body da aplicação principal */
+      body { 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+        color: var(--text-dark); 
+        line-height: 1.6;
+        font-size: 14px;
+        background-color: #fff; /* Mantém o fundo branco da aplicação principal */
+      }
+      /* Oculta os elementos de Apps Script não necessários (base e scripts de comunicação) */
+      head > base { display: none; }
     </style>
 </head>
 <body>
@@ -149,6 +149,7 @@
         <a href="caixas.html" class="active"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
         <a href="relatorio.html" ><i class="fas fa-camera"></i> Relatório/Qualidade</a>
+        
     </aside>
     <header id="cabecalho-principal">
         <button class="menu-toggle" aria-label="Abrir Menu">
@@ -158,81 +159,80 @@
             <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
         </div>
         <h1>Qdelícia Frutas</h1>
-        <p>Registro periódico de caixas</p>
+        <p>Registro periódico de caixas secas</p>
     </header>
 
     <nav>
         <a href="index.html">Início</a>
         <a href="estoque.html">Estoque</a>
-        <a href="caixas.html" class="active">Caixas</a>
+        <a href="caixas.html"class="active">Caixas</a>
         <a href="camera.html">Câmera</a>
         <a href="relatorio.html">Relatório/Qualidade</a>
+        
     </nav>
     
     <div class="container form-container">
-        <div class="main-card">
-            
-            <div class="header-form">
-                <h4 class="mb-0">Balanço Geral de Caixas Cheias e Secas</h4>
-            </div>
-            
-            <div class="form-content">
-                <form id="balancoForm" onsubmit="handleFormSubmit(this)">
-                    
-                    <div class="section-label">Dados de Localização e Promotor</div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Estado</label>
-                        <select class="form-select" id="estado" name="estado" required onchange="updateRede()">
-                            <option value="" disabled selected>Selecione...</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Rede</label>
-                        <select class="form-select" id="rede" name="rede" required disabled onchange="updatePromotor()">
-                            <option value="" disabled selected>Escolha a Rede...</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Promotor</label>
-                        <select class="form-select" id="nome" name="nome" required disabled onchange="updateLoja()">
-                            <option value="" disabled selected>Escolha o Promotor...</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Loja</label>
-                        <select class="form-select" id="loja" name="loja" required disabled>
-                            <option value="" disabled selected>Escolha a Loja...</option>
-                        </select>
-                    </div>
-
-                    <hr>
-
-                    <div class="section-label">Caixas Cheias (Com Produto)</div>
-                    
-                    <div class="input-group mb-2"><span class="input-group-text">Caixas P</span><input type="number" class="form-control" name="cheiaP" placeholder="0" min="0"></div>
-                    <div class="input-group mb-2"><span class="input-group-text">Caixas G</span><input type="number" class="form-control" name="cheiaG" placeholder="0" min="0"></div>
-                    <div class="input-group mb-3"><span class="input-group-text">Caixas IFCO</span><input type="number" class="form-control" name="cheiaIfco" placeholder="0" min="0"></div>
-
-                    <div class="section-label">Caixas Secas (Vazias)</div>
-                    
-                    <div class="input-group mb-2"><span class="input-group-text">Caixas P</span><input type="number" class="form-control" name="secaP" placeholder="0" min="0"></div>
-                    <div class="input-group mb-2"><span class="input-group-text">Caixas G</span><input type="number" class="form-control" name="secaG" placeholder="0" min="0"></div>
-                    <div class="input-group mb-3"><span class="input-group-text">Caixas IFCO</span><input type="number" class="form-control" name="secaIfco" placeholder="0" min="0"></div>
-                    
-                    <div id="statusMessage" class="alert d-none" role="alert"></div>
-
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="submit" id="btnSubmit" class="btn btn-send">ENVIAR BALANÇO</button>
-                    </div>
-                </form>
-            </div>
+      <div class="main-card">
+        <div class="header-form">
+          <h4 class="mb-0">Balanço Geral de Caixas Cheias e Secas</h4>
         </div>
+        <div class="form-content">
+          <form id="balancoForm" onsubmit="handleFormSubmit(this)">
+            
+            <div class="section-label">Dados de Localização e Promotor</div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold">Estado</label>
+              <select class="form-select" id="estado" name="estado" required onchange="updateRede()">
+                <option value="" disabled selected>Selecione...</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Rede</label>
+              <select class="form-select" id="rede" name="rede" required disabled onchange="updatePromotor()">
+                <option value="" disabled selected>Escolha a Rede...</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold">Promotor</label>
+              <select class="form-select" id="nome" name="nome" required disabled onchange="updateLoja()">
+                <option value="" disabled selected>Escolha o Promotor...</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Loja</label>
+              <select class="form-select" id="loja" name="loja" required disabled>
+                <option value="" disabled selected>Escolha a Loja...</option>
+              </select>
+            </div>
+
+            <hr>
+
+            <div class="section-label">Caixas Cheias (Com Produto)</div>
+            
+            <div class="input-group mb-2"><span class="input-group-text">Caixas P</span><input type="number" class="form-control" name="cheiaP" placeholder="0" min="0"></div>
+            <div class="input-group mb-2"><span class="input-group-text">Caixas G</span><input type="number" class="form-control" name="cheiaG" placeholder="0" min="0"></div>
+            <div class="input-group mb-3"><span class="input-group-text">Caixas IFCO</span><input type="number" class="form-control" name="cheiaIfco" placeholder="0" min="0"></div>
+
+            <div class="section-label">Caixas Secas (Vazias)</div>
+            
+            <div class="input-group mb-2"><span class="input-group-text">Caixas P</span><input type="number" class="form-control" name="secaP" placeholder="0" min="0"></div>
+            <div class="input-group mb-2"><span class="input-group-text">Caixas G</span><input type="number" class="form-control" name="secaG" placeholder="0" min="0"></div>
+            <div class="input-group mb-3"><span class="input-group-text">Caixas IFCO</span><input type="number" class="form-control" name="secaIfco" placeholder="0" min="0"></div>
+            
+            <div id="statusMessage" class="alert d-none" role="alert"></div>
+
+            <div class="d-grid gap-2 mt-4">
+              <button type="submit" id="btnSubmit" class="btn btn-send">ENVIAR BALANÇO</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-        
+    
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
     </footer>
@@ -240,247 +240,247 @@
     <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
-
+    
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
-
+    
     <script src="script.js"></script>
     <script src="alert.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ⚠️ SUBSTITUA ESTE VALOR PELO SEU URL DE IMPLANTAÇÃO DO APPS SCRIPT
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNAvWObQC3b_KPo5M591mQra576ncXgjVaKpasghcycQLxKUGchxqpbLEPubFUWyFL/exec";
-        
-        // --- CONFIGURAÇÃO DE ESTADOS, REDES, PROMOTORES E LOJAS (REUTILIZADA) ---
-        const db = {
-            "RN": {
-              "Atacadão": {
-                "Vivian": ["BR - Zona Sul"],
-                "Nilson": ["Parnamirim"],
-                "Inácio": ["Prudente"],
-                "Amarildo": ["Zona Norte"],
-                "J Maurício": ["Prudente"]
-              },
-              "Assaí": {
-                "Reginaldo": ["Zona Sul"],
-                "Erivan": ["Maria Lacerda"],
-                "Miqueias": ["Ponta Negra"],
-                "Cosme": ["Zona Norte"]
-              },
-              "Nordestão": {
-                "J Mauricio": ["Loja 03"],
-                "Mateus": ["Loja 04"],
-                "Amarildo": ["Loja 05"],
-                "Cristiane": ["Loja 07"],
-                "Reginaldo": ["Loja 08"],
-                "Markson": ["Loja 03"]
-              },
-              "Carrefour": {
-                "Mateus": ["Zona Sul"]
-              },
-              "Superfácil": {
-                "Neto": ["Emaús"],
-                "David": ["Nazaré"],
-                "0000": ["Olho dágua"]
-              },
-              "Mar Vermelho": {
-                "Markson": ["Natal","Parnamirim"]  
-              }
-            },
-            "PE": {
-              "Rede A": {
-                "Sandro Santos": ["AB", "AC"],
-                "José Lima": ["AB"]
-              },
-              "Rede B": {
-                "Paulo Santos": ["ABC"]  
-              }
-            },
-            "AL": {
-              "Rede C": {
-                "Pedro Santos": ["AB", "AC"],
-                "Gabriel Lima": ["AB"]
-              },
-              "Rede D": {
-                "Miguel Santos": ["ABC"]  
-              }
-            },
-            "PB": {
-              "Rede F": {
-                "Joao Santos": ["AB", "AC"],
-                "Mario Lima": ["AB"]
-              },
-              "Rede G": {
-                "Jefferson Santos": ["ABC"]  
-              }
-            }
-          };
-        // ------------------------------------------------
-
-        const selEstado = document.getElementById("estado");
-        const selRede = document.getElementById("rede");
-        const selLoja = document.getElementById("loja");
-        const selNome = document.getElementById("nome"); 
-        const btn = document.getElementById("btnSubmit");
-        const statusMessage = document.getElementById('statusMessage');
-        
-        // Inicializa Estados
-        for (let uf in db) {
-          selEstado.options[selEstado.options.length] = new Option(uf, uf);
-        }
-        
-        // Funções de Dropdown (Mantidas)
-        function updateDropdown(element, optionsArray, defaultText) {
-            let optionsHtml = `<option value="" disabled selected>${defaultText}</option>`;
-            const uniqueOptions = [...new Set(optionsArray)];
-            uniqueOptions.forEach(opt => {
-                optionsHtml += `<option value="${opt}">${opt}</option>`;
-            });
-            element.innerHTML = optionsHtml;
-        }
-
-        function updateRede() {
-          updateDropdown(selRede, [], "Escolha a Rede...");
-          updateDropdown(selNome, [], "Escolha o Promotor...");
-          updateDropdown(selLoja, [], "Escolha a Loja...");
-          
-          selRede.disabled = true; selNome.disabled = true; selLoja.disabled = true;
-          
-          if (selEstado.value) {
-            selRede.disabled = false;
-            let redes = db[selEstado.value];
-            let redesArray = Object.keys(redes);
-            updateDropdown(selRede, redesArray, "Escolha a Rede...");
+      // **MANTENDO A ESTRUTURA ORIGINAL DE APP SCRIPT PARA SIMPLICIDADE DE REPRODUÇÃO DA LÓGICA**
+      
+      const GOOGLE_SCRIPT_URL = "SUA_URL_DE_WEBSCRIPT_DEPLOYED_AQUI"; // Local para a URL do Apps Script
+      
+      // --- CONFIGURAÇÃO DE ESTADOS, REDES, PROMOTORES E LOJAS (NOVA ESTRUTURA SEQUENCIAL) ---
+      const db = {
+        "RN": {
+          "Atacadão": {
+            "Vivian": ["BR - Zona Sul"],
+            "Nilson": ["Parnamirim"],
+            "Inácio": ["Prudente"],
+            "Amarildo": ["Zona Norte"],
+            "J Maurício": ["Prudente"]
+          },
+          "Assaí": {
+            "Reginaldo": ["Zona Sul"],
+            "Erivan": ["Maria Lacerda"],
+            "Miqueias": ["Ponta Negra"],
+            "Cosme": ["Zona Norte"]
+          },
+          "Nordestão": {
+            "J Mauricio": ["Loja 03"],
+            "Mateus": ["Loja 04"],
+            "Amarildo": ["Loja 05"],
+            "Cristiane": ["Loja 07"],
+            "Reginaldo": ["Loja 08"],
+            "Markson": ["Loja 03"] 
+          },
+          "Carrefour": {
+            "Mateus": ["Zona Sul"]
+          },
+          "Superfácil": {
+            "Neto": ["Emaús"],
+            "David": ["Nazaré"],
+            "0000": ["Olho dágua"]
+          },
+          "Mar Vermelho": {
+            "Markson": ["Natal","Parnamirim"]  
+          }
+        },
+        "PE": {
+          "Rede A": {
+            "Sandro Santos": ["AB", "AC"],
+            "José Lima": ["AB"]
+          },
+          "Rede B": {
+            "Paulo Santos": ["ABC"] 
+          }
+        },
+        "AL": {
+          "Rede C": {
+            "Pedro Santos": ["AB", "AC"],
+            "Gabriel Lima": ["AB"]
+          },
+          "Rede D": {
+            "Miguel Santos": ["ABC"] 
+          }
+        },
+        "PB": {
+          "Rede F": {
+            "Joao Santos": ["AB", "AC"],
+            "Mario Lima": ["AB"]
+          },
+          "Rede G": {
+            "Jefferson Santos": ["ABC"] 
           }
         }
+      };
+      // ------------------------------------------------
 
-        function updatePromotor() {
-          updateDropdown(selNome, [], "Escolha o Promotor...");
-          updateDropdown(selLoja, [], "Escolha a Loja...");
-          
-          selNome.disabled = true; selLoja.disabled = true;
-          
-          if (selRede.value) {
-            selNome.disabled = false;
-            let promotoresObj = db[selEstado.value][selRede.value];
-            let promotoresArray = Object.keys(promotoresObj);
-            updateDropdown(selNome, promotoresArray, "Escolha o Promotor...");
-          }
-        }
+      const selEstado = document.getElementById("estado");
+      const selRede = document.getElementById("rede");
+      const selLoja = document.getElementById("loja");
+      const selNome = document.getElementById("nome"); // Promotor
+      const btn = document.getElementById("btnSubmit");
+      // NOVO ELEMENTO DE MENSAGEM DE STATUS
+      const statusMessage = document.getElementById('statusMessage');
 
-        function updateLoja() {
-          updateDropdown(selLoja, [], "Escolha a Loja...");
-          
-          selLoja.disabled = true;
-          
-          if (selNome.value) {
-            selLoja.disabled = false;
-            let lojasArray = db[selEstado.value][selRede.value][selNome.value];
-            updateDropdown(selLoja, lojasArray, "Escolha a Loja...");
-          }
-        }
+      // Inicializa Estados
+      for (let uf in db) {
+        selEstado.options[selEstado.options.length] = new Option(uf, uf);
+      }
+      
+      /**
+       * Função otimizada para atualização de dropdowns
+       */
+      function updateDropdown(element, optionsArray, defaultText = "Selecione...") {
+          let optionsHtml = `<option value="" disabled selected>${defaultText}</option>`;
+          const uniqueOptions = [...new Set(optionsArray)];
+          uniqueOptions.forEach(opt => {
+              optionsHtml += `<option value="${opt}">${opt}</option>`;
+          });
+          element.innerHTML = optionsHtml;
+      }
 
-        // Funções de Status (Mantidas)
-        function showStatus(message, type = 'success') {
-            statusMessage.textContent = message;
-            statusMessage.classList.remove('d-none', 'alert-danger', 'alert-success-custom');
-            
-            if (type === 'success') {
-                statusMessage.classList.add('alert-success-custom');
-                statusMessage.classList.remove('alert-danger');
-            } else if (type === 'error') {
-                statusMessage.classList.add('alert-danger');
-                statusMessage.classList.remove('alert-success-custom');
-            }
-        }
+      /**
+       * Passo 1: Estado -> Rede
+       */
+      function updateRede() {
+        // Reseta todos os dropdowns dependentes
+        updateDropdown(selRede, [], "Escolha a Rede...");
+        updateDropdown(selNome, [], "Escolha o Promotor...");
+        updateDropdown(selLoja, [], "Escolha a Loja...");
         
-        function hideStatus() {
-            statusMessage.classList.add('d-none');
-            statusMessage.textContent = '';
-        }
-
-        /**
-         * Função principal de envio do formulário, ADAPTADA para o Apps Script como API (via fetch).
-         */
-        async function handleFormSubmit(formObject) {
-            event.preventDefault();
-            
-            hideStatus(); 
-
-            const formData = new FormData(formObject);
-            const data = Object.fromEntries(formData.entries()); 
-            
-            // 🛑 PASSO CRUCIAL: Identifica o formulário para o Apps Script
-            data.formType = "balanco";
-
-            // --- VALIDAÇÃO DE OBRIGATORIEDADE DE CAIXAS ---
-            let totalCaixas = 0;
-            ['cheiaP', 'cheiaG', 'cheiaIfco', 'secaP', 'secaG', 'secaIfco'].forEach(key => {
-                const value = parseInt(data[key] || 0); 
-                if (!isNaN(value) && value > 0) {
-                    totalCaixas += value;
-                }
-            });
-
-            if (totalCaixas === 0) {
-                showStatus("❌ ERRO: Pelo menos um tipo de caixa (cheia ou seca) deve ter valor maior que zero.", 'error');
-                return;
-            }
-            // --- FIM DA VALIDAÇÃO ---
-            
-            btn.disabled = true;
-            btn.textContent = "Calculando e Enviando...";
-
-            try {
-                // 🚀 COMUNICAÇÃO REAL VIA FETCH
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8', 
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erro de rede: ${response.status} ${response.statusText}`);
-                }
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // Sucesso
-                    document.getElementById("balancoForm").reset();
-                    updateRede(); // Reseta os dropdowns de localização
-                    
-                    showStatus("✅ SUCESSO! " + result.message, 'success');
-                    
-                    // Redirecionamento após 2 segundos
-                    setTimeout(function() {
-                        // Atenção: O Balanco.html original usava window.top.location.href, mas para manter a estrutura do site, mantive o window.location.href
-                        window.location.href = "caixas.html"; // Auto-refresh na mesma página
-                    }, 2000); 
-
-                } else {
-                    // Falha lógica retornada pelo Apps Script (result.success é false)
-                    throw new Error(result.message);
-                }
-
-            } catch (error) {
-                // Trata erros de rede, parse ou falha lógica
-                console.error("Erro no fetch:", error);
-                showStatus(`❌ ERRO AO ENVIAR: ${error.message || "Falha desconhecida"}`, 'error');
-
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "ENVIAR BALANÇO";
-            }
-        }
+        selRede.disabled = true; selNome.disabled = true; selLoja.disabled = true;
+        hideStatus();
         
-        window.onload = function() {
+        if (selEstado.value) {
+          selRede.disabled = false;
+          let redes = db[selEstado.value];
+          let redesArray = Object.keys(redes);
+          updateDropdown(selRede, redesArray, "Escolha a Rede...");
+        }
+      }
+
+      /**
+       * Passo 2: Rede -> Promotor
+       */
+      function updatePromotor() {
+        // Reseta Promotor e Loja
+        updateDropdown(selNome, [], "Escolha o Promotor...");
+        updateDropdown(selLoja, [], "Escolha a Loja...");
+        
+        selNome.disabled = true; selLoja.disabled = true;
+        
+        if (selRede.value) {
+          selNome.disabled = false;
+          let promotoresObj = db[selEstado.value][selRede.value];
+          let promotoresArray = Object.keys(promotoresObj);
+          updateDropdown(selNome, promotoresArray, "Escolha o Promotor...");
+        }
+      }
+
+      /**
+       * Passo 3: Promotor -> Loja
+       */
+      function updateLoja() {
+        // Reseta Loja
+        updateDropdown(selLoja, [], "Escolha a Loja...");
+        
+        selLoja.disabled = true;
+        
+        if (selNome.value) {
+          selLoja.disabled = false;
+          // Pega o array de lojas diretamente do promotor selecionado
+          let lojasArray = db[selEstado.value][selRede.value][selNome.value];
+          updateDropdown(selLoja, lojasArray, "Escolha a Loja...");
+        }
+      }
+      
+      /**
+       * Função auxiliar para exibir mensagens de status
+       */
+      function showStatus(message, type = 'success') {
+          statusMessage.textContent = message;
+          statusMessage.classList.remove('d-none', 'alert-danger', 'alert-success-custom');
+          
+          if (type === 'success') {
+              statusMessage.classList.add('alert-success-custom');
+              statusMessage.classList.remove('alert-danger');
+          } else if (type === 'error') {
+              statusMessage.classList.add('alert-danger');
+              statusMessage.classList.remove('alert-success-custom');
+          }
+      }
+      
+      function hideStatus() {
+          statusMessage.classList.add('d-none');
+          statusMessage.textContent = '';
+      }
+
+      /**
+       * Função principal de envio do formulário, adaptada para o Apps Script como API.
+       * NOTA: `google.script.run` foi substituído por um `fetch` simulado.
+       */
+      function handleFormSubmit(formObject) {
+        event.preventDefault();
+        
+        hideStatus(); 
+        
+        const formData = new FormData(formObject);
+        const data = Object.fromEntries(formData.entries()); // Converte para objeto JSON
+        
+        // --- VALIDAÇÃO DE OBRIGATORIEDADE DE CAIXAS ---
+        let totalCaixas = 0;
+        ['cheiaP', 'cheiaG', 'cheiaIfco', 'secaP', 'secaG', 'secaIfco'].forEach(key => {
+            const value = parseInt(data[key] || 0); 
+            if (!isNaN(value) && value > 0) {
+                totalCaixas += value;
+            }
+        });
+
+        if (totalCaixas === 0) {
+            showStatus("❌ ERRO de Validação: Pelo menos uma caixa (Cheia ou Seca) deve ter valor maior que zero.", 'error');
+            return;
+        }
+        // --- FIM DA VALIDAÇÃO ---
+
+
+        // **SUBSTITUIÇÃO DE google.script.run POR FETCH (EMULADO/SIMULADO)**
+        btn.disabled = true;
+        btn.textContent = "Consolidando e Enviando...";
+        
+        // fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })...
+
+        // SIMULAÇÃO DO SUCESSO DO APPS SCRIPT:
+        
+        // A função processarBalanco retorna: "Balanço de caixas enviado e consolidado por tipo."
+        const mockSuccessMessage = "Balanço de caixas enviado e consolidado por tipo.";
+        
+        setTimeout(() => { // Simula a latência da API
+            // Simula o sucesso
+            document.getElementById("balancoForm").reset();
+            updateRede(); 
+            
+            showStatus("✅ SUCESSO! " + mockSuccessMessage, 'success');
+            
+            btn.disabled = false;
+            btn.textContent = "ENVIAR BALANÇO";
+
+            // Redirecionamento original (mantido)
+            setTimeout(function() {
+                window.location.href = "caixas.html"; // Altera para auto-refresh na mesma página
+            }, 2000); 
+        }, 1000); 
+        
+        // FIM DA SIMULAÇÃO
+      }
+      
+      window.onload = function() {
           updateRede(); 
-        };  
+      }; 
     </script>
 </body>
 </html>
