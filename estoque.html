@@ -430,19 +430,27 @@
       }
 
       /**
-       * Função principal de envio do formulário.
+       * Função principal de envio do formulário (AGORA USA FETCH/API REST).
        */
       function handleFormSubmit(formObject) {
         event.preventDefault();
         
+        // --- 🚨 Substitua este placeholder pelo seu URL de implantação do Apps Script (Web App) 🚨 ---
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzt9XMIbLvrFZ0BjIpJ_AQqxPBLfOQkSPZV0o5wKgCFBRP5YtLJZCUHbt2cCUkoGXAg/exec'; 
+        // ------------------------------------------------------------------------------------------------------
+        
         hideStatus(); 
         
         const formData = new FormData(formObject);
+        const data = Object.fromEntries(formData.entries());
         
+        // Adiciona o identificador para o roteamento no Apps Script (doPost)
+        data.formType = 'estoque'; 
+
         // --- VALIDAÇÃO DE OBRIGATORIEDADE DE CAIXAS/UNIDADES ---
         let totalProdutos = 0;
         ['pacoP', 'pacoG', 'prataP', 'prataG', 'prataIfco', 'nanicaP', 'nanicaG', 'compP', 'compG', 'leiteP', 'leiteG', 'goiaba', 'melao', 'abacaxi'].forEach(key => {
-            const value = parseInt(formData.get(key) || 0); 
+            const value = parseInt(data[key] || 0); 
             if (!isNaN(value) && value > 0) {
                 totalProdutos += value;
             }
@@ -457,32 +465,50 @@
         btn.disabled = true;
         btn.textContent = "Calculando e Enviando...";
         
-        google.script.run
-          .withSuccessHandler(function(msg) {
-            // NOVO: Limpa o Local Storage após o envio bem-sucedido
-            clearFormStorage(); 
-            
-            // Limpa o formulário visualmente e reajusta dropdowns
-            document.getElementById("stockForm").reset();
-            updateRede(); 
-            
-            showStatus("✅ SUCESSO! " + msg, 'success');
-            
-            btn.disabled = false;
-            btn.textContent = "ENVIAR RELATÓRIO";
+        fetch(APP_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (result.success) {
+                // Limpa o Local Storage e o formulário visualmente
+                clearFormStorage(); 
+                document.getElementById("stockForm").reset();
+                updateRede(); 
+                
+                showStatus("✅ SUCESSO! " + result.message, 'success');
+                
+                btn.disabled = false;
+                btn.textContent = "ENVIAR RELATÓRIO";
 
-            // Redirecionamento após 2 segundos
-            setTimeout(function() {
-                window.top.location.href = "https://jonatasandrade8.github.io/AppQD/estoque.html";
-            }, 2000);
-          })
-          .withFailureHandler(function(err) {
-            showStatus("❌ ERRO AO ENVIAR: Falha: " + err, 'error');
+                // Redirecionamento após 2 segundos
+                setTimeout(function() {
+                    window.top.location.href = "https://jonatasandrade8.github.io/AppQD/estoque.html";
+                }, 2000);
+
+            } else {
+                showStatus("❌ ERRO AO ENVIAR: Falha: " + result.message, 'error');
+                
+                btn.disabled = false;
+                btn.textContent = "TENTAR NOVAMENTE";
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição fetch:', error);
+            showStatus("❌ ERRO DE CONEXÃO: " + error.message, 'error');
             
             btn.disabled = false;
             btn.textContent = "TENTAR NOVAMENTE";
-          })
-          .processarFormulario(formObject);
+        });
       }
       
       // --- CÓDIGO DE CORREÇÃO DE ROLAGEM ---
@@ -530,7 +556,6 @@
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
-<script type="text/javascript" src="https://script.google.com/macros/s/AKfycbzt9XMIbLvrFZ0BjIpJ_AQqxPBLfOQkSPZV0o5wKgCFBRP5YtLJZCUHbt2cCUkoGXAg/userCode.js"></script>
     <script src="script.js"></script>
     <script src="alert.js"></script>
 </body>
