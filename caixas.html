@@ -15,8 +15,6 @@
         <a href="index.html"><i class="fas fa-home"></i> Início</a>
         <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> Estoque</a>
         <a href="caixas.html" class="active"><i class="fas fa-box-open"></i> Caixas</a>
-        <!--<a href="vendas.html"><i class="fas fa-chart-line"></i> Vendas</a>
-        --<a href="avarias.html"><i class="fas fa-trash-can"></i> Avarias</a>-->
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
         <a href="relatorio.html" ><i class="fas fa-camera"></i> Relatório/Qualidade</a>
         
@@ -36,15 +34,427 @@
         <a href="index.html">Início</a>
         <a href="estoque.html">Estoque</a>
         <a href="caixas.html"class="active">Caixas</a>
-        <!--<a href="vendas.html">Vendas</a>
-        <a href="avarias.html">Avarias</a>-->
         <a href="camera.html">Câmera</a>
         <a href="relatorio.html">Relatório/Qualidade</a>
         
     </nav>
-    <div>
-    <iframe width="100%" height="480px" src="https://forms.office.com/r/GcfFew1CWx?embed=true" frameborder="0" marginwidth="0" marginheight="0" style="border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
-     </div>
+    <div class="container">
+      <div class="main-card">
+        <section class="watermark-settings">
+          <h2>Balanço Geral de Caixas Cheias e Secas</h2>
+        
+          <form id="balancoForm" onsubmit="handleFormSubmit(this)">
+            
+            <hr>
+            <h2>Dados de Localização e Promotor</h2>
+            
+            <div class="input-group">
+              <label for="estado"><i class="fas fa-map-marked-alt"></i> Estado</label>
+              <select id="estado" name="estado" required onchange="updateRede()">
+                <option value="" disabled selected>Selecione...</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="rede"><i class="fas fa-store"></i> Rede</label>
+              <select id="rede" name="rede" required disabled onchange="updatePromotor()">
+                <option value="" disabled selected>Escolha a Rede...</option>
+              </select>
+            </div>
+            
+            <div class="input-group">
+              <label for="nome"><i class="fas fa-user-circle"></i> Promotor</label>
+              <select id="nome" name="nome" required disabled onchange="updateLoja()">
+                <option value="" disabled selected>Escolha o Promotor...</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="loja"><i class="fas fa-map-marker-alt"></i> Loja</label>
+              <select id="loja" name="loja" required disabled>
+                <option value="" disabled selected>Escolha a Loja...</option>
+              </select>
+            </div>
+
+            <hr>
+
+            <div class="report-fieldset">
+                <legend>Caixas Cheias (Com Produto)</legend>
+                
+                <div class="input-group">
+                    <label for="cheiaP"><i class="fas fa-box"></i> Caixas P</label>
+                    <input type="number" class="report-input" id="cheiaP" name="cheiaP" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="cheiaG"><i class="fas fa-box"></i> Caixas G</label>
+                    <input type="number" class="report-input" id="cheiaG" name="cheiaG" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="cheiaIfco"><i class="fas fa-box-open"></i> Caixas IFCO</label>
+                    <input type="number" class="report-input" id="cheiaIfco" name="cheiaIfco" placeholder="0" min="0">
+                </div>
+            </div>
+
+            <div class="report-fieldset">
+                <legend>Caixas Secas (Vazias)</legend>
+                
+                <div class="input-group">
+                    <label for="secaP"><i class="fas fa-box"></i> Caixas P</label>
+                    <input type="number" class="report-input" id="secaP" name="secaP" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="secaG"><i class="fas fa-box"></i> Caixas G</label>
+                    <input type="number" class="report-input" id="secaG" name="secaG" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="secaIfco"><i class="fas fa-box-open"></i> Caixas IFCO</label>
+                    <input type="number" class="report-input" id="secaIfco" name="secaIfco" placeholder="0" min="0">
+                </div>
+            </div>
+            
+            <div id="statusMessage" class="alert d-none" role="alert"></div>
+
+            <div class="d-grid gap-2 mt-4">
+              <button type="submit" id="btnSubmit" class="report-btn">ENVIAR BALANÇO</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // --- CONFIGURAÇÃO DE ESTADOS, REDES, PROMOTORES E LOJAS ---
+      const db = {
+        "RN": {
+          "Atacadão": {
+            "Vivian": ["BR - Zona Sul"],
+            "Nilson": ["Parnamirim"],
+            "Inácio": ["Prudente"],
+            "Amarildo": ["Zona Norte"],
+            "J Maurício": ["Prudente"]
+          },
+          "Assaí": {
+            "Reginaldo": ["Zona Sul"],
+            "Erivan": ["Maria Lacerda"],
+            "Miqueias": ["Ponta Negra"],
+            "Cosme": ["Zona Norte"]
+          },
+          "Nordestão": {
+            "J Mauricio": ["Loja 03"],
+            "Mateus": ["Loja 04"],
+            "Amarildo": ["Loja 05"],
+            "Cristiane": ["Loja 07"],
+            "Reginaldo": ["Loja 08"],
+            "Markson": ["Loja 03"] 
+          },
+          "Carrefour": {
+            "Mateus": ["Zona Sul"]
+          },
+          "Superfácil": {
+            "Neto": ["Emaús"],
+            "David": ["Nazaré"],
+            "0000": ["Olho dágua"]
+          },
+          "Mar Vermelho": {
+            "Markson": ["Natal","Parnamirim"]  
+          }
+        },
+        "PE": {
+          "Rede A": {
+            "Sandro Santos": ["AB", "AC"],
+            "José Lima": ["AB"]
+          },
+          "Rede B": {
+            "Paulo Santos": ["ABC"] 
+          }
+        },
+        "AL": {
+          "Rede C": {
+            "Pedro Santos": ["AB", "AC"],
+            "Gabriel Lima": ["AB"]
+          },
+          "Rede D": {
+            "Miguel Santos": ["ABC"] 
+          }
+        },
+        "PB": {
+          "Rede F": {
+            "Joao Santos": ["AB", "AC"],
+            "Mario Lima": ["AB"]
+          },
+          "Rede G": {
+            "Jefferson Santos": ["ABC"] 
+          }
+        }
+      };
+      // ------------------------------------------------
+
+      const selEstado = document.getElementById("estado");
+      const selRede = document.getElementById("rede");
+      const selLoja = document.getElementById("loja");
+      const selNome = document.getElementById("nome"); // Promotor
+      const btn = document.getElementById("btnSubmit");
+      const statusMessage = document.getElementById('statusMessage');
+
+      
+      // --- FUNÇÕES DE PERSISTÊNCIA (LOCAL STORAGE) ---
+
+      const STORAGE_KEY_CAIXAS = 'formDataCaixas';
+      const DROPDOWN_KEYS_CAIXAS = ['estado', 'rede', 'nome', 'loja'];
+
+      function saveField(key, value) {
+          let data = JSON.parse(localStorage.getItem(STORAGE_KEY_CAIXAS)) || {};
+          data[key] = value;
+          localStorage.setItem(STORAGE_KEY_CAIXAS, JSON.stringify(data));
+      }
+
+      function clearFormStorage() {
+          localStorage.removeItem(STORAGE_KEY_CAIXAS);
+      }
+
+      function loadForm() {
+          const data = JSON.parse(localStorage.getItem(STORAGE_KEY_CAIXAS));
+          if (!data) return;
+
+          // 1. Carregar Seleções (Dropdowns)
+          DROPDOWN_KEYS_CAIXAS.forEach(key => {
+              const element = document.getElementById(key);
+              if (element && data[key]) {
+                  element.value = data[key];
+              }
+          });
+
+          // É crucial chamar a sequência de atualização APÓS carregar os valores dos selects
+          if (data.estado) updateRede(true);
+          if (data.rede) updatePromotor(true);
+          if (data.nome) updateLoja(true);
+
+          // 2. Carregar Inputs de Quantidade
+          const form = document.getElementById("balancoForm");
+          const inputs = form.querySelectorAll('input[type="number"]');
+
+          inputs.forEach(input => {
+              if (data[input.name] !== undefined) {
+                  input.value = data[input.name];
+              }
+          });
+      }
+
+      // --- FIM DAS FUNÇÕES DE PERSISTÊNCIA ---
+
+      // Inicializa Estados
+      for (let uf in db) {
+        selEstado.options[selEstado.options.length] = new Option(uf, uf);
+      }
+      
+      /**
+       * Função otimizada para atualização de dropdowns
+       */
+      function updateDropdown(element, optionsArray, defaultText = "Selecione...") {
+          let optionsHtml = `<option value="" disabled selected>${defaultText}</option>`;
+          const uniqueOptions = [...new Set(optionsArray)];
+          uniqueOptions.forEach(opt => {
+              optionsHtml += `<option value="${opt}">${opt}</option>`;
+          });
+          element.innerHTML = optionsHtml;
+      }
+
+      /**
+       * Passo 1: Estado -> Rede
+       */
+      function updateRede(isLoad = false) {
+        // Reseta todos os dropdowns dependentes
+        updateDropdown(selRede, [], "Escolha a Rede...");
+        updateDropdown(selNome, [], "Escolha o Promotor...");
+        updateDropdown(selLoja, [], "Escolha a Loja...");
+        
+        selRede.disabled = true; selNome.disabled = true; selLoja.disabled = true;
+        hideStatus();
+
+        // Persistência
+        if (!isLoad && selEstado.value) { 
+            saveField('estado', selEstado.value);
+        } else if (!selEstado.value) {
+            saveField('estado', '');
+        }
+        
+        if (selEstado.value) {
+          selRede.disabled = false;
+          let redes = db[selEstado.value];
+          let redesArray = Object.keys(redes);
+          updateDropdown(selRede, redesArray, "Escolha a Rede...");
+        }
+      }
+
+      /**
+       * Passo 2: Rede -> Promotor
+       */
+      function updatePromotor(isLoad = false) {
+        // Reseta Promotor e Loja
+        updateDropdown(selNome, [], "Escolha o Promotor...");
+        updateDropdown(selLoja, [], "Escolha a Loja...");
+        
+        selNome.disabled = true; selLoja.disabled = true;
+
+        // Persistência
+        if (!isLoad && selRede.value) {
+            saveField('rede', selRede.value);
+        } else if (!selRede.value) {
+            saveField('rede', '');
+        }
+        
+        if (selRede.value) {
+          selNome.disabled = false;
+          let promotoresObj = db[selEstado.value][selRede.value];
+          let promotoresArray = Object.keys(promotoresObj);
+          updateDropdown(selNome, promotoresArray, "Escolha o Promotor...");
+        }
+      }
+
+      /**
+       * Passo 3: Promotor -> Loja
+       */
+      function updateLoja(isLoad = false) {
+        // Reseta Loja
+        updateDropdown(selLoja, [], "Escolha a Loja...");
+        
+        selLoja.disabled = true;
+
+        // Persistência
+        if (!isLoad && selNome.value) {
+            saveField('nome', selNome.value);
+        } else if (!selNome.value) {
+            saveField('nome', '');
+        }
+        
+        if (selNome.value) {
+          selLoja.disabled = false;
+          let lojasArray = db[selEstado.value][selRede.value][selNome.value];
+          updateDropdown(selLoja, lojasArray, "Escolha a Loja...");
+        }
+
+        // Persistência da Loja (final do encadeamento)
+        if (!isLoad && selLoja.value) {
+            saveField('loja', selLoja.value);
+        } else if (!selLoja.value) {
+            saveField('loja', '');
+        }
+      }
+      
+      /**
+       * Função auxiliar para exibir mensagens de status
+       */
+      function showStatus(message, type = 'success') {
+          statusMessage.textContent = message;
+          statusMessage.classList.remove('d-none', 'alert-danger', 'alert-success-custom');
+          
+          if (type === 'success') {
+              statusMessage.classList.add('alert-success-custom');
+              statusMessage.classList.remove('alert-danger');
+          } else if (type === 'error') {
+              statusMessage.classList.add('alert-danger');
+              statusMessage.classList.remove('alert-success-custom');
+          }
+          resizeIframe();
+      }
+      
+      function hideStatus() {
+          statusMessage.classList.add('d-none');
+          statusMessage.textContent = '';
+          resizeIframe();
+      }
+
+      /**
+       * Função principal de envio do formulário.
+       */
+      function handleFormSubmit(formObject) {
+        event.preventDefault();
+        
+        hideStatus();
+        
+        const formData = new FormData(formObject);
+        
+        // --- VALIDAÇÃO DE OBRIGATORIEDADE DE CAIXAS ---
+        let totalCaixas = 0;
+        ['cheiaP', 'cheiaG', 'cheiaIfco', 'secaP', 'secaG', 'secaIfco'].forEach(key => {
+            const value = parseInt(formData.get(key) || 0); 
+            if (!isNaN(value) && value > 0) {
+                totalCaixas += value;
+            }
+        });
+
+        if (totalCaixas === 0) {
+            showStatus("❌ ERRO de Validação: Pelo menos uma caixa (Cheia ou Seca) deve ter valor maior que zero.", 'error');
+            return;
+        }
+        // --- FIM DA VALIDAÇÃO ---
+
+        btn.disabled = true;
+        btn.textContent = "Consolidando e Enviando...";
+        
+        google.script.run
+          .withSuccessHandler(function(msg) {
+            // NOVO: Limpa o Local Storage após o envio bem-sucedido
+            clearFormStorage(); 
+
+            // Limpa o formulário visualmente e reajusta dropdowns
+            document.getElementById("balancoForm").reset();
+            updateRede(); 
+            
+            showStatus("✅ SUCESSO! " + msg, 'success');
+            
+            btn.disabled = false;
+            btn.textContent = "ENVIAR BALANÇO";
+
+            // Redirecionamento após 2 segundos
+            setTimeout(function() {
+                window.top.location.href = "https://jonatasandrade8.github.io/AppQD/caixas.html";
+            }, 2000);
+          })
+          .withFailureHandler(function(err) {
+            showStatus("❌ ERRO AO ENVIAR: Falha: " + err, 'error');
+            
+            btn.disabled = false;
+            btn.textContent = "TENTAR NOVAMENTE";
+          })
+          .processarBalanco(formObject); // Chama a função de balanço no Apps Script
+      }
+      
+      // --- CÓDIGO DE CORREÇÃO DE ROLAGEM ---
+
+      function resizeIframe() {
+        var height = document.body.scrollHeight + 30; 
+        if(window.parent) {
+          window.parent.postMessage({
+              type: 'setHeight',
+              height: height
+          }, '*'); 
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+          // Carrega dados ao iniciar
+          loadForm();
+
+          const form = document.getElementById("balancoForm");
+          // Listener para salvar inputs de número em tempo real
+          form.addEventListener('input', (e) => { 
+              const element = e.target;
+              // Salva apenas inputs de número
+              if (element.tagName === 'INPUT' && element.type === 'number') {
+                   saveField(element.name, element.value);
+              }
+          });
+      });
+
+      window.onload = function() {
+          // As chamadas iniciais agora estão em loadForm() e updateRede(true)
+          resizeIframe(); 
+      }; 
+      setTimeout(resizeIframe, 500); 
+
+    </script>
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
     </footer>
@@ -56,7 +466,7 @@
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
-    
+    <script type="text/javascript" src="https://script.google.com/macros/s/1hS-sLdojzCD9Ntn_bjqFLG2-HUaeFsI3ind-8HUvXO2XmAK-H7HELQPD/userCode.js"></script>
     <script src="script.js"></script>
     <script src="alert.js"></script>
 </body>
