@@ -15,8 +15,6 @@
         <a href="index.html"><i class="fas fa-home"></i> Início</a>
         <a href="estoque.html" class="active"><i class="fas fa-boxes-stacked"></i> Estoque</a>
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
-        <!--<a href="vendas.html"><i class="fas fa-chart-line"></i> Vendas</a>
-        <a href="avarias.html"><i class="fas fa-trash-can"></i> Avarias</a>-->
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
         <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
         
@@ -36,16 +34,490 @@
         <a href="index.html">Início</a>
         <a href="estoque.html" class="active">Estoque</a>
         <a href="caixas.html">Caixas</a>
-        <!--<a href="vendas.html">Vendas</a>
-        <a href="avarias.html">Avarias</a>-->
         <a href="camera.html">Câmera</a>
         <a href="relatorio.html">Relatório/Qualidade</a>
         
         
     </nav>
-    <div>
-        <iframe width="100%" height="480px" src="https://script.google.com/macros/s/AKfycbxjqgFZaNCqy9ui_4EWpzEDP7jGThHyQDU3BTeiJo84iASfDFCAOTUpDJFNbOHSeRqc/exec" frameborder="0" marginwidth="0" marginheight="0" style="border: none; max-width:100%; max-height:100vh" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen> </iframe>
+    <div class="container">
+      <div class="main-card">
+        
+        <section class="watermark-settings">
+          <h2>Relatório de Estoque (Caixas)</h2>
+        
+          <form id="stockForm" onsubmit="handleFormSubmit(this)">
+            
+            <hr>
+            <h2>Dados do Promotor e Localização</h2>
+            
+            <div class="input-group">
+              <label for="estado"><i class="fas fa-map-marked-alt"></i> Estado</label>
+              <select id="estado" name="estado" required onchange="updateRede()">
+                <option value="" disabled selected>Selecione...</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="rede"><i class="fas fa-store"></i> Rede</label>
+              <select id="rede" name="rede" required disabled onchange="updatePromotor()">
+                <option value="" disabled selected>Selecione a Rede...</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="nome"><i class="fas fa-user-circle"></i> Promotor</label>
+              <select id="nome" name="nome" required disabled onchange="updateLoja()">
+                <option value="" disabled selected>Selecione o Promotor...</option>
+              </select>
+            </div>
+            
+            <div class="input-group">
+              <label for="loja"><i class="fas fa-map-marker-alt"></i> Loja</label>
+              <select id="loja" name="loja" required disabled>
+                <option value="" disabled selected>Selecione a Loja...</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+                <label for="descSim"><i class="fas fa-truck-loading"></i> O caminhão descarregou?</label>
+                <div style="display: flex; gap: 20px; margin-top: 5px; margin-left: 20px;">
+                    <div class="form-check form-check-inline">
+                      <input type="radio" name="descarregou" value="Sim" required id="descSim">
+                      <label for="descSim">Sim</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input type="radio" name="descarregou" value="Não" id="descNao">
+                      <label for="descNao">Não</label>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <h2>Quantidades (Caixas)</h2>
+            <p class="text-muted small" style="text-align: center;">Insira a quantidade de caixas. (Abacaxi é em UNIDADES)</p>
+
+            <div class="report-fieldset">
+                <legend>Banana Pacovan</legend>
+                <div class="input-group">
+                  <label for="pacoP"><i class="fas fa-box"></i> Pacovan P (Caixas)</label>
+                  <input type="number" class="report-input" id="pacoP" name="pacoP" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label for="pacoG"><i class="fas fa-box"></i> Pacovan G (Caixas)</label>
+                  <input type="number" class="report-input" id="pacoG" name="pacoG" placeholder="0" min="0">
+                </div>
+            </div>
+
+            <div class="report-fieldset">
+                <legend>Banana Prata</legend>
+                <div class="input-group">
+                  <label for="prataP"><i class="fas fa-box"></i> Prata P (Caixas)</label>
+                  <input type="number" class="report-input" id="prataP" name="prataP" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label for="prataG"><i class="fas fa-box"></i> Prata G (Caixas)</label>
+                  <input type="number" class="report-input" id="prataG" name="prataG" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label for="prataIfco"><i class="fas fa-box-open"></i> Prata IFCO (Caixas)</label>
+                  <input type="number" class="report-input" id="prataIfco" name="prataIfco" placeholder="0" min="0">
+                </div>
+            </div>
+
+            <div class="report-fieldset">
+                <legend>Banana Nanica</legend>
+                <div class="input-group">
+                  <label for="nanicaP"><i class="fas fa-box"></i> Nanica P (Caixas)</label>
+                  <input type="number" class="report-input" id="nanicaP" name="nanicaP" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label for="nanicaG"><i class="fas fa-box"></i> Nanica G (Caixas)</label>
+                  <input type="number" class="report-input" id="nanicaG" name="nanicaG" placeholder="0" min="0">
+                </div>
+            </div>
+
+            <div class="report-fieldset">
+                <legend>Banana Comprida</legend>
+                <div class="input-group">
+                  <label for="compP"><i class="fas fa-box"></i> Comprida P (Caixas)</label>
+                  <input type="number" class="report-input" id="compP" name="compP" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label for="compG"><i class="fas fa-box"></i> Comprida G (Caixas)</label>
+                  <input type="number" class="report-input" id="compG" name="compG" placeholder="0" min="0">
+                </div>
+            </div>
+
+            <div class="report-fieldset">
+                <legend>Banana Leite</legend>
+                <div class="input-group">
+                  <label for="leiteP"><i class="fas fa-box"></i> Leite P (Caixas)</label>
+                  <input type="number" class="report-input" id="leiteP" name="leiteP" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label for="leiteG"><i class="fas fa-box"></i> Leite G (Caixas)</label>
+                  <input type="number" class="report-input" id="leiteG" name="leiteG" placeholder="0" min="0">
+                </div>
+            </div>
+
+            <div class="report-fieldset">
+                <legend>Outras Frutas</legend>
+                <div class="input-group">
+                  <label for="goiaba"><i class="fas fa-box"></i> Goiaba (Caixas)</label>
+                  <input type="number" class="report-input" id="goiaba" name="goiaba" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label for="melao"><i class="fas fa-box"></i> Melão P (Caixas)</label>
+                  <input type="number" class="report-input" id="melao" name="melao" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                  <label for="abacaxi" style="color: var(--primary-color);"><i class="fas fa-grip-horizontal"></i> **Abacaxi (UNIDADES)**</label>
+                  <input type="number" class="report-input" id="abacaxi" name="abacaxi" placeholder="0" min="0">
+                </div>
+            </div>
+            
+            <hr>
+
+            <h2>Observações</h2>
+            <div class="input-group">
+              <label for="obs"><i class="fas fa-comment-dots"></i> Observações Adicionais</label>
+              <textarea class="report-textarea" id="obs" name="obs" rows="2" placeholder="Informações adicionais relevantes..."></textarea>
+            </div>
+            
+            <div id="statusMessage" class="alert d-none" role="alert"></div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" id="btnSubmit" class="report-btn">ENVIAR RELATÓRIO</button>
+            </div>
+            </form>
+        </section>
+      </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // --- CONFIGURAÇÃO DE ESTADOS, REDES, PROMOTORES E LOJAS ---
+      const db = {
+        "RN": {
+          "Atacadão": {
+            "Vivian": ["BR - Zona Sul"],
+            "Nilson": ["Parnamirim"],
+            "Inácio": ["Prudente"],
+            "Amarildo": ["Zona Norte"],
+            "J Maurício": ["Prudente"]
+          },
+          "Assaí": {
+            "Reginaldo": ["Zona Sul"],
+            "Erivan": ["Maria Lacerda"],
+            "Miqueias": ["Ponta Negra"],
+            "Cosme": ["Zona Norte"]
+          },
+          "Nordestão": {
+            "J Mauricio": ["Loja 03"],
+            "Mateus": ["Loja 04"],
+            "Amarildo": ["Loja 05"],
+            "Cristiane": ["Loja 07"],
+            "Reginaldo": ["Loja 08"],
+            "Markson": ["Loja 03"]
+          },
+          "Carrefour": {
+            "Mateus": ["Zona Sul"]
+          },
+          "Superfácil": {
+            "Neto": ["Emaús"],
+            "David": ["Nazaré"],
+            "0000": ["Olho dágua"]
+          },
+          "Mar Vermelho": {
+            "Markson": ["Natal","Parnamirim"]  
+          }
+        },
+        "PE": {
+          "Rede A": {
+            "Sandro Santos": ["AB", "AC"],
+            "José Lima": ["AB"]
+          },
+          "Rede B": {
+            "Paulo Santos": ["ABC"] 
+          }
+        },
+        "AL": {
+          "Rede C": {
+            "Pedro Santos": ["AB", "AC"],
+            "Gabriel Lima": ["AB"]
+          },
+          "Rede D": {
+            "Miguel Santos": ["ABC"] 
+          }
+        },
+        "PB": {
+          "Rede F": {
+            "Joao Santos": ["AB", "AC"],
+            "Mario Lima": ["AB"]
+          },
+          "Rede G": {
+            "Jefferson Santos": ["ABC"] 
+          }
+        }
+      };
+      // ------------------------------------------------
+
+      const selEstado = document.getElementById("estado");
+      const selRede = document.getElementById("rede");
+      const selLoja = document.getElementById("loja");
+      const selNome = document.getElementById("nome"); 
+      const btn = document.getElementById("btnSubmit");
+      const statusMessage = document.getElementById('statusMessage');
+
+
+      // --- FUNÇÕES DE PERSISTÊNCIA (LOCAL STORAGE) ---
+
+      const STORAGE_KEY_ESTOQUE = 'formDataEstoque';
+      const DROPDOWN_KEYS = ['estado', 'rede', 'nome', 'loja'];
+
+      function saveField(key, value) {
+          let data = JSON.parse(localStorage.getItem(STORAGE_KEY_ESTOQUE)) || {};
+          data[key] = value;
+          localStorage.setItem(STORAGE_KEY_ESTOQUE, JSON.stringify(data));
+      }
+
+      function clearFormStorage() {
+          localStorage.removeItem(STORAGE_KEY_ESTOQUE);
+      }
+
+      function loadForm() {
+          const data = JSON.parse(localStorage.getItem(STORAGE_KEY_ESTOQUE));
+          if (!data) return;
+
+          // 1. Carregar Seleções (Dropdowns)
+          DROPDOWN_KEYS.forEach(key => {
+              const element = document.getElementById(key);
+              if (element && data[key]) {
+                  element.value = data[key]; 
+              }
+          });
+
+          // É crucial chamar a sequência de atualização APÓS carregar os valores dos selects
+          if (data.estado) updateRede(true);
+          if (data.rede) updatePromotor(true);
+          if (data.nome) updateLoja(true);
+
+          // 2. Carregar Inputs de Quantidade, Radio e Textarea
+          const form = document.getElementById("stockForm");
+          const inputs = form.querySelectorAll('input, textarea, select');
+
+          inputs.forEach(input => {
+              if (!DROPDOWN_KEYS.includes(input.id) && data[input.name] !== undefined) {
+                  if (input.type === 'radio') {
+                      if (input.value === data[input.name]) {
+                          input.checked = true;
+                      }
+                  } else {
+                      input.value = data[input.name];
+                  }
+              }
+          });
+      }
+
+      // --- FIM DAS FUNÇÕES DE PERSISTÊNCIA ---
+
+      
+      // Inicializa Estados
+      for (let uf in db) {
+        selEstado.options[selEstado.options.length] = new Option(uf, uf);
+      }
+      
+      // Função otimizada para atualização de dropdowns
+      function updateDropdown(element, optionsArray, defaultText) {
+          let optionsHtml = `<option value="" disabled selected>${defaultText}</option>`;
+          const uniqueOptions = [...new Set(optionsArray)];
+          uniqueOptions.forEach(opt => {
+              optionsHtml += `<option value="${opt}">${opt}</option>`;
+          });
+          element.innerHTML = optionsHtml;
+      }
+
+      function updateRede(isLoad = false) {
+        updateDropdown(selRede, [], "Selecione a Rede...");
+        updateDropdown(selNome, [], "Selecione o Promotor...");
+        updateDropdown(selLoja, [], "Selecione a Loja...");
+        
+        selRede.disabled = true; selNome.disabled = true; selLoja.disabled = true;
+        
+        // Persistência
+        if (!isLoad && selEstado.value) { 
+            saveField('estado', selEstado.value);
+        } else if (!selEstado.value) {
+            saveField('estado', '');
+        }
+
+        if (selEstado.value) {
+          selRede.disabled = false;
+          let redes = db[selEstado.value];
+          let redesArray = Object.keys(redes);
+          updateDropdown(selRede, redesArray, "Selecione a Rede...");
+        }
+      }
+
+      function updatePromotor(isLoad = false) {
+        updateDropdown(selNome, [], "Selecione o Promotor...");
+        updateDropdown(selLoja, [], "Selecione a Loja...");
+        
+        selNome.disabled = true; selLoja.disabled = true;
+
+        // Persistência
+        if (!isLoad && selRede.value) {
+            saveField('rede', selRede.value);
+        } else if (!selRede.value) {
+            saveField('rede', '');
+        }
+        
+        if (selRede.value) {
+          selNome.disabled = false;
+          let promotoresObj = db[selEstado.value][selRede.value];
+          let promotoresArray = Object.keys(promotoresObj);
+          updateDropdown(selNome, promotoresArray, "Selecione o Promotor...");
+        }
+      }
+
+      function updateLoja(isLoad = false) {
+        updateDropdown(selLoja, [], "Selecione a Loja...");
+        
+        selLoja.disabled = true;
+
+        // Persistência
+        if (!isLoad && selNome.value) {
+            saveField('nome', selNome.value);
+        } else if (!selNome.value) {
+            saveField('nome', '');
+        }
+        
+        if (selNome.value) {
+          selLoja.disabled = false;
+          let lojasArray = db[selEstado.value][selRede.value][selNome.value];
+          updateDropdown(selLoja, lojasArray, "Selecione a Loja...");
+        }
+
+        // Persistência da Loja (final do encadeamento)
+        if (!isLoad && selLoja.value) {
+            saveField('loja', selLoja.value);
+        } else if (!selLoja.value) {
+            saveField('loja', '');
+        }
+      }
+
+      /**
+       * Função auxiliar para exibir mensagens de status
+       */
+      function showStatus(message, type = 'success') {
+          statusMessage.textContent = message;
+          statusMessage.classList.remove('d-none', 'alert-danger', 'alert-success-custom');
+          
+          if (type === 'success') {
+              statusMessage.classList.add('alert-success-custom');
+              statusMessage.classList.remove('alert-danger');
+          } else if (type === 'error') {
+              statusMessage.classList.add('alert-danger');
+              statusMessage.classList.remove('alert-success-custom');
+          }
+          resizeIframe();
+      }
+      
+      function hideStatus() {
+          statusMessage.classList.add('d-none');
+          statusMessage.textContent = '';
+          resizeIframe();
+      }
+
+      /**
+       * Função principal de envio do formulário.
+       */
+      function handleFormSubmit(formObject) {
+        event.preventDefault();
+        
+        hideStatus(); 
+        
+        const formData = new FormData(formObject);
+        
+        // --- VALIDAÇÃO DE OBRIGATORIEDADE DE CAIXAS/UNIDADES ---
+        let totalProdutos = 0;
+        ['pacoP', 'pacoG', 'prataP', 'prataG', 'prataIfco', 'nanicaP', 'nanicaG', 'compP', 'compG', 'leiteP', 'leiteG', 'goiaba', 'melao', 'abacaxi'].forEach(key => {
+            const value = parseInt(formData.get(key) || 0); 
+            if (!isNaN(value) && value > 0) {
+                totalProdutos += value;
+            }
+        });
+
+        if (totalProdutos === 0) {
+            showStatus("❌ ERRO: Pelo menos um tipo de produto deve ter valor maior que zero.", 'error');
+            return;
+        }
+        // --- FIM DA VALIDAÇÃO ---
+
+        btn.disabled = true;
+        btn.textContent = "Calculando e Enviando...";
+        
+        google.script.run
+          .withSuccessHandler(function(msg) {
+            // NOVO: Limpa o Local Storage após o envio bem-sucedido
+            clearFormStorage(); 
+            
+            // Limpa o formulário visualmente e reajusta dropdowns
+            document.getElementById("stockForm").reset();
+            updateRede(); 
+            
+            showStatus("✅ SUCESSO! " + msg, 'success');
+            
+            btn.disabled = false;
+            btn.textContent = "ENVIAR RELATÓRIO";
+
+            // Redirecionamento após 2 segundos
+            setTimeout(function() {
+                window.top.location.href = "https://jonatasandrade8.github.io/AppQD/estoque.html";
+            }, 2000);
+          })
+          .withFailureHandler(function(err) {
+            showStatus("❌ ERRO AO ENVIAR: Falha: " + err, 'error');
+            
+            btn.disabled = false;
+            btn.textContent = "TENTAR NOVAMENTE";
+          })
+          .processarFormulario(formObject);
+      }
+      
+      // --- CÓDIGO DE CORREÇÃO DE ROLAGEM ---
+      function resizeIframe() {
+        var height = document.body.scrollHeight + 30; 
+        if(window.parent) {
+           window.parent.postMessage({
+               type: 'setHeight',
+               height: height
+           }, '*'); 
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+          // Carrega dados ao iniciar
+          loadForm();
+          
+          const form = document.getElementById("stockForm");
+          // Listener para salvar inputs, textarea e radio buttons
+          form.addEventListener('change', (e) => {
+              const element = e.target;
+              // Salva campos que não são os dropdowns de localização
+              if (!DROPDOWN_KEYS.includes(element.id)) {
+                   saveField(element.name, element.type === 'radio' ? element.value : element.value);
+              }
+          });
+      });
+
+      window.onload = function() {
+        // As chamadas iniciais agora estão em loadForm() e updateRede(true)
+        resizeIframe(); 
+      }; 
+      setTimeout(resizeIframe, 500); 
+
+    </script>
         
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
@@ -58,10 +530,8 @@
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
     </div>
-
+<script type="text/javascript" src="https://script.google.com/macros/s/1hS-sLdojzCD9Ntn_bjqFLG2-HUaeFsI3ind-8HUvXO2XmAK-H7HELQPD/userCode.js"></script>
     <script src="script.js"></script>
     <script src="alert.js"></script>
 </body>
 </html>
-
-https://script.google.com/macros/s/AKfycbxjqgFZaNCqy9ui_4EWpzEDP7jGThHyQDU3BTeiJo84iASfDFCAOTUpDJFNbOHSeRqc/exec?page=balanco
