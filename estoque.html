@@ -8,13 +8,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-
-        /* Estilo para garantir que o iframe não tenha bordas e use a largura total */
+        /* Estilos do botão e iframe */
         iframe {
             border: none;
             max-width: 100%;
-            width: 100%; /* Garante largura total */
-            /* A altura será ajustada dinamicamente pelo script do formulário */
+            width: 100%; 
+        }
+        .btn-limpa {
+            background-color: #8b5cf6; /* Cor secundária (roxo mais claro) */
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 15px 0;
+            display: block;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-limpa:hover {
+            background-color: #5d3fd3; /* Cor primária (roxo mais escuro) */
+        }
+        .instrucao-limpa {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 5px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -49,6 +71,13 @@
     </nav>
     
     <div id="app-container">
+        <button type="button" class="btn-limpa" onclick="openNewTab('estoque.html')">
+            ABRIR FORMULÁRIO EM NOVA SESSÃO LIMPA
+        </button>
+        <p class="instrucao-limpa">
+            Use este botão se a página estiver com problemas de carregamento ou login. Se o erro persistir, abra a nova aba em **Modo Anónimo** manualmente.
+        </p>
+        
         <iframe 
             src="https://script.google.com/macros/s/AKfycbz2S-fqWWGlsMQoLNrCLs0L4w2Hc5ohqBCIOCD7m5XN0DzXDVs8GZafOh1U7FECY-1O/exec" 
             id="appscript-iframe"
@@ -57,10 +86,35 @@
             scrolling="no">
         </iframe>
     </div>
+        
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
     </footer>
 
     <script src="menu.js"></script>
-    <script src="iframe_resizer.js"></script> </body>
+    <script>
+        /**
+         * Função para lidar com a comunicação de ajuste de altura do iframe.
+         * O formulário (dentro do iframe) envia a altura.
+         */
+        window.addEventListener('message', function(event) {
+            // Verifica se a mensagem é do tipo 'setHeight'
+            if (event.data && event.data.type === 'setHeight') {
+                const iframe = document.getElementById('appscript-iframe');
+                if (iframe) {
+                    // Define a altura do iframe + uma margem
+                    iframe.style.height = (event.data.height + 30) + 'px';
+                }
+            }
+        });
+        
+        /**
+         * Abre o URL do HOST em uma nova aba regular.
+         * @param {string} pageName - O nome da página (ex: 'estoque.html').
+         */
+        function openNewTab(pageName) {
+            window.open(pageName, "_blank");
+        }
+    </script>
+</body>
 </html>
