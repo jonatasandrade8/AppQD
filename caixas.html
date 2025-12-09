@@ -8,35 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Estilos do botão e iframe */
+        /* Adicionei esta regra para garantir que o iframe seja 100% responsivo, caso não esteja no style.css */
         iframe {
-            border: none;
-            max-width: 100%;
-            width: 100%; 
-        }
-        .btn-limpa {
-            background-color: #8b5cf6; /* Cor secundária (roxo mais claro) */
-            color: white;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 15px;
-            margin: 15px 0;
-            display: block;
             width: 100%;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-limpa:hover {
-            background-color: #5d3fd3; /* Cor primária (roxo mais escuro) */
-        }
-        .instrucao-limpa {
-            text-align: center;
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-top: 5px;
-            margin-bottom: 15px;
+            border: none;
         }
     </style>
 </head>
@@ -49,6 +24,7 @@
         <a href="caixas.html" class="active"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
         <a href="relatorio.html" ><i class="fas fa-camera"></i> Relatório/Qualidade</a>
+        
     </aside>
     <header id="cabecalho-principal">
         <button class="menu-toggle" aria-label="Abrir Menu">
@@ -67,53 +43,24 @@
         <a href="caixas.html"class="active">Caixas</a>
         <a href="camera.html">Câmera</a>
         <a href="relatorio.html">Relatório/Qualidade</a>
-    </nav>
-
-    <div id="app-container">
-        <button type="button" class="btn-limpa" onclick="openNewTab('caixas.html')">
-            ABRIR FORMULÁRIO EM NOVA SESSÃO LIMPA
-        </button>
-        <p class="instrucao-limpa">
-            Use este botão se a página estiver com problemas de carregamento ou login. Se o erro persistir, abra a nova aba em **Modo Anónimo** manualmente.
-        </p>
         
-        <iframe 
-            src="https://script.google.com/macros/s/AKfycbz2S-fqWWGlsMQoLNrCLs0L4w2Hc5ohqBCIOCD7m5XN0DzXDVs8GZafOh1U7FECY-1O/exec?page=balanco" 
-            id="appscript-iframe"
-            style="width: 100%; height: 800px; border: none;" 
-            frameborder="0" 
-            scrolling="no">
-        </iframe>
-    </div>
-    
+    </nav>
+    <div>
+        <iframe src="https://script.google.com/macros/s/AKfycbz2S-fqWWGlsMQoLNrCLs0L4w2Hc5ohqBCIOCD7m5XN0DzXDVs8GZafOh1U7FECY-1O/exec?page=balanco" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">Carregando script...</iframe>
+     </div>
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
     </footer>
 
-    <script src="menu.js"></script>
-    <script>
-        /**
-         * Função para lidar com a comunicação de ajuste de altura do iframe.
-         * O formulário (dentro do iframe) envia a altura.
-         */
-        window.addEventListener('message', function(event) {
-            // Verifica se a mensagem é do tipo 'setHeight'
-            if (event.data && event.data.type === 'setHeight') {
-                const iframe = document.getElementById('appscript-iframe');
-                if (iframe) {
-                    // Define a altura do iframe + uma margem
-                    iframe.style.height = (event.data.height + 30) + 'px';
-                }
-            }
-        });
-        
-        /**
-         * Abre o URL do HOST em uma nova aba regular.
-         * @param {string} pageName - O nome da página (ex: 'caixas.html').
-         */
-        function openNewTab(pageName) {
-            window.open(pageName, "_blank");
-        }
-    </script>
+    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    
+    <script src="script.js"></script>
+    <script src="alert.js"></script>
 </body>
 </html>
