@@ -7,18 +7,14 @@ const APP_DATA = {
     "Cosme": {
         "Assaí": ["Zona Norte"],
     },
-    "David": {
-        "Superfácil": ["Emaús"],
-
-    },
+    
     "Erivan": {
         "Assaí": ["Maria Lacerda"],
     
     },
     "Reginaldo": {
-        "Nordestão": ["Loja 8"],
-        "Superfácil": ["Emaús"],
-    
+        "Assaí": ["Zona Sul"],
+
     },
     "Inacio": {
         "Atacadão": ["Prudente"],
@@ -37,9 +33,9 @@ const APP_DATA = {
 
     },
     "Markson": {
-         "Nordestão": ["Loja 03"],
+         "Nordestão": ["Loja 08"],
         "Mar Vermelho": ["Parnamirim"],
-        "Mar Vermelho": ["Natal"],
+        "Mar Vermelho": ["Natal"]
         
     },
     
@@ -52,7 +48,7 @@ const APP_DATA = {
 
     },
     "J Mauricio": {
-        "Atacadão": ["Prudente"],
+        "Nordestão": ["Loja 03"],
 
     },
     "Neto": {
