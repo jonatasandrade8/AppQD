@@ -85,6 +85,12 @@
         </div>
         <h1>Qdelícia Frutas</h1>
         <p>Página Inicial</p>
+        <div id="status-envio" class="status-card-header">
+        <div id="dia-rotulo" class="dia-rotulo">---</div>
+        <div class="info-envio">Estoque</div>
+        <div class="info-envio">Envio às 14:00</div>
+        <div id="contagem-regressiva" class="timer">00:00:00</div>
+    </div>
     </header>
     
     <nav>
@@ -98,24 +104,7 @@
     
     <main>
        
-       <section id="alert-activation-section" style="margin-top: 20px; padding: 20px; border: 1px solid var(--tertiary-color); border-radius: var(--border-radius); text-align: center;">
-            <h2>Ativação de Alertas Diários 🔔</h2>
-            
-            <div class="alert-toggle-container">
-                <span id="toggle-label-off" style="font-weight: bold; color: #777;">Desativado</span>
-                <label class="switch">
-                    <input type="checkbox" id="alert-toggle-switch">
-                    <span class="slider"></span>
-                </label>
-                <span id="toggle-label-on" style="font-weight: bold; color: #4CAF50;">Ativado</span>
-            </div>
-
-            <p id="alert-status" style="margin-bottom: 15px; font-weight: bold;">Verificando status...</p>
-            
-            <button id="test-audio-btn" class="action-btn" style="background-color: #007bff; color: white; display: none;">
-                <i class="fas fa-volume-up"></i> Testar / Desbloquear Áudio
-            </button>
-        </section>
+       
         <section class ="missao" >
             <h2>Nossa Missão:</h2>
             <ul >

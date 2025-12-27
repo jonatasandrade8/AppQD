@@ -906,3 +906,95 @@ hr {
         padding: 20px;
     }
 }
+
+--------------------------
+/* Garante que o header seja a referência de posição */
+#cabecalho-principal {
+    position: relative; 
+    padding-right: 120px; /* Abre espaço para o relógio em telas menores */
+}
+
+.status-card-header {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.15); /* Fundo leve para combinar com o header */
+    backdrop-filter: blur(5px); /* Efeito moderno de vidro */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    min-width: 100px;
+}
+
+.dia-rotulo {
+    font-weight: bold;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #ffcc00; /* Destaque para o Hoje/Amanhã */
+}
+
+.info-envio {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+.timer {
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace; /* Fonte mono para os números não pularem */
+}
+
+/* Ajuste para celulares */
+@media (max-width: 600px) {
+    .status-card-header {
+        top: 5px;
+        right: 5px;
+        padding: 5px;
+    }
+    .timer { font-size: 0.9rem; }
+}
+/* Botão de Atualizar */
+.btn-refresh {
+    background: #ffcc00;
+    color: #333;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-refresh:active {
+    transform: scale(0.95);
+}
+
+.btn-refresh i {
+    font-size: 0.7rem;
+}
+
+/* Estado de Urgência (Menos de 30 min) */
+.urgente {
+    background: rgba(255, 0, 0, 0.8) !important;
+    border: 1px solid white !important;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Ajuste no Header para acomodar o botão */
+#cabecalho-principal {
+    position: relative;
+    padding-bottom: 15px;
+}

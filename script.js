@@ -27,6 +27,53 @@
             });
         });
     }
+    function atualizarRelogio() {
+    const agora = new Date();
+    const meta = new Date();
+    
+    meta.setHours(14, 0, 0, 0);
+
+    if (agora >= meta) {
+        meta.setDate(meta.getDate() + 1);
+        document.getElementById('dia-rotulo').innerText = 'Amanhã';
+        document.getElementById('status-envio').classList.remove('urgente');
+    } else {
+        document.getElementById('dia-rotulo').innerText = 'Hoje';
+    }
+
+    const diferenca = meta - agora;
+    const totalMinutos = Math.floor(diferenca / (1000 * 60));
+
+    // Lógica de Cor Vermelha (Urgência)
+    const card = document.getElementById('status-envio');
+    if (document.getElementById('dia-rotulo').innerText === 'Hoje' && totalMinutos < 30) {
+        card.classList.add('urgente');
+    } else {
+        card.classList.remove('urgente');
+    }
+
+    // Cálculos de tempo
+    const horas = Math.floor((diferenca / (1000 * 60 * 60)) % 24);
+    const minutos = Math.floor((diferenca / (1000 * 60)) % 60);
+    const segundos = Math.floor((diferenca / 1000) % 60);
+
+    document.getElementById('contagem-regressiva').innerText = 
+        `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+}
+
+// Função para recarregar a página e limpar o cache do iframe
+function recarregarPagina() {
+    // Adiciona um parâmetro aleatório ao URL do iframe para forçar o Google a atualizar
+    const iframe = document.querySelector('iframe');
+    const src = iframe.src.split('?')[0];
+    iframe.src = src + "?t=" + new Date().getTime();
+    
+    // Recarrega a página principal também
+    location.reload();
+}
+
+setInterval(atualizarRelogio, 1000);
+atualizarRelogio();
 
     // 2. Lógica do Botão Voltar ao Topo
     const backToTop = document.querySelector('.back-to-top');
