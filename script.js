@@ -2,7 +2,24 @@
     // =================================================================
     // MÓDULO DE SCRIPTS GERAIS (Envolto em IIFE para isolar variáveis)
     // =================================================================
+    // Defina a função logo no topo do arquivo
+    window.recarregarPagina = function() {
+    console.log("Botão clicado, recarregando..."); // Para você ver no F12 que funcionou
+    
+    // Tenta atualizar o iframe primeiro
+    const iframe = document.querySelector('iframe');
+    if (iframe) {
+        const urlBase = iframe.src.split('?')[0];
+        iframe.src = urlBase + "?t=" + new Date().getTime();
+    }
+    
+    // Recarrega a página após 300ms
+    setTimeout(() => {
+        window.location.reload();
+    }, 300);
+    };
 
+// ... restante do código (atualizarRelogio, etc)
     // 1. Lógica do Menu Hambúrguer (Lateral)
     const menuToggle = document.querySelector('.menu-toggle');
     const sideMenu = document.querySelector('.side-menu');
@@ -61,16 +78,7 @@
         `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
 }
 
-// Função para recarregar a página e limpar o cache do iframe
-function recarregarPagina() {
-    // Adiciona um parâmetro aleatório ao URL do iframe para forçar o Google a atualizar
-    const iframe = document.querySelector('iframe');
-    const src = iframe.src.split('?')[0];
-    iframe.src = src + "?t=" + new Date().getTime();
-    
-    // Recarrega a página principal também
-    location.reload();
-}
+
 
 setInterval(atualizarRelogio, 1000);
 atualizarRelogio();
