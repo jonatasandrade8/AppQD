@@ -13,64 +13,62 @@ const PHOTO_TYPES = {
 
 
 // ==================== ESTRUTURA DE DADOS PARA DROPDOWNS ====================
-// ATENÇÃO: Preencha este objeto com os nomes dos promotores, as redes que ele atende e as lojas/PDVs.
+// Hierarquia: Estado -> Rede -> Promotor -> Lojas
 const APP_DATA = {
-    "Miqueias": {
-        "Assaí": ["Ponta Negra"],
+    "RN": {
+        "Atacadão": {
+            "Vivian": ["BR - Zona Sul"],
+            "Nilson": ["Parnamirim"],
+            "Inácio": ["Prudente"],
+            "Amarildo": ["Zona Norte"]
+        },
+        "Assaí": {
+            "Reginaldo": ["Zona Sul"],
+            "Erivan": ["Maria Lacerda"],
+            "Miqueias": ["Ponta Negra"],
+            "Cosme": ["Zona Norte"]
+        },
+        "Nordestão": {
+            "J Mauricio": ["Loja 03"],
+            "Mateus": ["Loja 04"],
+            "Amarildo": ["Loja 05"],
+            "Cristiane": ["Loja 07"],
+            "Markson": ["Loja 08"]
+        },
+        "Carrefour": {
+            "Mateus": ["Zona Sul"]
+        },
+        "Superfácil": {
+            "Neto": ["Emaús"],
+            "David": ["Nazaré"]
+        },
+        "Mar Vermelho": {
+            "Markson": ["Natal", "Parnamirim"]
+        }
     },
-    "Cosme": {
-        "Assaí": ["Zona Norte"],
+    "PE": {
+        "Rede A": {
+            "Promotor A": ["Loja A"]
+        },
+        "Rede B": {
+            "Promotor B": ["Loja B"]
+        }
     },
-    
-    "Erivan": {
-        "Assaí": ["Maria Lacerda"],
-    
+    "AL": {
+        "Rede C": {
+            "Promotor C": ["Loja C"]
+        },
+        "Rede D": {
+            "Promotor D": ["Loja D"]
+        }
     },
-    "Reginaldo": {
-        "Assaí": ["Zona Sul"],
-
-    },
-    "Inacio": {
-        "Atacadão": ["Prudente"],
-
-    },
-    "Vivian": {
-        "Atacadão": ["BR-101 Sul"],
-
-    },
-    "Amarildo": {
-        "Atacadão": ["Zona Norte"],
-        "Nordestão": ["Loja 05"]
-    },
-    "Nilson": {
-        "Atacadão": ["Parnamirim"],
-
-    },
-    "Markson": {
-         "Nordestão": ["Loja 08"],
-        "Mar Vermelho": ["Natal", "Parnamirim"]
-        
-    },
-    
-    "Mateus": {
-        "Nordestão": ["Loja 04"],
-        "Carrefour": ["Zona Sul"]
-    },
-    "Cristiane": {
-        "Nordestão": ["Loja 07"],
-
-    },
-    "J Mauricio": {
-        "Nordestão": ["Loja 03"],
-
-    },
-    "Neto": {
-        "Superfácil": ["Emaús"],
-
-    },
-    "Antonio": {
-        "Superfácil": ["Nazaré"],
-
+    "PB": {
+        "Rede F": {
+            "Promotor F": ["Loja F"]
+        },
+        "Rede G": {
+            "Promotor G": ["Loja G"]
+        }
     }
 };
 
@@ -98,6 +96,7 @@ const landscapeGuide = document.getElementById('landscape-guide'); // Guia Paisa
 
 
 // NOVOS ELEMENTOS: Dropdowns para Marca D'água
+const selectEstado = document.getElementById('select-estado'); // NOVO: Estado
 const selectTipoFoto = document.getElementById('select-tipo-foto'); // NOVO: Tipo de Foto
 const selectPromotor = document.getElementById('select-promotor');
 const selectRede = document.getElementById('select-rede');
@@ -129,6 +128,7 @@ logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca.
  */
 function saveSelection() {
     const selection = {
+        estado: selectEstado.value,
         // NÃO INCLUI selectTipoFoto.value AQUI
         promotor: selectPromotor.value,
         rede: selectRede.value,
@@ -143,7 +143,21 @@ function saveSelection() {
  * @description Carrega as seleções do localStorage e preenche os dropdowns.
  */
 function loadAndPopulateDropdowns() {
-    // 1. Preenche o Tipo de Foto e GARANTE QUE ELE RECOMECE NA OPÇÃO PADRÃO
+    const savedSelection = JSON.parse(localStorage.getItem(localStorageKey)) || {};
+
+    // 1. Preenche os ESTADOS
+    selectEstado.innerHTML = '<option value="" disabled selected>Selecione o Estado</option>';
+    Object.keys(APP_DATA).forEach(estado => {
+        const option = document.createElement('option');
+        option.value = estado;
+        option.textContent = estado;
+        selectEstado.appendChild(option);
+    });
+    if (savedSelection.estado) {
+        selectEstado.value = savedSelection.estado;
+    }
+
+    // 2. Preenche o Tipo de Foto e GARANTE QUE ELE RECOMECE NA OPÇÃO PADRÃO
     selectTipoFoto.innerHTML = '<option value="" disabled selected>Selecione o Tipo</option>';
     Object.keys(PHOTO_TYPES).forEach(value => {
         const option = document.createElement('option');
@@ -152,52 +166,36 @@ function loadAndPopulateDropdowns() {
         selectTipoFoto.appendChild(option);
     });
 
-    const savedSelection = JSON.parse(localStorage.getItem(localStorageKey));
-
-    if (savedSelection) {
-        // *** NÃO CARREGA O Tipo de Foto A PARTIR DO localStorage ***
-
+    // 3. Preenche as REDES baseado no Estado selecionado
+    populateRede(savedSelection.estado || '');
+    if (savedSelection.rede) {
+        selectRede.value = savedSelection.rede;
+        populatePromotor(savedSelection.estado, savedSelection.rede);
         if (savedSelection.promotor) {
             selectPromotor.value = savedSelection.promotor;
-            // 3. Preenche a Rede baseada no Promotor salvo
-            populateRede(savedSelection.promotor);
-            selectRede.value = savedSelection.rede;
-            // 4. Preenche a Loja baseada na Rede salva
-            if (savedSelection.rede) {
-                populateLoja(savedSelection.promotor, savedSelection.rede);
+            populateLoja(savedSelection.estado, savedSelection.rede, savedSelection.promotor);
+            if (savedSelection.loja) {
                 selectLoja.value = savedSelection.loja;
             }
         }
     }
-
-    // Preenche o Promotor sempre após carregar as seleções salvas
-    selectPromotor.innerHTML = '<option value="" disabled selected>Selecione na lista</option>';
-    Object.keys(APP_DATA).forEach(promotor => {
-        const option = document.createElement('option');
-        option.value = promotor;
-        option.textContent = promotor;
-        selectPromotor.appendChild(option);
-    });
-    // Se havia um promotor salvo, garante que ele seja selecionado novamente
-    if (savedSelection && savedSelection.promotor) {
-        selectPromotor.value = savedSelection.promotor;
-    }
-
 
     // Força a validação inicial do botão
     checkCameraAccess();
 }
 
 /**
- * @description Preenche as opções de Rede com base no Promotor selecionado.
+ * @description Preenche as opções de Rede com base no Estado selecionado.
  */
-function populateRede(promotor) {
+function populateRede(estado) {
     selectRede.innerHTML = '<option value="" disabled selected>Selecione a Rede</option>';
+    selectPromotor.innerHTML = '<option value="" disabled selected>Selecione na lista</option>';
     selectLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
+    selectPromotor.disabled = true;
     selectLoja.disabled = true;
 
-    if (promotor && APP_DATA[promotor]) {
-        Object.keys(APP_DATA[promotor]).forEach(rede => {
+    if (estado && APP_DATA[estado]) {
+        Object.keys(APP_DATA[estado]).forEach(rede => {
             const option = document.createElement('option');
             option.value = rede;
             option.textContent = rede;
@@ -210,13 +208,34 @@ function populateRede(promotor) {
 }
 
 /**
- * @description Preenche as opções de Loja com base na Rede e Promotor selecionados.
+ * @description Preenche as opções de Promotor com base no Estado e Rede selecionados.
  */
-function populateLoja(promotor, rede) {
+function populatePromotor(estado, rede) {
+    selectPromotor.innerHTML = '<option value="" disabled selected>Selecione na lista</option>';
+    selectLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
+    selectLoja.disabled = true;
+
+    if (estado && rede && APP_DATA[estado] && APP_DATA[estado][rede]) {
+        Object.keys(APP_DATA[estado][rede]).forEach(promotor => {
+            const option = document.createElement('option');
+            option.value = promotor;
+            option.textContent = promotor;
+            selectPromotor.appendChild(option);
+        });
+        selectPromotor.disabled = false;
+    } else {
+        selectPromotor.disabled = true;
+    }
+}
+
+/**
+ * @description Preenche as opções de Loja com base no Estado, Rede e Promotor selecionados.
+ */
+function populateLoja(estado, rede, promotor) {
     selectLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
 
-    if (promotor && rede && APP_DATA[promotor] && APP_DATA[promotor][rede]) {
-        APP_DATA[promotor][rede].forEach(loja => {
+    if (estado && rede && promotor && APP_DATA[estado] && APP_DATA[estado][rede] && APP_DATA[estado][rede][promotor]) {
+        APP_DATA[estado][rede][promotor].forEach(loja => {
             const option = document.createElement('option');
             option.value = loja;
             option.textContent = loja;
@@ -233,8 +252,8 @@ function populateLoja(promotor, rede) {
  * @description Verifica se os dropdowns estão preenchidos para liberar o botão da câmera.
  */
 function checkCameraAccess() {
-    // NOVO: Adicionado selectTipoFoto.value à verificação
-    const isReady = selectTipoFoto.value && selectPromotor.value && selectRede.value && selectLoja.value;
+    // NOVO: Adicionado selectEstado.value à verificação
+    const isReady = selectEstado.value && selectTipoFoto.value && selectPromotor.value && selectRede.value && selectLoja.value;
 
     if (openCameraBtn) {
         if (isReady) {
@@ -251,22 +270,28 @@ function checkCameraAccess() {
 
 
 // EVENT LISTENERS para os Dropdowns
-// NOVO: Adicionado listener para o Tipo de Foto
-if (selectTipoFoto) {
-    // Apenas salva/checa, mas não é persistido (o valor será resetado ao recarregar a página)
-    selectTipoFoto.addEventListener('change', saveSelection);
-}
-if (selectPromotor) {
-    selectPromotor.addEventListener('change', () => {
-        populateRede(selectPromotor.value);
+if (selectEstado) {
+    selectEstado.addEventListener('change', () => {
+        populateRede(selectEstado.value);
         saveSelection();
     });
 }
 if (selectRede) {
     selectRede.addEventListener('change', () => {
-        populateLoja(selectPromotor.value, selectRede.value);
+        populatePromotor(selectEstado.value, selectRede.value);
         saveSelection();
     });
+}
+if (selectPromotor) {
+    selectPromotor.addEventListener('change', () => {
+        populateLoja(selectEstado.value, selectRede.value, selectPromotor.value);
+        saveSelection();
+    });
+}
+// NOVO: Adicionado listener para o Tipo de Foto
+if (selectTipoFoto) {
+    // Apenas salva/checa, mas não é persistido (o valor será resetado ao recarregar a página)
+    selectTipoFoto.addEventListener('change', saveSelection);
 }
 if (selectLoja) {
     selectLoja.addEventListener('change', saveSelection);

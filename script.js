@@ -120,6 +120,71 @@
 setInterval(atualizarRelogio, 1000);
 
 atualizarRelogio();
+
+// Função para calcular o próximo envio de caixas secas (segunda-feira a cada 2 semanas)
+function atualizarTimerCaixasSec() {
+    const caixasRotuloEl = document.getElementById('caixas-rotulo');
+    const timerCaixasEl = document.getElementById('timer-caixas');
+    
+    if (!caixasRotuloEl || !timerCaixasEl) return; // Se elementos não existem, sai
+    
+    const agora = new Date();
+    const diaAtual = agora.getDay(); // 0 = domingo, 1 = segunda, 2 = terça, ..., 6 = sábado
+    const horaAtual = agora.getHours();
+    
+    // Calcula a próxima segunda-feira às 08:00
+    let proximaSegunda = new Date(agora);
+    proximaSegunda.setHours(8, 0, 0, 0);
+    
+    // Se é segunda-feira
+    if (diaAtual === 1) {
+        // Se ainda não passou das 08:00, usa a segunda-feira de hoje
+        if (horaAtual < 8) {
+            // proximaSegunda já está setado para hoje às 08:00
+            caixasRotuloEl.innerText = 'Hoje';
+        } else {
+            // Se já passou das 08:00, próxima segunda é em 14 dias
+            proximaSegunda.setDate(proximaSegunda.getDate() + 14);
+            caixasRotuloEl.innerText = '14 dias';
+        }
+    } else {
+        // Calcula quantos dias faltam até a próxima segunda-feira
+        const diasAteSegunda = diaAtual === 0 ? 1 : (8 - diaAtual) % 7 || 7;
+        proximaSegunda.setDate(proximaSegunda.getDate() + diasAteSegunda);
+        
+        if (diasAteSegunda === 1) {
+            caixasRotuloEl.innerText = 'Amanhã';
+        } else {
+            caixasRotuloEl.innerText = `${diasAteSegunda} dias`;
+        }
+    }
+    
+    // Calcula diferença de tempo até a próxima segunda-feira às 08:00
+    const diferenca = proximaSegunda - agora;
+    
+    if (diferenca > 0) {
+        const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+        const horas = Math.floor((diferenca / (1000 * 60 * 60)) % 24);
+        const minutos = Math.floor((diferenca / (1000 * 60)) % 60);
+        const segundos = Math.floor((diferenca / 1000) % 60);
+        
+        // Formato: "Xd HH:MM:SS" ou apenas "HH:MM:SS" se for hoje
+        if (dias > 0) {
+            timerCaixasEl.innerText = `${dias}d ${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+        } else {
+            timerCaixasEl.innerText = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+        }
+    } else {
+        timerCaixasEl.innerText = '00:00:00';
+    }
+}
+
+// Atualiza timer de caixas a cada segundo
+if (document.getElementById('timer-caixas')) {
+    setInterval(atualizarTimerCaixasSec, 1000);
+    atualizarTimerCaixasSec();
+}
+
     // 2. Lógica do Botão Voltar ao Topo
     const backToTop = document.querySelector('.back-to-top');
 

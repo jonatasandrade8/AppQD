@@ -45,61 +45,81 @@ header {
     background: var(--gradient);
     color: var(--white);
     text-align: center;
-    padding: 15px 0;
+    padding: 10px 0 8px;
     position: relative;
     box-shadow: 0 2px 10px var(--shadow);
 }
 
 .logo-placeholder {
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .logo-placeholder img {
-    max-width: 100px; 
+    max-width: 70px; 
     height: auto;
     border-radius: 50%;
 }
 
 header h1 {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     margin: 0;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    line-height: 1.2;
 }
 
 header p {
-    font-size: 1rem;
-    margin-top: 5px;
+    font-size: 0.8rem;
+    margin-top: 2px;
     opacity: 0.9;
 }
 
 /* Menu Hamburger (Toggle Button) */
 .menu-toggle {
-    display: block; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     position: absolute;
-    top: 25px;
+    top: 15px;
     left: 15px;
-    background: none;
+    background: rgba(255, 255, 255, 0.2);
     border: none;
     color: var(--white);
     font-size: 1.5rem;
     cursor: pointer;
     z-index: 100;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.menu-toggle:active {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0.95);
+}
+
+.menu-label {
+    font-size: 0.65rem;
+    margin-top: 2px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 /* Menu Lateral (Side Menu - App Navigation) */
 .side-menu {
     position: fixed;
     top: 0;
-    left: -250px; /* Inicialmente fora da tela */
-    width: 250px;
+    left: -280px; /* Inicialmente fora da tela */
+    width: 280px;
     height: 100%;
-    background-color: var(--text-dark); /* Fundo escuro */
-    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(180deg, var(--text-dark) 0%, #1a0033 100%);
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.6);
     z-index: 99;
-    transition: left 0.3s ease;
-    padding-top: 70px; /* Espaço para não colidir com a barra superior do mobile */
+    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-top: 70px;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 .side-menu.active {
@@ -107,17 +127,35 @@ header p {
 }
 
 .side-menu a {
-    padding: 15px 20px;
-    color: var(--bg-light);
+    padding: 16px 20px;
+    color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
     font-weight: 500;
-    transition: background-color 0.2s;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.side-menu a:hover, .side-menu a.active {
-    background-color: var(--primary-color);
+.side-menu a i {
+    font-size: 1.1rem;
+    width: 24px;
+    text-align: center;
+}
+
+.side-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--primary-color);
     color: var(--white);
+    transform: translateX(4px);
+}
+
+.side-menu a.active {
+    background: linear-gradient(90deg, rgba(93, 63, 211, 0.3) 0%, transparent 100%);
+    border-left-color: var(--accent-color);
+    color: var(--white);
+    font-weight: 600;
 }
 
 .menu-overlay {
@@ -861,49 +899,202 @@ hr {
         font-size: 1rem;
     }
 
-    /* Centraliza o conteúdo principal */
+/* ===================== RESPONSIVIDADE - TABLET (768px+) ===================== */
+@media (min-width: 601px) and (max-width: 767px) {
+    .notification-board {
+        flex-direction: row;
+        max-width: 100%;
+        gap: 12px;
+        padding: 0 12px;
+        margin-top: 12px;
+        justify-content: center;
+    }
+
+    .notification-item {
+        flex: 1;
+        padding: 12px 14px;
+        margin-bottom: 0;
+        min-height: 65px;
+    }
+
+    .notification-divider {
+        display: none;
+    }
+
+    .notification-label {
+        font-size: 0.7rem;
+    }
+
+    .dia-rotulo {
+        font-size: 0.85rem;
+    }
+
+    .timer-label {
+        font-size: 0.65rem;
+    }
+
+    .timer {
+        font-size: 1rem;
+    }
+}
+    /* Esconde o hamburger em tablet/desktop */
+    .menu-toggle {
+        display: none !important;
+    }
+
+    /* Mostra menu horizontal em tablet/desktop */
+    nav {
+        display: flex;
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        justify-content: center;
+        gap: 30px;
+        padding: 15px 20px;
+        box-shadow: 0 2px 10px var(--shadow);
+        flex-wrap: wrap;
+    }
+
+    nav a {
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 8px 12px;
+        border-bottom: 3px solid transparent;
+    }
+
+    nav a:hover {
+        border-bottom-color: var(--accent-color);
+        transform: translateY(-2px);
+    }
+
+    nav a.active {
+        border-bottom-color: var(--accent-color);
+        font-weight: 600;
+    }
+
+    /* Esconde o side-menu overlay */
+    .side-menu,
+    .menu-overlay {
+        display: none !important;
+    }
+
+    /* Centraliza o header em desktop */
+    header {
+        padding: 30px 20px 20px;
+    }
+
+    header h1 {
+        font-size: 2.2rem;
+    }
+
+    header p {
+        font-size: 1.1rem;
+    }
+
+    /* Notification Board em Tablet/Desktop */
+    .notification-board {
+        flex-direction: row;
+        max-width: 100%;
+        margin: 20px auto 0;
+        padding: 0 20px;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .notification-item {
+        flex: 1;
+        max-width: 250px;
+        padding: 14px 16px;
+        min-height: 65px;
+    }
+
+    .notification-divider {
+        display: none;
+    }
+
+    .notification-label {
+        font-size: 0.8rem;
+    }
+
+    .dia-rotulo {
+        font-size: 0.9rem;
+    }
+
+    .timer-label {
+        font-size: 0.7rem;
+    }
+
+    .timer {
+        font-size: 1.2rem;
+    }
+}
+
+/* ===================== RESPONSIVIDADE - DESKTOP GRANDE (1024px+) ===================== */
+@media (min-width: 1024px) {
+    body {
+        font-size: 16px;
+    }
+
+    header {
+        padding: 40px 20px 25px;
+    }
+
+    header h1 {
+        font-size: 2.5rem;
+    }
+
+    header p {
+        font-size: 1.2rem;
+    }
+
+    .logo-placeholder img {
+        max-width: 120px;
+    }
+
     main {
-        max-width: 900px;
-        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 30px;
     }
 
     section {
-        padding: 30px;
-        margin: 20px auto;
-        max-width: 800px; 
+        padding: 40px;
+        margin: 30px auto;
     }
 
-    /* Estilos do Input em Desktop */
-    .input-group {
-        max-width: 450px; 
-    }
-
-    /* Carrossel */
-    .carousel-container {
-        max-width: 700px;
-    }
-
-    /* Câmera: Botões de Ação horizontal na galeria */
-    .action-buttons {
-        flex-direction: row; 
+    /* Notification Board maior em desktop grande */
+    .notification-board {
+        flex-direction: row;
+        max-width: 100%;
+        gap: 12px;
         justify-content: center;
-        max-width: 480px;
-        margin: 10px auto;
     }
-    
-    .action-btn {
-        max-width: 220px;
+
+    .notification-item {
+        flex: 1;
+        max-width: 280px;
+        padding: 16px 20px;
+        min-height: 70px;
     }
-    
-    /* Câmera: Botão de abrir centralizado no desktop */
-    .start-camera-section {
-        min-height: 400px; 
+
+    .notification-divider {
+        display: none;
     }
-    
-    .gallery {
-        max-width: 800px;
-        margin: 20px auto;
-        padding: 20px;
+
+    .notification-label {
+        font-size: 0.85rem;
+    }
+
+    .dia-rotulo {
+        font-size: 1rem;
+    }
+
+    .timer-label {
+        font-size: 0.75rem;
+    }
+
+    .timer {
+        font-size: 1.3rem;
     }
 }
 
@@ -911,49 +1102,173 @@ hr {
 /* Garante que o header seja a referência de posição */
 #cabecalho-principal {
     position: relative; 
-    padding-right: 120px; /* Abre espaço para o relógio em telas menores */
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
 
-.status-card-header {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: rgba(255, 255, 255, 0.15); /* Fundo leve para combinar com o header */
-    backdrop-filter: blur(5px); /* Efeito moderno de vidro */
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
+/* Quadro de Avisos Moderno - Base para Mobile */
+.notification-board {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 0 8px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+
+.notification-item {
+    flex: 1;
+    min-width: 140px;
+    max-width: calc(50% - 4px);
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    min-width: 100px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    min-height: 55px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.notification-divider {
+    display: none;
+}
+
+.notification-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    opacity: 0.8;
+    letter-spacing: 0.3px;
+    margin-bottom: 3px;
+}
+
+.notification-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
 .dia-rotulo {
     font-weight: bold;
     font-size: 0.75rem;
     text-transform: uppercase;
-    color: #ffcc00; /* Destaque para o Hoje/Amanhã */
+    color: #ffcc00;
 }
 
-.info-envio {
-    font-size: 0.7rem;
+.timer-label {
+    font-size: 0.55rem;
     opacity: 0.9;
 }
 
 .timer {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: bold;
-    font-family: 'Courier New', Courier, monospace; /* Fonte mono para os números não pularem */
+    font-family: 'Courier New', Courier, monospace;
+    color: #ffff00;
+    letter-spacing: 1px;
 }
 
 /* Ajuste para celulares */
 @media (max-width: 600px) {
-    .status-card-header {
-        top: 5px;
-        right: 5px;
-        padding: 5px;
+    header {
+        padding: 8px 0 6px;
     }
-    .timer { font-size: 0.9rem; }
+
+    .logo-placeholder {
+        margin-bottom: 2px;
+    }
+
+    .logo-placeholder img {
+        max-width: 60px;
+    }
+
+    header h1 {
+        font-size: 1.2rem;
+        line-height: 1.1;
+    }
+
+    header p {
+        font-size: 0.7rem;
+        margin-top: 1px;
+    }
+
+    #cabecalho-principal {
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+
+    .notification-board {
+        gap: 6px;
+        padding: 0 6px;
+        margin-top: 10px;
+        flex-direction: row;
+        display: flex;
+        justify-content: space-between;
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+    
+    .notification-item {
+        flex: 1;
+        min-width: 135px;
+        max-width: calc(50% - 3px);
+        padding: 8px 10px;
+        margin-bottom: 0;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        min-height: 50px;
+    }
+    
+    .notification-divider {
+        display: none;
+    }
+    
+    .notification-label {
+        font-size: 0.55rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        opacity: 0.8;
+        letter-spacing: 0.2px;
+        margin-bottom: 2px;
+    }
+    
+    .notification-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .dia-rotulo {
+        font-weight: bold;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        color: #ffcc00;
+    }
+    
+    .timer-label {
+        font-size: 0.5rem;
+        opacity: 0.9;
+    }
+    
+    .timer {
+        font-size: 0.8rem;
+        font-weight: bold;
+        font-family: 'Courier New', Courier, monospace;
+        color: #ffff00;
+    }
 }
 /* Botão de Atualizar */
 .btn-refresh {

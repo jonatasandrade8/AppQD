@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./style.css"> 
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> 
-    
 </head>
 <body class="camera-page">
     
@@ -21,31 +18,47 @@
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
         <a href="relatorio.html" class="active"><i class="fas fa-file-alt"></i> Relatório de Qualidade</a>
+        <a href="materiais.html"><i class="fas fa-download"></i> Materiais</a>
     </aside>
 
     <header id="cabecalho-principal">
         <button class="menu-toggle" aria-label="Abrir Menu">
             <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
         </button>
         <div class="logo-placeholder">
             <img src="./images/logo-qdelicia.png" alt="Logo Qdelícia Frutas">
         </div>
         <h1>Relatório de Qualidade</h1>
         <p>Registro de Ocorrências (Devolução / Qualidade)</p>
-        <div id="status-envio" class="status-card-header">
-        <div id="dia-rotulo" class="dia-rotulo">---</div>
-        <div class="info-envio">Estoque</div>
-        <div class="info-envio">Envio às 14:00</div>
-        <div id="contagem-regressiva" class="timer">00:00:00</div>
-    </div>
+        <div id="status-envio" class="notification-board">
+            <div class="notification-item">
+                <div class="notification-label">Estoque</div>
+                <div class="notification-content">
+                    <div id="dia-rotulo" class="dia-rotulo">---</div>
+                    <div class="timer-label">Envio até às 14:00</div>
+                    <div id="contagem-regressiva" class="timer">00:00:00</div>
+                </div>
+            </div>
+            <div class="notification-divider"></div>
+            <div class="notification-item">
+                <div class="notification-label">Caixas Secas</div>
+                <div class="notification-content">
+                    <div id="caixas-rotulo" class="dia-rotulo">---</div>
+                    <div class="timer-label">Próximo envio</div>
+                    <div id="timer-caixas" class="timer">00:00:00</div>
+                </div>
+            </div>
+        </div>
     </header>
 
     <nav>
         <a href="index.html">Início</a>
-        <a href="estoque.html" class="active">Estoque</a>
+        <a href="estoque.html">Estoque</a>
         <a href="caixas.html">Caixas</a>
         <a href="camera.html">Câmera</a>
-        <a href="relatorio.html">Relatório/Qualidade</a>
+        <a href="relatorio.html" class="active">Relatório/Qualidade</a>
+        <a href="materiais.html">Materiais</a>
         
         
     </nav>
@@ -56,6 +69,17 @@
             <button class="report-btn clear-btn" id="clear-report-btn" style="background-color: #dc3545; margin-bottom: 20px;">
                 <i class="fas fa-eraser"></i> Limpar Relatório
             </button>
+            <div class="input-group">
+                <label for="select-estado"><i class="fas fa-map-marker-alt"></i> Estado</label>
+                <select id="select-estado" required>
+                    <option value="" disabled selected>Selecione um Estado</option>
+                    <option value="RN">Rio Grande do Norte</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="AL">Alagoas</option>
+                    <option value="PB">Paraíba</option>
+                </select>
+            </div>
+
             <div class="input-group">
                 <label for="select-report-type"><i class="fas fa-file-alt"></i> Selecione o Tipo de Relatório</label>
                 <select id="select-report-type" required>
@@ -195,8 +219,29 @@
         <i class="fas fa-arrow-up"></i>
     </div>
     <script src="./script.js"></script>
+    <script src="./localizacao.js"></script>
     <script src="./relatorio.js"></script>
-    <script src="alert.js"></script>
     
+    <!-- Carregar scripts de PDF e Canvas de forma assíncrona para não bloquear renderização -->
+    <script>
+        // Carregar jsPDF e html2canvas quando necessário (lazy loading)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Criar loader para scripts pesados
+            var jspdfScript = document.createElement('script');
+            jspdfScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            jspdfScript.async = true;
+            
+            var html2canvasScript = document.createElement('script');
+            html2canvasScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            html2canvasScript.async = true;
+            
+            // Adicionar com delay para não impactar renderização inicial
+            setTimeout(function() {
+                document.head.appendChild(jspdfScript);
+                document.head.appendChild(html2canvasScript);
+            }, 2000);
+        });
+    </script>
+    <script src="auth.js"></script>
 </body>
 </html>

@@ -18,112 +18,158 @@
 
     <link rel="stylesheet" href="style.css">
 
-
-
     <style>
-
-        /* Estilos para o Toggle Switch */
-
-        .alert-toggle-container {
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-            gap: 15px;
-
-            margin-bottom: 20px;
-
-        }
-
-        .switch {
-
-            position: relative;
-
-            display: inline-block;
-
-            width: 60px;
-
-            height: 34px;
-
-        }
-
-        .switch input {
-
-            opacity: 0;
-
-            width: 0;
-
-            height: 0;
-
-        }
-
-        .slider {
-
-            position: absolute;
-
-            cursor: pointer;
-
+        /* ===================== MODAL DE AUTENTICAÇÃO ===================== */
+        .auth-overlay {
+            position: fixed;
             top: 0;
-
             left: 0;
-
-            right: 0;
-
-            bottom: 0;
-
-            background-color: #ccc; /* Cor quando desligado */
-
-            transition: .4s;
-
-            border-radius: 34px;
-
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(3px);
         }
 
-        .slider:before {
+        .auth-overlay.hidden {
+            display: none;
+        }
 
-            position: absolute;
+        .auth-modal {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
 
-            content: "";
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-            height: 26px;
-
-            width: 26px;
-
-            left: 4px;
-
-            bottom: 4px;
-
-            background-color: white;
-
-            transition: .4s;
-
+        .auth-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
         }
 
-        input:checked + .slider {
-
-            background-color: #4CAF50; /* Cor verde quando ligado */
-
+        .auth-modal h2 {
+            color: var(--white);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
         }
 
-        input:checked + .slider:before {
-
-            transform: translateX(26px);
-
+        .auth-modal p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            font-size: 0.95rem;
         }
 
-        input:disabled + .slider {
-
-            background-color: #f44336; /* Cor vermelha para bloqueado */
-
-            cursor: not-allowed;
-
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
+        .auth-input {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--dark-bg);
+            transition: all 0.3s ease;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            background: var(--white);
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+        }
+
+        .auth-input::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent-color);
+            color: var(--dark-bg);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .auth-btn:hover {
+            background: #ffdd33;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+        }
+
+        .auth-btn:active {
+            transform: translateY(0);
+        }
+
+        .auth-error {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+            animation: shake 0.3s ease;
+        }
+
+        .auth-error.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .auth-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            margin-top: 20px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .auth-info strong {
+            color: var(--accent-color);
+        }
+
+        /* Blur das páginas quando modal está ativo */
+        body.auth-active {
+            overflow: hidden;
+        }
     </style>
 
     </head>
@@ -134,7 +180,35 @@
 
 <body>
 
-    
+    <!-- ============= MODAL DE AUTENTICAÇÃO ============= -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-modal">
+            <div class="auth-logo">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h1>Bem vindo à Área do Promotor Qdelícia Frutas</h1>
+            <h2>Acesso Seguro</h2>
+            <p>Digite a senha para acessar o sistema</p>
+            
+            <form class="auth-form" id="authForm">
+                <input 
+                    type="password" 
+                    class="auth-input" 
+                    id="authPassword" 
+                    placeholder="Senha"
+                    autocomplete="off"
+                >
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-unlock"></i> Acessar
+                </button>
+                <div class="auth-error" id="authError"></div>
+            </form>
+
+            <div class="auth-info">
+                <strong>💡 Dica:</strong> Digite a senha para liberar o acesso a todas as funcionalidades do sistema.
+            </div>
+        </div>
+    </div>
 
     <div class="menu-overlay"></div>
 
@@ -150,6 +224,8 @@
 
         <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
 
+        <a href="materiais.html"><i class="fas fa-download"></i> Materiais</a>
+
         
 
     </aside>
@@ -159,6 +235,7 @@
         <button class="menu-toggle" aria-label="Abrir Menu">
 
             <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
 
         </button>
 
@@ -172,17 +249,25 @@
 
         <p>Página Inicial</p>
 
-        <div id="status-envio" class="status-card-header">
-
-        <div id="dia-rotulo" class="dia-rotulo">---</div>
-
-        <div class="info-envio">Estoque</div>
-
-        <div class="info-envio">Envio até às 14:00</div>
-
-        <div id="contagem-regressiva" class="timer">00:00:00</div>
-
-    </div>
+        <div id="status-envio" class="notification-board">
+            <div class="notification-item">
+                <div class="notification-label">Estoque</div>
+                <div class="notification-content">
+                    <div id="dia-rotulo" class="dia-rotulo">---</div>
+                    <div class="timer-label">Envio até às 14:00</div>
+                    <div id="contagem-regressiva" class="timer">00:00:00</div>
+                </div>
+            </div>
+            <div class="notification-divider"></div>
+            <div class="notification-item">
+                <div class="notification-label">Caixas Secas</div>
+                <div class="notification-content">
+                    <div id="caixas-rotulo" class="dia-rotulo">---</div>
+                    <div class="timer-label">Próximo envio</div>
+                    <div id="timer-caixas" class="timer">00:00:00</div>
+                </div>
+            </div>
+        </div>
 
     </header>
 
@@ -199,6 +284,8 @@
         <a href="camera.html">Câmera</a>
 
         <a href="relatorio.html">Relatório/Qualidade</a>
+
+        <a href="materiais.html">Materiais</a>
 
         
 
@@ -270,17 +357,19 @@
 
             <h2>Nossa rotina diária:</h2>
 
-            <ul>
+            <ol>
 
-                <li>Manter pontos de venda sempre limpos e organizados;</li>
+                <section><li>Checar Estoque e Bancadas, Caso Esteja Zerado Repassar a Informação Imediatamente Para a Gestão;</li></section>
+                <section><li>Realizar Abastecimento;</li></section>
+                <section><li>Registrar e Compartilhar Fotos no Grupo Por Meio do App;</li></section>
+                <section><li>As Fotos das Bancadas Precisam ser Registradas em 3 Momentos: No 1º Abastecimento, Antes do almoço e Antes de Finalizar a Jornada;</li></section>
+                <section><li>Realizar o Registro do Estoque Diário Pelo App;</li></section>
+                <section><li>Realizar a Organização das Caixas 'G' em Blocos de 3 para agilizar o recolhimento; </li></section>
+                <section><li>Registrar e Compartilhar a Foto das Caixas Secas no Grupo Via App;</li></section>
 
-                <li>Manter boa comunicação com líderes e equipe;</li>
+                
 
-                <li>Estar atento aos canais de comunicação;</li>
-
-                <li>Informar diariamente informações da loja como: estoques, avarias, qualidade...</li>
-
-            </ul>
+            </ol>
 
         </section>
 
@@ -476,6 +565,85 @@
 
     <script src="script.js"></script>
 
-    <script src="alert.js"></script> </body>
+    <script src="alert.js"></script>
+
+    <script src="auth.js"></script>
+
+    <!-- Script de Inicialização da Autenticação -->
+    <script>
+        // ===================== CONFIGURAÇÃO DE AUTENTICAÇÃO =====================
+        // ALTERE ESTA SENHA CONFORME NECESSÁRIO
+        const AUTH_PASSWORD = 'promotores2026'; // Mude para a senha desejada
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const authOverlay = document.getElementById('authOverlay');
+            const authForm = document.getElementById('authForm');
+            const authPassword = document.getElementById('authPassword');
+            const authError = document.getElementById('authError');
+
+            // Se já está autenticado, esconde o modal
+            if (isAuthenticated()) {
+                authOverlay.classList.add('hidden');
+                document.body.classList.remove('auth-active');
+            } else {
+                // Se não está autenticado, exibe o modal
+                document.body.classList.add('auth-active');
+                authPassword.focus();
+            }
+
+            // Submissão do formulário
+            authForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const enteredPassword = authPassword.value.trim();
+
+                if (enteredPassword === AUTH_PASSWORD) {
+                    // Senha correta
+                    authError.classList.remove('show');
+                    setAuthenticated();
+                    
+                    // Anima o fechamento do modal
+                    authOverlay.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => {
+                        authOverlay.classList.add('hidden');
+                        document.body.classList.remove('auth-active');
+                    }, 300);
+                } else {
+                    // Senha incorreta
+                    authError.textContent = '❌ Senha incorreta! Tente novamente.';
+                    authError.classList.add('show');
+                    authPassword.value = '';
+                    authPassword.focus();
+                }
+            });
+
+            // Previne que o usuário clique fora do modal para fechar
+            authOverlay.addEventListener('click', function(e) {
+                if (e.target === authOverlay) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Adicionar animação de fadeOut ao CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from {
+                    opacity: 1;
+                }
+                to {
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Botão de logout (opcional - você pode adicionar em outro lugar)
+        window.logout = function() {
+            clearAuthentication();
+            window.location.href = 'index.html';
+        };
+    </script> </body>
 
 </html>

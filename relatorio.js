@@ -1,62 +1,60 @@
-// ==================== ESTRUTURA DE DADOS PARA DROPDOWNS (PROMOTORES/REDES) ====================
-// RESTAURADO: A lista de promotores e lojas foi restaurada para a versão anterior.
+// ==================== ESTRUTURA DE DADOS PARA DROPDOWNS ====================
+// Hierarquia: Estado -> Rede -> Promotor -> Lojas
 const APP_DATA = {
-    "Miqueias": {
-        "Assaí": ["Ponta Negra"],
+    "RN": {
+        "Atacadão": {
+            "Vivian": ["BR - Zona Sul"],
+            "Nilson": ["Parnamirim"],
+            "Inácio": ["Prudente"],
+            "Amarildo": ["Zona Norte"]
+        },
+        "Assaí": {
+            "Reginaldo": ["Zona Sul"],
+            "Erivan": ["Maria Lacerda"],
+            "Miqueias": ["Ponta Negra"],
+            "Cosme": ["Zona Norte"]
+        },
+        "Nordestão": {
+            "J Mauricio": ["Loja 03"],
+            "Mateus": ["Loja 04"],
+            "Amarildo": ["Loja 05"],
+            "Cristiane": ["Loja 07"],
+            "Markson": ["Loja 08"]
+        },
+        "Carrefour": {
+            "Mateus": ["Zona Sul"]
+        },
+        "Superfácil": {
+            "Neto": ["Emaús"],
+            "David": ["Nazaré"]
+        },
+        "Mar Vermelho": {
+            "Markson": ["Natal", "Parnamirim"]
+        }
     },
-    "Cosme": {
-        "Assaí": ["Zona Norte"],
+    "PE": {
+        "Rede A": {
+            "Promotor A": ["Loja A"]
+        },
+        "Rede B": {
+            "Promotor B": ["Loja B"]
+        }
     },
-    
-    "Erivan": {
-        "Assaí": ["Maria Lacerda"],
-    
+    "AL": {
+        "Rede C": {
+            "Promotor C": ["Loja C"]
+        },
+        "Rede D": {
+            "Promotor D": ["Loja D"]
+        }
     },
-    "Reginaldo": {
-        "Assaí": ["Zona Sul"],
-
-    },
-    "Inacio": {
-        "Atacadão": ["Prudente"],
-
-    },
-    "Vivian": {
-        "Atacadão": ["BR-101 Sul"],
-
-    },
-    "Amarildo": {
-        "Atacadão": ["Zona Norte"],
-        "Nordestão": ["Loja 05"]
-    },
-    "Nilson": {
-        "Atacadão": ["Parnamirim"],
-
-    },
-    "Markson": {
-         "Nordestão": ["Loja 08"],
-        "Mar Vermelho": ["Natal", "Parnamirim"]
-        
-    },
-    
-    "Mateus": {
-        "Nordestão": ["Loja 04"],
-        "Carrefour": ["Zona Sul"]
-    },
-    "Cristiane": {
-        "Nordestão": ["Loja 07"],
-
-    },
-    "J Mauricio": {
-        "Nordestão": ["Loja 03"],
-
-    },
-    "Neto": {
-        "Superfácil": ["Emaús"],
-
-    },
-    "Antonio": {
-        "Superfácil": ["Nazaré"],
-
+    "PB": {
+        "Rede F": {
+            "Promotor F": ["Loja F"]
+        },
+        "Rede G": {
+            "Promotor G": ["Loja G"]
+        }
     }
 };
 
@@ -87,48 +85,6 @@ const RELATORIO_DATA = {
 };
 
 
-// ================= MENU HAMBÚRGUER e VOLTAR AO TOPO =================
-// (Restante do código JS mantido)
-const menuToggle = document.querySelector('.menu-toggle');
-const sideMenu = document.querySelector('.side-menu');
-const menuOverlay = document.querySelector('.menu-overlay');
-
-if (menuToggle && sideMenu && menuOverlay) {
-    menuToggle.addEventListener('click', () => {
-        sideMenu.classList.toggle('active');
-        menuOverlay.classList.toggle('active');
-    });
-
-    menuOverlay.addEventListener('click', () => {
-        sideMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-    
-    sideMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            sideMenu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
-    });
-}
-
-const backToTop = document.querySelector('.back-to-top');
-
-if (backToTop) {
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
-            backToTop.classList.add('show');
-        } else {
-            backToTop.classList.remove('show');
-        }
-    });
-
-    backToTop.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-}
-
-
 // ==================== FUNCIONALIDADES DA CÂMERA E VÍDEO (DEVOLUÇÃO) ====================
 
 // Elementos da Interface (Comuns)
@@ -145,6 +101,7 @@ const photoCountElement = document.getElementById('photo-count');
 const dateTimeElement = document.getElementById('date-time'); // Adicionado para marca d'água de data/hora
 
 // Elementos para Marca D'água (Base)
+const selectEstado = document.getElementById('select-estado'); // NOVO: Estado
 const selectReportType = document.getElementById('select-report-type'); // NOVO: Tipo de Relatório
 const selectPromotor = document.getElementById('select-promotor'); 
 const selectRede = document.getElementById('select-rede'); 
@@ -182,6 +139,7 @@ logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca.
  */
 function saveSelection() {
     const selection = {
+        estado: selectEstado.value,
         // reportType: selectReportType.value, // Persistência removida
         promotor: selectPromotor.value,
         rede: selectRede.value,
@@ -212,15 +170,17 @@ function populateSelect(selectElement, data, placeholder) {
 }
 
 /**
- * @description Preenche as opções de Rede com base no Promotor selecionado.
+ * @description Preenche as opções de Rede com base no Estado selecionado.
  */
-function populateRede(promotor) {
+function populateRede(estado) {
     selectRede.innerHTML = '<option value="" disabled selected>Selecione a Rede</option>';
+    selectPromotor.innerHTML = '<option value="" disabled selected>Selecione na lista</option>';
     selectLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
+    selectPromotor.disabled = true;
     selectLoja.disabled = true;
 
-    if (promotor && APP_DATA[promotor]) {
-        Object.keys(APP_DATA[promotor]).forEach(rede => {
+    if (estado && APP_DATA[estado]) {
+        Object.keys(APP_DATA[estado]).forEach(rede => {
             const option = document.createElement('option');
             option.value = rede;
             option.textContent = rede;
@@ -233,13 +193,34 @@ function populateRede(promotor) {
 }
 
 /**
- * @description Preenche as opções de Loja com base na Rede e Promotor selecionados.
+ * @description Preenche as opções de Promotor com base no Estado e Rede selecionados.
  */
-function populateLoja(promotor, rede) {
+function populatePromotor(estado, rede) {
+    selectPromotor.innerHTML = '<option value="" disabled selected>Selecione na lista</option>';
+    selectLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
+    selectLoja.disabled = true;
+
+    if (estado && rede && APP_DATA[estado] && APP_DATA[estado][rede]) {
+        Object.keys(APP_DATA[estado][rede]).forEach(promotor => {
+            const option = document.createElement('option');
+            option.value = promotor;
+            option.textContent = promotor;
+            selectPromotor.appendChild(option);
+        });
+        selectPromotor.disabled = false;
+    } else {
+        selectPromotor.disabled = true;
+    }
+}
+
+/**
+ * @description Preenche as opções de Loja com base no Estado, Rede e Promotor selecionados.
+ */
+function populateLoja(estado, rede, promotor) {
     selectLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
 
-    if (promotor && rede && APP_DATA[promotor] && APP_DATA[promotor][rede]) {
-        APP_DATA[promotor][rede].forEach(loja => {
+    if (estado && rede && promotor && APP_DATA[estado] && APP_DATA[estado][rede] && APP_DATA[estado][rede][promotor]) {
+        APP_DATA[estado][rede][promotor].forEach(loja => {
             const option = document.createElement('option');
             option.value = loja;
             option.textContent = loja;
@@ -253,48 +234,40 @@ function populateLoja(promotor, rede) {
 
 /**
  * @description Carrega as seleções do localStorage e preenche os dropdowns.
- * (MODIFICADO: 'reportType' e 'observacoes' removidos do carregamento)
  */
 function loadAndPopulateDropdowns() {
-    // --- Lógica de Promotor/Rede/Loja ---
-    Object.keys(APP_DATA).forEach(promotor => {
-        if (!selectPromotor) return;
+    const savedSelection = JSON.parse(localStorage.getItem(localStorageKey)) || {};
+
+    // 1. Preenche os ESTADOS
+    if (!selectEstado) return;
+    selectEstado.innerHTML = '<option value="" disabled selected>Selecione o Estado</option>';
+    Object.keys(APP_DATA).forEach(estado => {
         const option = document.createElement('option');
-        option.value = promotor;
-        option.textContent = promotor;
-        selectPromotor.appendChild(option);
+        option.value = estado;
+        option.textContent = estado;
+        selectEstado.appendChild(option);
     });
+    if (savedSelection.estado) {
+        selectEstado.value = savedSelection.estado;
+    }
 
-    const savedSelection = JSON.parse(localStorage.getItem(localStorageKey));
-
-    if (savedSelection && savedSelection.promotor) {
-        selectPromotor.value = savedSelection.promotor;
-        // Preenche a Rede baseada no Promotor salvo
-        populateRede(savedSelection.promotor);
+    // 2. Preenche as REDES baseado no Estado selecionado
+    populateRede(savedSelection.estado || '');
+    if (savedSelection.rede) {
         selectRede.value = savedSelection.rede;
-        // Preenche a Loja baseada na Rede salva
-        if (savedSelection.rede) {
-            populateLoja(savedSelection.promotor, savedSelection.rede);
-            selectLoja.value = savedSelection.loja;
+        populatePromotor(savedSelection.estado, savedSelection.rede);
+        if (savedSelection.promotor) {
+            selectPromotor.value = savedSelection.promotor;
+            populateLoja(savedSelection.estado, savedSelection.rede, savedSelection.promotor);
+            if (savedSelection.loja) {
+                selectLoja.value = savedSelection.loja;
+            }
         }
     }
-    
-    // --- Lógica de Tipo de Relatório ---
-    /*
-    if (selectReportType && savedSelection && savedSelection.reportType) {
-        selectReportType.value = savedSelection.reportType;
-    }
-    */ // Persistência removida
     
     // --- Lógica de Motivo/Produto/Observações ---
     populateSelect(selectMotivo, RELATORIO_DATA.MOTIVOS_DEVOLUCAO, "Selecione o Motivo");
     populateSelect(selectProduto, RELATORIO_DATA.TIPOS_PRODUTO, "Selecione o Produto");
-
-    /*
-    if (savedSelection && inputObservacoes && savedSelection.observacoes) {
-        inputObservacoes.value = savedSelection.observacoes; 
-    }
-    */ // Persistência removida
     
     checkCameraAccess();
 }
@@ -391,13 +364,14 @@ function clearReportData() {
  * @returns {boolean} True se estiver pronto para abrir a câmera ou gerar PDF.
  */
 function checkCameraAccess() {
+    const isEstadoSelected = selectEstado && selectEstado.value !== "";
     const isReportTypeSelected = selectReportType && selectReportType.value !== "";
     const isPromotorSelected = selectPromotor && selectPromotor.value !== "";
     const isRedeSelected = selectRede && selectRede.value !== "";
     const isLojaSelected = selectLoja && selectLoja.value !== "";
     const hasItems = items.length > 0;
     
-    const isReady = isReportTypeSelected && isPromotorSelected && isRedeSelected && isLojaSelected && hasItems;
+    const isReady = isEstadoSelected && isReportTypeSelected && isPromotorSelected && isRedeSelected && isLojaSelected && hasItems;
     
     if (openCameraBtn) {
         if (isReady) {
@@ -809,20 +783,26 @@ async function generatePDFReport(action) {
 // ==================== EVENT LISTENERS ====================
 
 // Listeners para os Dropdowns
-if (selectReportType) {
-    selectReportType.addEventListener('change', saveSelection);
-}
-if (selectPromotor) {
-    selectPromotor.addEventListener('change', () => {
-        populateRede(selectPromotor.value);
+if (selectEstado) {
+    selectEstado.addEventListener('change', () => {
+        populateRede(selectEstado.value);
         saveSelection();
     });
 }
 if (selectRede) {
     selectRede.addEventListener('change', () => {
-        populateLoja(selectPromotor.value, selectRede.value);
+        populatePromotor(selectEstado.value, selectRede.value);
         saveSelection();
     });
+}
+if (selectPromotor) {
+    selectPromotor.addEventListener('change', () => {
+        populateLoja(selectEstado.value, selectRede.value, selectPromotor.value);
+        saveSelection();
+    });
+}
+if (selectReportType) {
+    selectReportType.addEventListener('change', saveSelection);
 }
 if (selectLoja) {
     selectLoja.addEventListener('change', saveSelection);

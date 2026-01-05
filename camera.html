@@ -159,6 +159,7 @@
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="camera.html" class="active"><i class="fas fa-camera"></i> Câmera</a>
         <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
+        <a href="materiais.html"><i class="fas fa-download"></i> Materiais</a>
         
     </aside>
 
@@ -171,12 +172,25 @@
         </div>
         <h1>Qdelícia Frutas</h1>
         <p>Câmera para Registros</p>
-        <div id="status-envio" class="status-card-header">
-        <div id="dia-rotulo" class="dia-rotulo">---</div>
-        <div class="info-envio">Estoque</div>
-        <div class="info-envio">Envio até às 14:00</div>
-        <div id="contagem-regressiva" class="timer">00:00:00</div>
-    </div>
+        <div id="status-envio" class="notification-board">
+            <div class="notification-item">
+                <div class="notification-label">Estoque</div>
+                <div class="notification-content">
+                    <div id="dia-rotulo" class="dia-rotulo">---</div>
+                    <div class="timer-label">Envio até às 14:00</div>
+                    <div id="contagem-regressiva" class="timer">00:00:00</div>
+                </div>
+            </div>
+            <div class="notification-divider"></div>
+            <div class="notification-item">
+                <div class="notification-label">Caixas Secas</div>
+                <div class="notification-content">
+                    <div id="caixas-rotulo" class="dia-rotulo">---</div>
+                    <div class="timer-label">Próximo envio</div>
+                    <div id="timer-caixas" class="timer">00:00:00</div>
+                </div>
+            </div>
+        </div>
     </header>
     
     <nav>
@@ -185,6 +199,7 @@
         <a href="caixas.html">Caixas</a>
         <a href="camera.html" class="active">Câmera</a>
         <a href="relatorio.html">Relatório/Qualidade</a>
+        <a href="materiais.html">Materiais</a>
         
     </nav>
     
@@ -193,6 +208,17 @@
         <section class="watermark-settings">
             <h2>Informações da Foto</h2>
             <p>Para Melhor Qualidade Ative a Rotação Automática do Dispositivo</p>
+            
+            <div class="input-group">
+                <label for="select-estado"><i class="fas fa-map-marker-alt"></i> Estado</label>
+                <select id="select-estado" required>
+                    <option value="" disabled selected>Selecione um Estado</option>
+                    <option value="RN">Rio Grande do Norte</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="AL">Alagoas</option>
+                    <option value="PB">Paraíba</option>
+                </select>
+            </div>
             
             <div class="input-group">
                 <label for="select-tipo-foto"><i class="fas fa-tags"></i> Tipo de Foto</label>
@@ -306,7 +332,9 @@
     </div>
     
     <script src="script.js"></script>
+    <script src="localizacao.js"></script>
     <script src="camera.js"></script>
     <script src="alert.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>

@@ -20,11 +20,13 @@
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
         <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
+        <a href="materiais.html"><i class="fas fa-download"></i> Materiais</a>
         
     </aside>
    <header id="cabecalho-principal">
     <button class="menu-toggle" aria-label="Abrir Menu">
         <i class="fas fa-bars"></i>
+        <span class="menu-label">Menu</span>
     </button>
     <div class="logo-placeholder">
         <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
@@ -36,11 +38,24 @@
         <i class="fas fa-sync-alt"></i> Atualizar Página
     </button>
 
-    <div id="status-envio" class="status-card-header">
-        <div id="dia-rotulo" class="dia-rotulo">---</div>
-        <div class="info-envio">Estoque</div>
-        <div class="info-envio">Envio até às 14:00</div>
-        <div id="contagem-regressiva" class="timer">00:00:00</div>
+    <div id="status-envio" class="notification-board">
+        <div class="notification-item">
+            <div class="notification-label">Estoque</div>
+            <div class="notification-content">
+                <div id="dia-rotulo" class="dia-rotulo">---</div>
+                <div class="timer-label">Envio até às 14:00</div>
+                <div id="contagem-regressiva" class="timer">00:00:00</div>
+            </div>
+        </div>
+        <div class="notification-divider"></div>
+        <div class="notification-item">
+            <div class="notification-label">Caixas Secas</div>
+            <div class="notification-content">
+                <div id="caixas-rotulo" class="dia-rotulo">---</div>
+                <div class="timer-label">Próximo envio</div>
+                <div id="timer-caixas" class="timer">00:00:00</div>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -50,6 +65,7 @@
         <a href="caixas.html">Caixas</a>
         <a href="camera.html">Câmera</a>
         <a href="relatorio.html">Relatório/Qualidade</a>
+        <a href="materiais.html">Materiais</a>
         
         
     </nav>
@@ -72,5 +88,6 @@
 
     <script src="script.js"></script>
     <script src="alert.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>
