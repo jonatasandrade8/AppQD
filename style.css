@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. RESET E VARIÁVEIS GLOBAIS
+   1. RESET, VARIÁVEIS E CONFIGURAÇÕES GLOBAIS
    ========================================================================== */
 * {
     margin: 0;
@@ -35,35 +35,38 @@ body {
     background-color: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.6;
-    font-size: 14px; /* Tamanho base Mobile */
+    font-size: 14px; /* Mobile First: Fonte base menor */
 }
 
 /* ==========================================================================
-   2. CABEÇALHO (MOBILE FIRST LAYOUT)
+   2. CABEÇALHO (AJUSTADO PARA NÃO SOBREPOR)
    ========================================================================== */
 
 header {
     background: var(--gradient);
     color: var(--white);
     text-align: center;
-    /* Flexbox vertical para mobile: garante que elementos não colidam */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 10px;
-    min-height: 160px; /* Altura mínima para caber Menu + Timer + Logo */
     position: relative;
     box-shadow: 0 2px 10px var(--shadow);
     z-index: 50;
+    
+    /* Flexbox vertical: Organiza os elementos um embaixo do outro */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 15px;
+    min-height: 160px; /* Garante altura para caber tudo */
 }
 
-/* Container da Logo */
+/* ÁREA DA LOGO:
+   Adicionei margin-top para empurrar a logo para baixo da linha 
+   onde ficam o Botão Menu e o Timer. Assim nada fica encavalado.
+*/
 .logo-placeholder {
-    /* Empurra a logo para baixo da linha do Menu/Timer no mobile */
-    margin-top: 50px; 
+    margin-top: 55px; /* Espaço para o Timer/Menu que estão no topo (absolute) */
     margin-bottom: 5px;
     transition: margin 0.3s ease;
+    z-index: 1;
 }
 
 .logo-placeholder img {
@@ -80,6 +83,7 @@ header h1 {
     line-height: 1.2;
     font-weight: 700;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    padding: 0 10px;
 }
 
 header p {
@@ -93,7 +97,7 @@ header p {
    3. NAVEGAÇÃO E MENU (MOBILE)
    ========================================================================== */
 
-/* Botão Hamburguer (Só aparece no mobile) */
+/* Botão Hamburguer (Fixo no canto superior esquerdo) */
 .menu-toggle {
     display: flex;
     align-items: center;
@@ -107,7 +111,7 @@ header p {
     color: var(--white);
     font-size: 1.2rem;
     cursor: pointer;
-    z-index: 101;
+    z-index: 101; /* Acima de tudo */
     width: 42px;
     height: 42px;
     backdrop-filter: blur(4px);
@@ -119,11 +123,11 @@ header p {
     transform: scale(0.95);
 }
 
-/* Menu Lateral (Off-canvas) */
+/* Menu Lateral (Slide-in) */
 .side-menu {
     position: fixed;
     top: 0;
-    left: -280px; /* Escondido à esquerda */
+    left: -280px; /* Escondido */
     width: 280px;
     height: 100%;
     background-color: var(--text-dark);
@@ -164,7 +168,7 @@ header p {
 
 .side-menu a.active i { color: var(--accent-color); }
 
-/* Overlay Escuro quando menu abre */
+/* Fundo escuro ao abrir menu */
 .menu-overlay {
     position: fixed;
     top: 0;
@@ -178,15 +182,16 @@ header p {
 }
 .menu-overlay.active { display: block; }
 
-/* Navegação Desktop (Escondida por padrão no mobile) */
+/* Navegação Desktop (Invisível no celular) */
 nav.desktop-nav {
     display: none; 
 }
 
 /* ==========================================================================
-   4. TIMER DUPLO (DESIGN GLASSMORPHISM)
+   4. TIMER DUPLO (DESIGN DE VIDRO)
    ========================================================================== */
 
+/* Container do Timer (Fixo no canto superior direito) */
 .status-card-header {
     position: absolute;
     top: 15px;
@@ -195,13 +200,13 @@ nav.desktop-nav {
     flex-direction: column;
     justify-content: center;
     
-    /* Estilo Vidro */
-    padding: 8px 12px;
-    background-color: rgba(0, 0, 0, 0.3);
+    /* Design Glassmorphism */
+    padding: 6px 10px;
+    background-color: rgba(0, 0, 0, 0.25);
     border-radius: 8px;
-    min-width: 140px;
+    min-width: 130px;
     backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.15);
     z-index: 50;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
@@ -248,11 +253,11 @@ nav.desktop-nav {
 .timer-separator {
     height: 1px;
     background-color: rgba(255, 255, 255, 0.25);
-    margin: 4px 0;
+    margin: 3px 0;
     width: 100%;
 }
 
-/* Animação de Urgência */
+/* Urgência (Pulsar Vermelho) */
 .urgente-text {
     color: #ff4d4d !important;
     text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
@@ -266,7 +271,7 @@ nav.desktop-nav {
 }
 
 /* ==========================================================================
-   5. CONTEÚDO PRINCIPAL E LAYOUT
+   5. ESTRUTURA PRINCIPAL (MAIN & SECTIONS)
    ========================================================================== */
 
 main {
@@ -284,7 +289,7 @@ section {
     text-align: center;
 }
 
-/* Listas */
+/* Listas (Geral) */
 ul {
     text-align: left;
     margin-left: 20px;
@@ -292,8 +297,12 @@ ul {
     display: inline-block;
 }
 
+.missao ul li, section ul li {
+    margin-bottom: 5px;
+}
+
 /* ==========================================================================
-   6. FORMULÁRIOS E INPUTS (PADRONIZADOS)
+   6. FORMULÁRIOS, INPUTS E TOGGLE
    ========================================================================== */
 
 .input-group {
@@ -316,7 +325,7 @@ ul {
     gap: 8px;
 }
 
-/* Estilo unificado para Selects e Inputs */
+/* Estilo unificado para Selects, Inputs e Textareas */
 .input-group select, 
 .input-group .report-input, 
 .input-group .report-textarea {
@@ -334,7 +343,7 @@ ul {
     box-sizing: border-box;
 }
 
-/* Ícone de seta para Select */
+/* Seta do Select */
 .input-group select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%235d3fd3' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E"); 
     background-repeat: no-repeat;
@@ -350,7 +359,6 @@ ul {
     box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.2); 
 }
 
-/* Inputs Desabilitados */
 .input-group select:disabled, 
 .input-group .report-input:disabled {
     background-color: #f0f0f0; 
@@ -365,6 +373,40 @@ hr {
     margin: 20px auto;
     max-width: 90%;
 }
+
+/* --- TOGGLE SWITCH (ALERTAS) --- */
+.alert-toggle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+    position: absolute; cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+.slider:before {
+    position: absolute; content: "";
+    height: 26px; width: 26px;
+    left: 4px; bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider { background-color: #4CAF50; }
+input:checked + .slider:before { transform: translateX(26px); }
+input:disabled + .slider { background-color: #f44336; cursor: not-allowed; }
 
 /* ==========================================================================
    7. CARROSSEL
@@ -387,7 +429,7 @@ hr {
 
 .carousel-slides .slide {
     width: 20%;
-    height: 250px; /* Altura otimizada para mobile */
+    height: 250px; /* Altura mobile */
     object-fit: cover; 
     flex-shrink: 0;
 }
@@ -418,14 +460,16 @@ hr {
 }
 
 /* ==========================================================================
-   8. CÂMERA E GALERIA
+   8. CÂMERA E GALERIA (FUNCIONALIDADE INTEGRAL)
    ========================================================================== */
 
-/* Botão Abrir Câmera */
+.camera-page { padding: 0; background: var(--bg-light); }
+
+/* Botão de Abrir Câmera (Tela inicial da página câmera) */
 #open-camera-btn {
     width: 100%;
     max-width: 300px;
-    margin: 0 auto;
+    margin: 20px auto;
     padding: 15px;
     border-radius: 12px;
     background-color: var(--primary-color);
@@ -450,7 +494,7 @@ hr {
     box-shadow: none;
 }
 
-/* Container Fullscreen da Câmera */
+/* Câmera Fullscreen Overlay */
 .fullscreen-camera-container {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -473,7 +517,7 @@ hr {
 
 #video { width: 100%; height: 100%; object-fit: cover; }
 
-/* Elementos sobre a câmera */
+/* Overlays da Câmera */
 .watermark {
     position: absolute;
     top: 20px; left: 50%;
@@ -484,6 +528,8 @@ hr {
     border-radius: 4px;
     font-size: 0.8rem;
     pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex; gap: 5px; align-items: center;
 }
 
 #photo-count {
@@ -495,9 +541,27 @@ hr {
     border-radius: 15px;
     font-weight: bold;
     font-size: 0.9rem;
+    border: 1px solid white;
 }
 
-/* Controles da Câmera */
+/* Controles Laterais (Zoom, Switch) */
+.camera-controls-right {
+    position: absolute;
+    right: 15px; top: 80px;
+    display: flex; flex-direction: column; gap: 12px;
+    z-index: 20;
+}
+.camera-control-btn {
+    width: 45px; height: 45px;
+    border-radius: 50%; border: none;
+    background: rgba(255,255,255,0.8);
+    color: var(--primary-color);
+    font-size: 1.2rem; cursor: pointer;
+}
+.camera-control-btn.active { background: var(--accent-color); color: #000; }
+.zoom-level { background: rgba(0,0,0,0.5); color: white; padding: 4px; border-radius: 4px; text-align: center; font-size: 0.8rem; }
+
+/* Barra Inferior (Shutter) */
 .controls {
     height: 120px;
     background: rgba(0,0,0,0.8);
@@ -506,6 +570,7 @@ hr {
     align-items: center;
     gap: 30px;
     position: relative;
+    width: 100%;
 }
 
 .btn-circle {
@@ -518,26 +583,33 @@ hr {
 }
 
 #shutter-btn {
-    width: 70px; height: 70px;
-    background: var(--white);
-    border: 4px solid #ccc;
+    width: 75px; height: 75px;
+    background: var(--accent-color);
+    border: 4px solid var(--white);
+    box-shadow: 0 0 0 2px var(--primary-color);
 }
-#shutter-btn:active { background: #eee; border-color: var(--primary-color); }
+#shutter-btn:active { transform: scale(0.95); }
+
+#switch-btn { background: rgba(255,255,255,0.9); color: var(--primary-color); }
 
 #back-to-gallery-btn {
     position: absolute;
-    left: 20px;
+    left: 20px; top: 40px; /* Ajustado para área segura do celular */
     background: transparent;
     color: white;
     font-size: 1.5rem;
     border: none;
     cursor: pointer;
+    z-index: 100;
 }
 
-/* Galeria */
+/* Galeria de Fotos */
 .gallery {
     padding: 15px;
     margin-top: 20px;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 5px var(--shadow);
 }
 
 .photo-list {
@@ -552,6 +624,7 @@ hr {
     overflow: hidden;
     aspect-ratio: 1/1;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    background: #000;
 }
 
 .photo-item img {
@@ -574,13 +647,27 @@ hr {
     color: white;
     cursor: pointer;
     font-size: 0.8rem;
+    display: flex; align-items: center; justify-content: center;
 }
 .delete-icon { background: var(--danger-color); }
 .download-icon { background: var(--primary-color); }
 
+.action-buttons {
+    display: flex; flex-direction: column; gap: 10px; margin-top: 20px;
+}
+.action-btn {
+    padding: 12px; border: none; border-radius: 8px;
+    font-weight: bold; color: white; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.download-btn { background: var(--primary-color); }
+.share-btn { background: #25d366; }
+
 /* ==========================================================================
-   9. RELATÓRIOS
+   9. RELATÓRIOS E OUTROS ELEMENTOS
    ========================================================================== */
+
+.report-section { text-align: left; }
 
 .report-fieldset {
     border: 2px solid var(--tertiary-color);
@@ -595,6 +682,7 @@ hr {
     color: var(--primary-color);
     font-weight: bold;
     padding: 0 5px;
+    font-size: 1.1rem;
 }
 
 .report-btn {
@@ -609,6 +697,8 @@ hr {
     margin-top: 10px;
 }
 
+.report-items-list { list-style: none; padding: 0; margin-top: 15px; }
+
 .report-item {
     background: #f9f9f9;
     border-left: 4px solid var(--primary-color);
@@ -617,14 +707,18 @@ hr {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
+
+.item-details strong { display: block; color: var(--text-dark); }
 
 .delete-item-btn {
     color: var(--danger-color);
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
 /* ==========================================================================
@@ -672,25 +766,25 @@ footer {
 }
 
 /* ==========================================================================
-   11. DESKTOP & TABLET MEDIA QUERY (min-width: 768px)
-   Aqui está a lógica de transformação para telas grandes
+   11. MEDIA QUERIES (TABLET & DESKTOP)
+   Transforma o layout para telas maiores (Min-width: 768px)
    ========================================================================== */
 
 @media (min-width: 768px) {
     
     body {
-        font-size: 16px; /* Fonte maior para leitura confortável */
+        font-size: 16px; /* Fonte maior */
     }
 
     /* --- CABEÇALHO DESKTOP --- */
     header {
-        flex-direction: column; /* Organiza: Logo/Titulo -> Navegação */
+        flex-direction: column; /* Logo em cima, Navegação em baixo */
         justify-content: center;
         padding: 20px 0;
         min-height: auto;
     }
 
-    /* Logo sobe e fica centralizada */
+    /* Logo volta ao topo (remove margem forçada do mobile) */
     .logo-placeholder {
         margin-top: 0; 
         margin-bottom: 10px;
@@ -707,16 +801,16 @@ footer {
 
     /* --- NAVEGAÇÃO DESKTOP (BARRA HORIZONTAL) --- */
     
-    /* Esconde elementos exclusivos do Mobile */
+    /* Esconde menu hamburguer e menu lateral */
     .menu-toggle, .side-menu, .menu-overlay {
         display: none !important; 
     }
 
-    /* Mostra a barra horizontal elegante */
+    /* Exibe barra horizontal */
     nav.desktop-nav {
         display: flex; 
         justify-content: center;
-        background-color: rgba(0, 0, 0, 0.1); /* Faixa sutil */
+        background-color: rgba(0, 0, 0, 0.1);
         width: 100%;
         margin-top: 20px;
         padding: 0;
@@ -740,11 +834,10 @@ footer {
     }
 
     /* --- TIMER DESKTOP --- */
-    /* Posicionado mais discretamente no canto superior direito */
     .status-card-header {
         top: 20px;
         right: 30px;
-        background-color: rgba(255, 255, 255, 0.15); /* Mais claro para desktop */
+        background-color: rgba(255, 255, 255, 0.15);
         padding: 12px 20px;
         min-width: 180px; 
     }
@@ -761,10 +854,10 @@ footer {
     section {
         padding: 40px;
         margin: 30px auto;
-        max-width: 900px; /* Limita largura do conteúdo */
+        max-width: 900px;
     }
 
-    /* Ajustes de componentes para tela grande */
+    /* Ajustes específicos para desktop */
     .carousel-slides .slide { height: 400px; }
 
     .photo-list {
@@ -773,4 +866,9 @@ footer {
     }
     
     .start-camera-section { min-height: 350px; }
+    
+    .action-buttons { flex-direction: row; justify-content: center; }
+    .action-btn { width: auto; min-width: 200px; }
+    
+    .input-group { max-width: 500px; }
 }
