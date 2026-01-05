@@ -10,7 +10,7 @@
     --primary-color: #5d3fd3; /* Roxo principal */
     --secondary-color: #8b5cf6; /* Roxo mais claro */
     --tertiary-color: #a78bfa; /* Roxo ainda mais claro */
-    --accent-color: #39ff14; /* Verde neon para destaque (mantido para outros elementos) */
+    --accent-color: #39ff14; /* Verde neon para destaque */
     --bg-light: #f3f0ff; /* Fundo claro com roxo */
     --white: #ffffff;
     --text-dark: #2c0e5a; /* Roxo escuro para texto */
@@ -46,8 +46,16 @@ header {
     color: var(--white);
     text-align: center;
     padding: 15px 0;
-    position: relative;
+    position: relative; /* Importante para o posicionamento do timer */
     box-shadow: 0 2px 10px var(--shadow);
+    /* Garante espaço lateral para não sobrepor o timer em telas muito pequenas */
+    padding-right: 0; 
+}
+
+/* Ajuste específico do ID para garantir contexto de posicionamento */
+#cabecalho-principal {
+    position: relative;
+    padding-bottom: 20px;
 }
 
 .logo-placeholder {
@@ -71,6 +79,81 @@ header p {
     margin-top: 5px;
     opacity: 0.9;
 }
+
+/* ===================== NOVO: CARD DUPLO DE TIMER (ESTOQUE + CAIXAS) ===================== */
+
+.status-card-header {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.15); /* Fundo translúcido */
+    border-radius: 8px;
+    min-width: 160px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.2);
+    z-index: 50;
+}
+
+.timer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 0;
+}
+
+.timer-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.75rem;
+    color: #eee;
+}
+
+.timer-label {
+    font-size: 0.7rem;
+    opacity: 0.9;
+    white-space: nowrap;
+}
+
+.dia-rotulo-sm {
+    font-weight: bold;
+    color: #ffd700; /* Dourado para destaque */
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.timer-display {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+}
+
+.timer-separator {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin: 4px 0;
+    width: 100%;
+}
+
+/* Classe de Urgência (Pulsar Vermelho) */
+.urgente-text {
+    color: #ff4d4d !important; /* Vermelho claro */
+    animation: pulsar 1.5s infinite;
+}
+
+@keyframes pulsar {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* ===================== NAVEGAÇÃO E MENU ===================== */
 
 /* Menu Hamburger (Toggle Button) */
 .menu-toggle {
@@ -159,13 +242,11 @@ ul{
 
 /* Footer */
 footer {
-    /* (Seu CSS existente) */
     background-color: var(--text-dark);
     color: var(--bg-light);
     text-align: center;
     padding: 15px 0;
     font-size: 0.8rem;
-    
 }
 
 /* ===================== BOTÕES FLUTUANTES ===================== */
@@ -213,7 +294,7 @@ footer {
     visibility: visible;
 }
 
-/* ===================== CARROSSEL (Preservado) ===================== */
+/* ===================== CARROSSEL ===================== */
 .carousel-container {
     position: relative;
     width: 100%;
@@ -266,7 +347,6 @@ footer {
     border-radius: 4px;
 }
 
-
 /* ===================== ESTILOS PARA DROPDOWNS E INPUTS GERAIS ===================== */
 
 .watermark-settings h2 {
@@ -295,7 +375,7 @@ footer {
     font-size: 0.9rem;
 }
 
-/* Estilo Base para Inputs de Texto, Número, Textarea e Selects (PADRONIZADO) */
+/* Estilo Base para Inputs */
 .input-group select, 
 .input-group .report-input, 
 .input-group .report-textarea {
@@ -305,17 +385,17 @@ footer {
     width: 100%;
     padding: 12px 15px;
     border: 2px solid var(--tertiary-color);
-    border-radius: var(--border-radius); /* 8px */
+    border-radius: var(--border-radius);
     font-size: 1rem;
     color: var(--text-dark);
     background-color: var(--white);
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
     cursor: pointer;
-    box-sizing: border-box; /* Garante que padding e border não aumentem a largura total */
+    box-sizing: border-box;
 }
 
-/* Tratamento específico para o selectbox, que precisa da seta */
+/* Tratamento específico para o selectbox */
 .input-group select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%235d3fd3' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E"); 
     background-repeat: no-repeat;
@@ -323,14 +403,12 @@ footer {
     background-size: 16px;
 }
 
-/* Estilo para Inputs/Textareas sem seta de dropdown */
 .input-group .report-input, 
 .input-group .report-textarea {
     cursor: text;
     resize: vertical;
 }
 
-/* Foco e Hover */
 .input-group select:hover,
 .input-group .report-input:hover,
 .input-group .report-textarea:hover {
@@ -343,7 +421,6 @@ footer {
     box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.2); 
 }
 
-/* Estilo para caixas de seleção DESABILITADAS */
 .input-group select:disabled, 
 .input-group .report-input:disabled {
     cursor: not-allowed;
@@ -353,7 +430,6 @@ footer {
     opacity: 0.8;
 }
 
-/* Botão de acesso à câmera */
 #open-camera-btn[disabled] {
     background-color: #aaa;
     color: #eee;
@@ -365,7 +441,6 @@ footer {
     color: #555;
 }
 
-/* Linha separadora horizontal */
 hr {
     border: none;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
@@ -374,7 +449,7 @@ hr {
 }
 
 
-/* ===================== ESTILOS DA CÂMERA (Mobile/Fullscreen) ===================== */
+/* ===================== ESTILOS DA CÂMERA ===================== */
 
 .camera-page {
     padding: 0; 
@@ -405,7 +480,6 @@ hr {
     gap: 10px;
 }
 
-/* Contêiner da Câmera em Fullscreen (Preservado) */
 .fullscreen-camera-container {
     position: fixed;
     top: 0;
@@ -451,7 +525,6 @@ hr {
     object-fit: cover; 
 }
 
-/* Marca d'água (Preservado) */
 .watermark {
     position: absolute;
     top: 15px; 
@@ -470,7 +543,6 @@ hr {
     backdrop-filter: blur(4px);
 }
 
-/* Contador de Fotos (Refinado para Badge Discreto no Canto) */
 #photo-count {
     position: absolute;
     top: 15px;
@@ -489,8 +561,6 @@ hr {
     backdrop-filter: blur(4px);
 }
 
-
-/* Controles de Zoom e Flash (Lado Direito) */
 .camera-controls-right {
     position: absolute;
     right: 15px;
@@ -545,7 +615,6 @@ hr {
     min-width: 50px;
 }
 
-/* Controles (Preservado) */
 .controls {
     position: absolute;
     bottom: 50px;
@@ -587,7 +656,6 @@ hr {
     border: 2px solid var(--primary-color);
 }
 
-/* Botão de Voltar/Fechar Câmera (Preservado) */
 #back-to-gallery-btn {
     position: absolute;
     top: 15px;
@@ -608,7 +676,7 @@ hr {
 }
 
 
-/* Galeria (Preservado) */
+/* ===================== GALERIA ===================== */
 .gallery {
     padding: 15px;
     background: var(--white);
@@ -638,7 +706,6 @@ hr {
     object-fit: cover;
 }
 
-/* Botões de Ação na Galeria (Geral) */
 .action-buttons {
     display: flex;
     flex-direction: column; 
@@ -669,23 +736,19 @@ hr {
     background: var(--secondary-color);
 }
 
-/* Botão de Compartilhar (FIXADO) */
 .share-btn {
-    background: #25d366 !important; /* Verde WhatsApp */
+    background: #25d366 !important;
     color: var(--white) !important;
 }
 
 .share-btn:hover {
-    background: #1da851 !important; /* Tom mais escuro */
+    background: #1da851 !important;
 }
 
 .share-btn:disabled {
     background: #999 !important;
     cursor: not-allowed;
 }
-
-
-/* ===================== BOTÕES UNITÁRIOS DA GALERIA (FIXADO) ===================== */
 
 .photo-controls {
     position: absolute;
@@ -717,23 +780,13 @@ hr {
     transform: scale(1.1);
 }
 
-/* Botão de Download na foto */
-.download-icon {
-    background-color: var(--primary-color);
-}
+.download-icon { background-color: var(--primary-color); }
+.delete-icon { background-color: #dc3545; }
 
-/* Botão de Excluir na foto */
-.delete-icon {
-    background-color: #dc3545; /* Vermelho padrão para exclusão */
-}
+/* ===================== RELATÓRIO ===================== */
 
-/* ===================== ESTILOS ESPECÍFICOS PARA RELATÓRIO ===================== */
+.report-section { text-align: left; }
 
-.report-section {
-    text-align: left; 
-}
-
-/* Estilo para Fieldset (Contêiner para Agrupamento) */
 .report-fieldset {
     border: 2px solid var(--tertiary-color);
     padding: 15px;
@@ -750,7 +803,6 @@ hr {
     padding: 0 10px;
 }
 
-/* Estilo para Botões de Ação dentro do fieldset (Ex: Adicionar Item) */
 .report-btn {
     width: 100%;
     padding: 12px;
@@ -772,7 +824,6 @@ hr {
     transform: scale(0.98);
 }
 
-/* Estilos para a Lista de Itens do Relatório */
 .report-items-list {
     list-style: none;
     padding: 0;
@@ -803,7 +854,6 @@ hr {
     font-size: 1rem;
 }
 
-/* Botão de Remover Item da Lista */
 .delete-item-btn { 
     background: none;
     border: none;
@@ -817,7 +867,6 @@ hr {
 .delete-item-btn:hover {
     color: #a01d2a;
 }
-
 
 /* ===================== MEDIA QUERY: DESKTOP (WEBSITE LOOK) ===================== */
 @media (min-width: 768px) {
@@ -895,7 +944,6 @@ hr {
         max-width: 220px;
     }
     
-    /* Câmera: Botão de abrir centralizado no desktop */
     .start-camera-section {
         min-height: 400px; 
     }
@@ -907,94 +955,19 @@ hr {
     }
 }
 
---------------------------
-/* Garante que o header seja a referência de posição */
-#cabecalho-principal {
-    position: relative; 
-    padding-right: 120px; /* Abre espaço para o relógio em telas menores */
-}
-
-.status-card-header {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: rgba(255, 255, 255, 0.15); /* Fundo leve para combinar com o header */
-    backdrop-filter: blur(5px); /* Efeito moderno de vidro */
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    min-width: 100px;
-}
-
-.dia-rotulo {
-    font-weight: bold;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #ffcc00; /* Destaque para o Hoje/Amanhã */
-}
-
-.info-envio {
-    font-size: 0.7rem;
-    opacity: 0.9;
-}
-
-.timer {
-    font-size: 1.1rem;
-    font-weight: bold;
-    font-family: 'Courier New', Courier, monospace; /* Fonte mono para os números não pularem */
-}
-
-/* Ajuste para celulares */
+/* ===================== AJUSTES DE RESPONSIVIDADE PARA O TIMER ===================== */
 @media (max-width: 600px) {
     .status-card-header {
-        top: 5px;
-        right: 5px;
-        padding: 5px;
+        top: 10px;
+        right: 10px;
+        padding: 6px 10px;
+        min-width: 140px;
     }
-    .timer { font-size: 0.9rem; }
-}
-/* Botão de Atualizar */
-.btn-refresh {
-    background: #ffcc00;
-    color: #333;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 5px;
-    transition: transform 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.btn-refresh:active {
-    transform: scale(0.95);
-}
-
-.btn-refresh i {
-    font-size: 0.7rem;
-}
-
-/* Estado de Urgência (Menos de 30 min) */
-.urgente {
-    background: rgba(255, 0, 0, 0.8) !important;
-    border: 1px solid white !important;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-/* Ajuste no Header para acomodar o botão */
-#cabecalho-principal {
-    position: relative;
-    padding-bottom: 15px;
+    .timer-display { font-size: 0.9rem; }
+    .dia-rotulo-sm { font-size: 0.75rem; }
+    
+    /* Garante que o texto do header não bata no timer */
+    #cabecalho-principal {
+        padding-top: 15px; /* Mais espaço no topo se necessário */
+    }
 }
