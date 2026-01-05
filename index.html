@@ -1,202 +1,481 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <meta name="description" content="Área do Promotor - Registros e Informações">
+
     <meta name="author" content="Qdelícia Frutas">
+
     <title>Home - Qdelícia Frutas</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="stylesheet" href="style.css">
 
-    </head>
-</body>
-</html>
-<body>
-    
-    <div class="menu-overlay"></div>
-    <aside class="side-menu">
-        <a href="index.html" class="active"><i class="fas fa-home"></i> Início</a>
-        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> Estoque</a>
-        <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
-        <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
-        <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
-        
-    </aside>
-    <header id="cabecalho-principal">
-        <button class="menu-toggle" aria-label="Abrir Menu">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="logo-placeholder">
-            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
-        </div>
-        <h1>Qdelícia Frutas</h1>
-        <p>Página Inicial</p>
-        <div id="status-envio" class="status-card-header">
-    
-    <div class="timer-row" id="row-estoque">
-        <div class="timer-info">
-            <span id="dia-rotulo-estoque" class="dia-rotulo-sm">---</span>
-            <span class="timer-label">Estoque (14h)</span>
-        </div>
-        <div id="timer-estoque" class="timer-display">00:00:00</div>
-    </div>
 
-    <div class="timer-separator"></div>
 
-    <div class="timer-row" id="row-caixas">
-        <div class="timer-info">
-            <span id="dia-rotulo-caixas" class="dia-rotulo-sm">---</span>
-            <span class="timer-label">Caixas (Seg)</span>
-        </div>
-        <div id="timer-caixas" class="timer-display">00:00:00</div>
-    </div>
+    <style>
 
-</div>
-    </header>
-    
-    <nav class="desktop-nav">
-    <a href="index.html" class="active">Início</a>
-    <a href="estoque.html">Estoque</a>
-    <a href="caixas.html">Caixas</a>
-    <a href="camera.html">Câmera</a>
-    <a href="relatorio.html">Relatório/Qualidade</a>
-</nav>
-    
-    <main>
-       
-       
-        <section class ="missao" >
-            <h2>Nossa Missão:</h2>
-            <ul >
-                <li>Ter foco no atendimento ao cliente;</li>
-                <li>Estar sempre disposto a ouvir e entender o cliente;</li>
-                <li>Tornar a experiência do cliente cada vez melhor e única;</li>
-                <li>Buscar sempre melhorar a cada dia.</li>
-            </ul>
-        </section>
-        
-        <div class="carousel-container">
-            <div class="carousel-slides">
-                <img src="./images/01.jpg" alt="foto" class="slide">
-                <img src="./images/02.jpg" alt="foto" class="slide">
-                <img src="./images/03.jpg" alt="foto" class="slide">
-                <img src="./images/04.jpg" alt="foto" class="slide">
-                <img src="./images/05.jpg" alt="foto" class="slide">
-                
-            </div>
-            <div class="carousel-dots">
-                <span class="dot active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </div>
-        </div>
-        <section>
-            <h2>Nossa rotina diária:</h2>
-            <ul>
-                <li>Manter pontos de venda sempre limpos e organizados;</li>
-                <li>Manter boa comunicação com líderes e equipe;</li>
-                <li>Estar atento aos canais de comunicação;</li>
-                <li>Informar diariamente informações da loja como: estoques, avarias, qualidade...</li>
-            </ul>
-        </section>
-    </main>
-       
-    <footer>
-        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
-    </footer>
+        /* Estilos para o Toggle Switch */
 
-    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+        .alert-toggle-container {
 
-    <div class="back-to-top">
-        <i class="fas fa-arrow-up"></i>
-    </div>
-    
-    <script>
-        // Função global (usada pelo alert.js) para atualizar a UI com base na permissão
-        window.updateAlertUI = function(permission) {
-            const statusElement = document.getElementById('alert-status');
-            const toggle = document.getElementById('alert-toggle-switch');
-            const testBtn = document.getElementById('test-audio-btn');
-            
-            permission = permission || Notification.permission;
+            display: flex;
 
-            if (permission === 'granted') {
-                const alertsEnabled = localStorage.getItem('alertsEnabled') === 'true';
-                toggle.checked = alertsEnabled;
-                toggle.disabled = false;
-                testBtn.style.display = 'inline-block'; // Mostra o botão de teste
+            justify-content: center;
 
-                if (alertsEnabled) {
-                    statusElement.innerHTML = '✅ **Alertas Ativos!** Clique em "Testar" se o áudio não funcionar nos lembretes.';
-                    document.getElementById('toggle-label-on').style.display = 'inline';
-                    document.getElementById('toggle-label-off').style.display = 'none';
-                } else {
-                    statusElement.innerHTML = 'Alertas pausados. Ligue o interruptor para reativar.';
-                    document.getElementById('toggle-label-on').style.display = 'none';
-                    document.getElementById('toggle-label-off').style.display = 'inline';
-                }
+            align-items: center;
 
-            } else if (permission === 'denied') {
-                statusElement.innerHTML = '❌ Alertas bloqueados permanentemente nas configurações do navegador.';
-                toggle.checked = false;
-                toggle.disabled = true; // Desativa o toggle
-                testBtn.style.display = 'none';
-                document.getElementById('toggle-label-on').style.display = 'none';
-                document.getElementById('toggle-label-off').style.display = 'inline';
+            gap: 15px;
 
-            } else { // 'default'
-                statusElement.innerHTML = 'Ligue o interruptor para ativar os lembretes de voz e notificações.';
-                toggle.checked = false;
-                toggle.disabled = false;
-                testBtn.style.display = 'none';
-                document.getElementById('toggle-label-on').style.display = 'none';
-                document.getElementById('toggle-label-off').style.display = 'inline';
-            }
+            margin-bottom: 20px;
+
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        .switch {
+
+            position: relative;
+
+            display: inline-block;
+
+            width: 60px;
+
+            height: 34px;
+
+        }
+
+        .switch input {
+
+            opacity: 0;
+
+            width: 0;
+
+            height: 0;
+
+        }
+
+        .slider {
+
+            position: absolute;
+
+            cursor: pointer;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            bottom: 0;
+
+            background-color: #ccc; /* Cor quando desligado */
+
+            transition: .4s;
+
+            border-radius: 34px;
+
+        }
+
+        .slider:before {
+
+            position: absolute;
+
+            content: "";
+
+            height: 26px;
+
+            width: 26px;
+
+            left: 4px;
+
+            bottom: 4px;
+
+            background-color: white;
+
+            transition: .4s;
+
+            border-radius: 50%;
+
+        }
+
+        input:checked + .slider {
+
+            background-color: #4CAF50; /* Cor verde quando ligado */
+
+        }
+
+        input:checked + .slider:before {
+
+            transform: translateX(26px);
+
+        }
+
+        input:disabled + .slider {
+
+            background-color: #f44336; /* Cor vermelha para bloqueado */
+
+            cursor: not-allowed;
+
+        }
+
+    </style>
+
+    </head>
+
+</body>
+
+</html>
+
+<body>
+
+    
+
+    <div class="menu-overlay"></div>
+
+    <aside class="side-menu">
+
+        <a href="index.html" class="active"><i class="fas fa-home"></i> Início</a>
+
+        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> Estoque</a>
+
+        <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
+
+        <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
+
+        <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
+
+        
+
+    </aside>
+
+    <header id="cabecalho-principal">
+
+        <button class="menu-toggle" aria-label="Abrir Menu">
+
+            <i class="fas fa-bars"></i>
+
+        </button>
+
+        <div class="logo-placeholder">
+
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
+
+        </div>
+
+        <h1>Qdelícia Frutas</h1>
+
+        <p>Página Inicial</p>
+
+        <div id="status-envio" class="status-card-header">
+
+        <div id="dia-rotulo" class="dia-rotulo">---</div>
+
+        <div class="info-envio">Estoque</div>
+
+        <div class="info-envio">Envio até às 14:00</div>
+
+        <div id="contagem-regressiva" class="timer">00:00:00</div>
+
+    </div>
+
+    </header>
+
+    
+
+    <nav>
+
+        <a href="index.html" class="active">Início</a>
+
+        <a href="estoque.html">Estoque</a>
+
+        <a href="caixas.html">Caixas</a>
+
+        <a href="camera.html">Câmera</a>
+
+        <a href="relatorio.html">Relatório/Qualidade</a>
+
+        
+
+    </nav>
+
+    
+
+    <main>
+
+       
+
+       
+
+        <section class ="missao" >
+
+            <h2>Nossa Missão:</h2>
+
+            <ul >
+
+                <li>Ter foco no atendimento ao cliente;</li>
+
+                <li>Estar sempre disposto a ouvir e entender o cliente;</li>
+
+                <li>Tornar a experiência do cliente cada vez melhor e única;</li>
+
+                <li>Buscar sempre melhorar a cada dia.</li>
+
+            </ul>
+
+        </section>
+
+        
+
+        <div class="carousel-container">
+
+            <div class="carousel-slides">
+
+                <img src="./images/01.jpg" alt="foto" class="slide">
+
+                <img src="./images/02.jpg" alt="foto" class="slide">
+
+                <img src="./images/03.jpg" alt="foto" class="slide">
+
+                <img src="./images/04.jpg" alt="foto" class="slide">
+
+                <img src="./images/05.jpg" alt="foto" class="slide">
+
+                
+
+            </div>
+
+            <div class="carousel-dots">
+
+                <span class="dot active"></span>
+
+                <span class="dot"></span>
+
+                <span class="dot"></span>
+
+                <span class="dot"></span>
+
+                <span class="dot"></span>
+
+            </div>
+
+        </div>
+
+        <section>
+
+            <h2>Nossa rotina diária:</h2>
+
+            <ul>
+
+                <li>Manter pontos de venda sempre limpos e organizados;</li>
+
+                <li>Manter boa comunicação com líderes e equipe;</li>
+
+                <li>Estar atento aos canais de comunicação;</li>
+
+                <li>Informar diariamente informações da loja como: estoques, avarias, qualidade...</li>
+
+            </ul>
+
+        </section>
+
+    </main>
+
+       
+
+    <footer>
+
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+
+    </footer>
+
+
+
+    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
+
+        <i class="fab fa-whatsapp"></i>
+
+    </a>
+
+
+
+    <div class="back-to-top">
+
+        <i class="fas fa-arrow-up"></i>
+
+    </div>
+
+    
+
+    <script>
+
+        // Função global (usada pelo alert.js) para atualizar a UI com base na permissão
+
+        window.updateAlertUI = function(permission) {
+
+            const statusElement = document.getElementById('alert-status');
+
             const toggle = document.getElementById('alert-toggle-switch');
+
             const testBtn = document.getElementById('test-audio-btn');
 
-            // Listener para o Toggle Switch
-            toggle.addEventListener('change', () => {
-                if (toggle.checked) {
-                    // O usuário está LIGANDO
-                    console.log('Usuário ativou o toggle.');
-                    // Chama a função de permissão/ativação do alert.js
-                    // Ela cuidará de pedir permissão e iniciar o sistema
-                    if (typeof window.enableAlerts === 'function') {
-                        window.enableAlerts(); 
-                    }
+            
+
+            permission = permission || Notification.permission;
+
+
+
+            if (permission === 'granted') {
+
+                const alertsEnabled = localStorage.getItem('alertsEnabled') === 'true';
+
+                toggle.checked = alertsEnabled;
+
+                toggle.disabled = false;
+
+                testBtn.style.display = 'inline-block'; // Mostra o botão de teste
+
+
+
+                if (alertsEnabled) {
+
+                    statusElement.innerHTML = '✅ **Alertas Ativos!** Clique em "Testar" se o áudio não funcionar nos lembretes.';
+
+                    document.getElementById('toggle-label-on').style.display = 'inline';
+
+                    document.getElementById('toggle-label-off').style.display = 'none';
+
                 } else {
-                    // O usuário está DESLIGANDO
-                    console.log('Usuário desativou o toggle.');
-                    if (typeof window.disableAlerts === 'function') {
-                        window.disableAlerts();
-                    }
+
+                    statusElement.innerHTML = 'Alertas pausados. Ligue o interruptor para reativar.';
+
+                    document.getElementById('toggle-label-on').style.display = 'none';
+
+                    document.getElementById('toggle-label-off').style.display = 'inline';
+
                 }
+
+
+
+            } else if (permission === 'denied') {
+
+                statusElement.innerHTML = '❌ Alertas bloqueados permanentemente nas configurações do navegador.';
+
+                toggle.checked = false;
+
+                toggle.disabled = true; // Desativa o toggle
+
+                testBtn.style.display = 'none';
+
+                document.getElementById('toggle-label-on').style.display = 'none';
+
+                document.getElementById('toggle-label-off').style.display = 'inline';
+
+
+
+            } else { // 'default'
+
+                statusElement.innerHTML = 'Ligue o interruptor para ativar os lembretes de voz e notificações.';
+
+                toggle.checked = false;
+
+                toggle.disabled = false;
+
+                testBtn.style.display = 'none';
+
+                document.getElementById('toggle-label-on').style.display = 'none';
+
+                document.getElementById('toggle-label-off').style.display = 'inline';
+
+            }
+
+        }
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const toggle = document.getElementById('alert-toggle-switch');
+
+            const testBtn = document.getElementById('test-audio-btn');
+
+
+
+            // Listener para o Toggle Switch
+
+            toggle.addEventListener('change', () => {
+
+                if (toggle.checked) {
+
+                    // O usuário está LIGANDO
+
+                    console.log('Usuário ativou o toggle.');
+
+                    // Chama a função de permissão/ativação do alert.js
+
+                    // Ela cuidará de pedir permissão e iniciar o sistema
+
+                    if (typeof window.enableAlerts === 'function') {
+
+                        window.enableAlerts(); 
+
+                    }
+
+                } else {
+
+                    // O usuário está DESLIGANDO
+
+                    console.log('Usuário desativou o toggle.');
+
+                    if (typeof window.disableAlerts === 'function') {
+
+                        window.disableAlerts();
+
+                    }
+
+                }
+
             });
+
+
 
             // Listener para o Botão de Teste
+
             testBtn.addEventListener('click', () => {
+
                 console.log('Botão de teste clicado. Desbloqueando áudio...');
+
                 // Chama a função de teste do alert.js
+
                 // Este clique é VITAL para smartphones
+
                 if (typeof window.unlockAndTestAudio === 'function') {
+
                     window.unlockAndTestAudio();
+
                 }
+
             });
 
+
+
             // Atualiza a UI no carregamento da página
+
             // O alert.js chamará isso de novo após verificar as permissões
+
             window.updateAlertUI(Notification.permission);
+
         });
+
     </script>
+
     <script src="script.js"></script>
+
     <script src="alert.js"></script> </body>
+
 </html>
