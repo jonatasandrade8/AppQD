@@ -1,6 +1,4 @@
-/* ==========================================================================
-   1. RESET, VARIÁVEIS E CONFIGURAÇÕES GLOBAIS
-   ========================================================================== */
+/* ===================== RESET E CONFIGURAÇÕES GLOBAIS ===================== */
 * {
     margin: 0;
     padding: 0;
@@ -8,21 +6,18 @@
 }
 
 :root {
-    /* Paleta de Cores */
-    --primary-color: #5d3fd3;      /* Roxo principal */
-    --secondary-color: #8b5cf6;    /* Roxo claro */
-    --tertiary-color: #a78bfa;     /* Roxo muito claro */
-    --accent-color: #39ff14;       /* Verde neon (destaque) */
-    --bg-light: #f3f0ff;           /* Fundo da página */
+    /* Cores e Variáveis */
+    --primary-color: #5d3fd3; /* Roxo principal */
+    --secondary-color: #8b5cf6; /* Roxo mais claro */
+    --tertiary-color: #a78bfa; /* Roxo ainda mais claro */
+    --accent-color: #39ff14; /* Verde neon para destaque (mantido para outros elementos) */
+    --bg-light: #f3f0ff; /* Fundo claro com roxo */
     --white: #ffffff;
-    --text-dark: #2c0e5a;          /* Texto principal */
-    --danger-color: #dc3545;       /* Vermelho erro/excluir */
-    
-    /* Configurações de UI */
+    --text-dark: #2c0e5a; /* Roxo escuro para texto */
     --shadow: rgba(0, 0, 0, 0.1);
     --border-radius: 8px;
     --transition: all 0.3s ease;
-    --max-width-desktop: 1200px;   /* Largura máxima do site em PC */
+    --max-width: 1200px;
     --gradient: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
 }
 
@@ -35,106 +30,74 @@ body {
     background-color: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.6;
-    font-size: 14px; /* Mobile First: Fonte base menor */
+    font-size: 14px; /* Mobile first */
 }
 
-/* ==========================================================================
-   2. CABEÇALHO (AJUSTADO PARA NÃO SOBREPOR)
-   ========================================================================== */
+/* ===================== MOBILE FIRST - LAYOUT GERAL (APP LOOK) ===================== */
 
+/* O Menu Horizontal é escondido no mobile e substituído pelo Hamburger/Side Menu */
+nav {
+    display: none; 
+}
+
+/* Header */
 header {
     background: var(--gradient);
     color: var(--white);
     text-align: center;
+    padding: 15px 0;
     position: relative;
     box-shadow: 0 2px 10px var(--shadow);
-    z-index: 50;
-    
-    /* Flexbox vertical: Organiza os elementos um embaixo do outro */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-bottom: 15px;
-    min-height: 160px; /* Garante altura para caber tudo */
 }
 
-/* ÁREA DA LOGO:
-   Adicionei margin-top para empurrar a logo para baixo da linha 
-   onde ficam o Botão Menu e o Timer. Assim nada fica encavalado.
-*/
 .logo-placeholder {
-    margin-top: 55px; /* Espaço para o Timer/Menu que estão no topo (absolute) */
-    margin-bottom: 5px;
-    transition: margin 0.3s ease;
-    z-index: 1;
+    margin-bottom: 8px;
 }
 
 .logo-placeholder img {
-    max-width: 90px;
+    max-width: 100px; 
     height: auto;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.3);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 header h1 {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     margin: 0;
-    line-height: 1.2;
-    font-weight: 700;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-    padding: 0 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 header p {
-    font-size: 0.9rem;
-    margin-top: 2px;
+    font-size: 1rem;
+    margin-top: 5px;
     opacity: 0.9;
-    font-weight: 300;
 }
 
-/* ==========================================================================
-   3. NAVEGAÇÃO E MENU (MOBILE)
-   ========================================================================== */
-
-/* Botão Hamburguer (Fixo no canto superior esquerdo) */
+/* Menu Hamburger (Toggle Button) */
 .menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block; 
     position: absolute;
-    top: 15px;
+    top: 25px;
     left: 15px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 8px;
+    background: none;
+    border: none;
     color: var(--white);
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     cursor: pointer;
-    z-index: 101; /* Acima de tudo */
-    width: 42px;
-    height: 42px;
-    backdrop-filter: blur(4px);
-    transition: background 0.2s, transform 0.2s;
+    z-index: 100;
 }
 
-.menu-toggle:active {
-    background: rgba(255, 255, 255, 0.4);
-    transform: scale(0.95);
-}
-
-/* Menu Lateral (Slide-in) */
+/* Menu Lateral (Side Menu - App Navigation) */
 .side-menu {
     position: fixed;
     top: 0;
-    left: -280px; /* Escondido */
-    width: 280px;
+    left: -250px; /* Inicialmente fora da tela */
+    width: 250px;
     height: 100%;
-    background-color: var(--text-dark);
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.6);
-    z-index: 200;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding-top: 90px;
+    background-color: var(--text-dark); /* Fundo escuro */
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    transition: left 0.3s ease;
+    padding-top: 70px; /* Espaço para não colidir com a barra superior do mobile */
     display: flex;
     flex-direction: column;
 }
@@ -144,21 +107,12 @@ header p {
 }
 
 .side-menu a {
-    padding: 15px 25px;
+    padding: 15px 20px;
     color: var(--bg-light);
     text-decoration: none;
     font-weight: 500;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    transition: background 0.2s;
-}
-
-.side-menu a i { 
-    width: 20px; 
-    text-align: center; 
-    color: var(--tertiary-color);
+    transition: background-color 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .side-menu a:hover, .side-menu a.active {
@@ -166,272 +120,124 @@ header p {
     color: var(--white);
 }
 
-.side-menu a.active i { color: var(--accent-color); }
-
-/* Fundo escuro ao abrir menu */
 .menu-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 199;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 98;
     display: none;
-    backdrop-filter: blur(3px);
 }
-.menu-overlay.active { display: block; }
-
-/* Navegação Desktop (Invisível no celular) */
-nav.desktop-nav {
-    display: none; 
+.menu-overlay.active {
+    display: block;
 }
 
-/* ==========================================================================
-   4. TIMER DUPLO (DESIGN DE VIDRO)
-   ========================================================================== */
 
-/* Container do Timer (Fixo no canto superior direito) */
-.status-card-header {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    
-    /* Design Glassmorphism */
-    padding: 6px 10px;
-    background-color: rgba(0, 0, 0, 0.25);
-    border-radius: 8px;
-    min-width: 130px;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.15);
-    z-index: 50;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.timer-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    padding: 2px 0;
-}
-
-.timer-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.timer-label {
-    font-size: 0.65rem;
-    opacity: 0.9;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1;
-    margin-top: 2px;
-    color: #eee;
-}
-
-.dia-rotulo-sm {
-    font-weight: 800;
-    color: #ffd700; /* Dourado */
-    font-size: 0.75rem;
-    line-height: 1;
-}
-
-.timer-display {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: white;
-    letter-spacing: -0.5px;
-}
-
-.timer-separator {
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.25);
-    margin: 3px 0;
-    width: 100%;
-}
-
-/* Urgência (Pulsar Vermelho) */
-.urgente-text {
-    color: #ff4d4d !important;
-    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
-    animation: pulsar 1.5s infinite;
-}
-
-@keyframes pulsar {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.02); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
-/* ==========================================================================
-   5. ESTRUTURA PRINCIPAL (MAIN & SECTIONS)
-   ========================================================================== */
-
+/* Main Content */
 main {
     max-width: 100%;
     margin: 0 auto;
-    padding-bottom: 80px; /* Espaço para footer e botões flutuantes */
 }
 
 section {
     background-color: var(--white);
     padding: 20px 15px;
-    margin: 15px;
+    margin-bottom: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
     border-radius: var(--border-radius);
     box-shadow: 0 4px 10px var(--shadow);
     text-align: center;
 }
-
-/* Listas (Geral) */
-ul {
-    text-align: left;
+ul{
+    text-align: center;
     margin-left: 20px;
     margin-top: 10px;
-    display: inline-block;
 }
 
-.missao ul li, section ul li {
-    margin-bottom: 5px;
+/* Footer */
+footer {
+    /* (Seu CSS existente) */
+    background-color: var(--text-dark);
+    color: var(--bg-light);
+    text-align: center;
+    padding: 15px 0;
+    font-size: 0.8rem;
+    
 }
 
-/* ==========================================================================
-   6. FORMULÁRIOS, INPUTS E TOGGLE
-   ========================================================================== */
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; 
-    width: 100%;
-    max-width: 400px; 
-    margin: 15px auto; 
-    text-align: left;
-}
-
-.input-group label {
-    font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* Estilo unificado para Selects, Inputs e Textareas */
-.input-group select, 
-.input-group .report-input, 
-.input-group .report-textarea {
-    appearance: none; 
-    -webkit-appearance: none;
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid var(--tertiary-color);
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    color: var(--text-dark);
-    background-color: var(--white);
-    outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    box-sizing: border-box;
-}
-
-/* Seta do Select */
-.input-group select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%235d3fd3' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E"); 
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    background-size: 16px;
-    cursor: pointer;
-}
-
-.input-group select:focus,
-.input-group .report-input:focus,
-.input-group .report-textarea:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.2); 
-}
-
-.input-group select:disabled, 
-.input-group .report-input:disabled {
-    background-color: #f0f0f0; 
-    border-color: #ddd;
-    color: #999;
-    cursor: not-allowed;
-}
-
-hr {
-    border: none;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
-    max-width: 90%;
-}
-
-/* --- TOGGLE SWITCH (ALERTAS) --- */
-.alert-toggle-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider {
-    position: absolute; cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
-}
-.slider:before {
-    position: absolute; content: "";
-    height: 26px; width: 26px;
-    left: 4px; bottom: 4px;
-    background-color: white;
-    transition: .4s;
+/* ===================== BOTÕES FLUTUANTES ===================== */
+.whatsapp-btn {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    background-color: #25d366;
+    color: white;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: transform 0.3s;
+    text-decoration: none;
 }
-input:checked + .slider { background-color: #4CAF50; }
-input:checked + .slider:before { transform: translateX(26px); }
-input:disabled + .slider { background-color: #f44336; cursor: not-allowed; }
 
-/* ==========================================================================
-   7. CARROSSEL
-   ========================================================================== */
+.back-to-top {
+    position: fixed;
+    bottom: 75px;
+    right: 15px;
+    background: var(--primary-color);
+    color: var(--white);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 99;
+}
+
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ===================== CARROSSEL (Preservado) ===================== */
 .carousel-container {
     position: relative;
     width: 100%;
     margin: 20px auto;
+    max-width: 100%;
     overflow: hidden;
     border-radius: var(--border-radius);
     box-shadow: 0 4px 10px var(--shadow);
-    background-color: #000;
+    background-color: black;
+    box-sizing: border-box;
 }
 
 .carousel-slides {
     display: flex;
     transition: transform 0.5s ease;
-    width: 500%; 
+    width: 500%; /* 5 slides */
 }
 
 .carousel-slides .slide {
     width: 20%;
-    height: 250px; /* Altura mobile */
+    height: 300px;
     object-fit: cover; 
     flex-shrink: 0;
+    background-color: var(--text-dark);
 }
 
 .carousel-dots {
@@ -448,66 +254,190 @@ input:disabled + .slider { background-color: #f44336; cursor: not-allowed; }
     height: 8px;
     width: 8px;
     margin: 0 4px;
-    background-color: rgba(255,255,255,0.5);
+    background-color: #bbb;
     border-radius: 50%;
-    transition: all 0.3s;
+    cursor: pointer;
+    transition: background-color 0.6s ease;
 }
 
 .dot.active {
     background-color: var(--white);
-    width: 16px;
+    width: 15px;
     border-radius: 4px;
 }
 
-/* ==========================================================================
-   8. CÂMERA E GALERIA (FUNCIONALIDADE INTEGRAL)
-   ========================================================================== */
 
-.camera-page { padding: 0; background: var(--bg-light); }
+/* ===================== ESTILOS PARA DROPDOWNS E INPUTS GERAIS ===================== */
 
-/* Botão de Abrir Câmera (Tela inicial da página câmera) */
-#open-camera-btn {
+.watermark-settings h2 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
     width: 100%;
-    max-width: 300px;
-    margin: 20px auto;
-    padding: 15px;
+    max-width: 350px; 
+    margin: 15px auto; 
+    text-align: left;
+}
+
+.input-group label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+/* Estilo Base para Inputs de Texto, Número, Textarea e Selects (PADRONIZADO) */
+.input-group select, 
+.input-group .report-input, 
+.input-group .report-textarea {
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--tertiary-color);
+    border-radius: var(--border-radius); /* 8px */
+    font-size: 1rem;
+    color: var(--text-dark);
+    background-color: var(--white);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    box-sizing: border-box; /* Garante que padding e border não aumentem a largura total */
+}
+
+/* Tratamento específico para o selectbox, que precisa da seta */
+.input-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%235d3fd3' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E"); 
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+}
+
+/* Estilo para Inputs/Textareas sem seta de dropdown */
+.input-group .report-input, 
+.input-group .report-textarea {
+    cursor: text;
+    resize: vertical;
+}
+
+/* Foco e Hover */
+.input-group select:hover,
+.input-group .report-input:hover,
+.input-group .report-textarea:hover {
+    border-color: var(--secondary-color);
+}
+.input-group select:focus,
+.input-group .report-input:focus,
+.input-group .report-textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(93, 63, 211, 0.2); 
+}
+
+/* Estilo para caixas de seleção DESABILITADAS */
+.input-group select:disabled, 
+.input-group .report-input:disabled {
+    cursor: not-allowed;
+    background-color: var(--bg-light); 
+    border-color: #ddd;
+    color: #a0a0a0;
+    opacity: 0.8;
+}
+
+/* Botão de acesso à câmera */
+#open-camera-btn[disabled] {
+    background-color: #aaa;
+    color: #eee;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+#open-camera-btn[disabled] i.fa-lock {
+    color: #555;
+}
+
+/* Linha separadora horizontal */
+hr {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 15px auto;
+    max-width: 90%;
+}
+
+
+/* ===================== ESTILOS DA CÂMERA (Mobile/Fullscreen) ===================== */
+
+.camera-page {
+    padding: 0; 
+    background: var(--bg-light);
+}
+
+.start-camera-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px; 
+    margin: 20px 0;
+}
+
+#open-camera-btn {
+    padding: 15px 30px;
+    border: none;
     border-radius: 12px;
     background-color: var(--primary-color);
     color: var(--white);
+    font-size: 1.1rem;
     font-weight: bold;
-    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: var(--transition);
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 10px;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    cursor: pointer;
-    transition: transform 0.2s;
 }
 
-#open-camera-btn:active { transform: scale(0.98); }
-
-#open-camera-btn[disabled] {
-    background-color: #aaa;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-/* Câmera Fullscreen Overlay */
+/* Contêiner da Câmera em Fullscreen (Preservado) */
 .fullscreen-camera-container {
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: #000;
     z-index: 9999;
     display: none; 
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-.fullscreen-camera-container.active { display: flex; }
+.fullscreen-camera-container.active {
+    display: flex;
+}
+
+.camera-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
 
 .camera-container {
-    flex: 1;
+    width: 100%;
+    height: 100%;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -515,360 +445,556 @@ input:disabled + .slider { background-color: #f44336; cursor: not-allowed; }
     align-items: center;
 }
 
-#video { width: 100%; height: 100%; object-fit: cover; }
+#video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
 
-/* Overlays da Câmera */
+/* Marca d'água (Preservado) */
 .watermark {
     position: absolute;
-    top: 20px; left: 50%;
+    top: 15px; 
+    left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    pointer-events: none;
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--white);
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     border: 1px solid rgba(255,255,255,0.2);
-    display: flex; gap: 5px; align-items: center;
+    backdrop-filter: blur(4px);
 }
 
+/* Contador de Fotos (Refinado para Badge Discreto no Canto) */
 #photo-count {
     position: absolute;
-    top: 20px; right: 20px;
-    background: var(--primary-color);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 15px;
+    top: 15px;
+    right: 15px;
+    background: rgba(93, 63, 211, 0.95); 
+    color: var(--white);
+    padding: 8px 14px;
+    border-radius: 20px;
     font-weight: bold;
-    font-size: 0.9rem;
-    border: 1px solid white;
+    font-size: 1.1rem;
+    min-width: 45px; 
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    z-index: 10;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
 }
 
-/* Controles Laterais (Zoom, Switch) */
+
+/* Controles de Zoom e Flash (Lado Direito) */
 .camera-controls-right {
     position: absolute;
-    right: 15px; top: 80px;
-    display: flex; flex-direction: column; gap: 12px;
+    right: 15px;
+    top: 70px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     z-index: 20;
 }
-.camera-control-btn {
-    width: 45px; height: 45px;
-    border-radius: 50%; border: none;
-    background: rgba(255,255,255,0.8);
-    color: var(--primary-color);
-    font-size: 1.2rem; cursor: pointer;
-}
-.camera-control-btn.active { background: var(--accent-color); color: #000; }
-.zoom-level { background: rgba(0,0,0,0.5); color: white; padding: 4px; border-radius: 4px; text-align: center; font-size: 0.8rem; }
 
-/* Barra Inferior (Shutter) */
-.controls {
-    height: 120px;
-    background: rgba(0,0,0,0.8);
+.camera-control-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    cursor: pointer;
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 30px;
-    position: relative;
-    width: 100%;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.camera-control-btn:hover:not(:disabled) {
+    background: var(--white);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.camera-control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.camera-control-btn.active {
+    background: var(--accent-color);
+    color: var(--text-dark);
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+}
+
+.zoom-level {
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--white);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-align: center;
+    min-width: 50px;
+}
+
+/* Controles (Preservado) */
+.controls {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 20;
 }
 
 .btn-circle {
-    width: 60px; height: 60px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: none;
     cursor: pointer;
     font-size: 1.2rem;
-    display: flex; align-items: center; justify-content: center;
+    background: var(--white);
+    transition: transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 #shutter-btn {
-    width: 75px; height: 75px;
+    width: 72px;
+    height: 72px;
+    border: 4px solid var(--primary-color);
+    box-shadow: 0 0 0 4px var(--white);
     background: var(--accent-color);
-    border: 4px solid var(--white);
-    box-shadow: 0 0 0 2px var(--primary-color);
+    color: var(--white);
 }
-#shutter-btn:active { transform: scale(0.95); }
 
-#switch-btn { background: rgba(255,255,255,0.9); color: var(--primary-color); }
+#switch-btn {
+    background: rgba(255,255,255,0.9);
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
 
+/* Botão de Voltar/Fechar Câmera (Preservado) */
 #back-to-gallery-btn {
     position: absolute;
-    left: 20px; top: 40px; /* Ajustado para área segura do celular */
-    background: transparent;
-    color: white;
-    font-size: 1.5rem;
-    border: none;
+    top: 15px;
+    left: 15px;
+    z-index: 30;
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--primary-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    z-index: 100;
+    font-size: 1.2rem;
+    transition: background 0.3s;
+    border: none;
 }
 
-/* Galeria de Fotos */
+
+/* Galeria (Preservado) */
 .gallery {
     padding: 15px;
-    margin-top: 20px;
     background: var(--white);
+    margin: 15px;
     border-radius: var(--border-radius);
-    box-shadow: 0 2px 5px var(--shadow);
+    box-shadow: 0 4px 10px var(--shadow);
 }
 
 .photo-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    padding: 5px;
 }
 
 .photo-item {
-    position: relative;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
-    aspect-ratio: 1/1;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    background: #000;
+    position: relative;
+    box-shadow: 0 2px 8px var(--shadow);
+    background: var(--bg-light);
 }
 
 .photo-item img {
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 120px;
     object-fit: cover;
 }
 
+/* Botões de Ação na Galeria (Geral) */
+.action-buttons {
+    display: flex;
+    flex-direction: column; 
+    gap: 10px;
+    padding-bottom: 15px;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    color: var(--white);
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.download-btn {
+    background: var(--primary-color);
+}
+.download-btn:hover {
+    background: var(--secondary-color);
+}
+
+/* Botão de Compartilhar (FIXADO) */
+.share-btn {
+    background: #25d366 !important; /* Verde WhatsApp */
+    color: var(--white) !important;
+}
+
+.share-btn:hover {
+    background: #1da851 !important; /* Tom mais escuro */
+}
+
+.share-btn:disabled {
+    background: #999 !important;
+    cursor: not-allowed;
+}
+
+
+/* ===================== BOTÕES UNITÁRIOS DA GALERIA (FIXADO) ===================== */
+
 .photo-controls {
     position: absolute;
-    top: 5px; right: 5px;
+    top: 10px; 
+    right: 10px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px; 
+    z-index: 10;
 }
 
 .icon-btn {
-    width: 30px; height: 30px;
+    width: 35px; 
+    height: 35px;
     border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: none;
-    color: white;
     cursor: pointer;
-    font-size: 0.8rem;
-    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    color: var(--white);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.2s, transform 0.2s;
 }
-.delete-icon { background: var(--danger-color); }
-.download-icon { background: var(--primary-color); }
 
-.action-buttons {
-    display: flex; flex-direction: column; gap: 10px; margin-top: 20px;
+.icon-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.1);
 }
-.action-btn {
-    padding: 12px; border: none; border-radius: 8px;
-    font-weight: bold; color: white; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+
+/* Botão de Download na foto */
+.download-icon {
+    background-color: var(--primary-color);
 }
-.download-btn { background: var(--primary-color); }
-.share-btn { background: #25d366; }
 
-/* ==========================================================================
-   9. RELATÓRIOS E OUTROS ELEMENTOS
-   ========================================================================== */
+/* Botão de Excluir na foto */
+.delete-icon {
+    background-color: #dc3545; /* Vermelho padrão para exclusão */
+}
 
-.report-section { text-align: left; }
+/* ===================== ESTILOS ESPECÍFICOS PARA RELATÓRIO ===================== */
 
+.report-section {
+    text-align: left; 
+}
+
+/* Estilo para Fieldset (Contêiner para Agrupamento) */
 .report-fieldset {
     border: 2px solid var(--tertiary-color);
     padding: 15px;
     margin-bottom: 20px;
-    border-radius: 8px;
-    background: var(--white);
-    text-align: left;
+    border-radius: var(--border-radius);
+    background-color: var(--bg-light);
+    box-shadow: 0 2px 5px var(--shadow);
 }
 
 .report-fieldset legend {
-    color: var(--primary-color);
-    font-weight: bold;
-    padding: 0 5px;
     font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    padding: 0 10px;
 }
 
+/* Estilo para Botões de Ação dentro do fieldset (Ex: Adicionar Item) */
 .report-btn {
     width: 100%;
     padding: 12px;
-    background: var(--primary-color);
-    color: white;
     border: none;
     border-radius: 8px;
-    font-weight: bold;
+    font-weight: 600;
     cursor: pointer;
+    background-color: var(--primary-color);
+    color: var(--white);
+    transition: background-color 0.3s, transform 0.1s;
     margin-top: 10px;
 }
 
-.report-items-list { list-style: none; padding: 0; margin-top: 15px; }
+.report-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.report-btn:active {
+    transform: scale(0.98);
+}
+
+/* Estilos para a Lista de Itens do Relatório */
+.report-items-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
 
 .report-item {
-    background: #f9f9f9;
-    border-left: 4px solid var(--primary-color);
-    padding: 10px;
-    margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-left: 5px solid var(--primary-color);
     border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    background-color: var(--white);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.item-details strong { display: block; color: var(--text-dark); }
+.item-details {
+    flex-grow: 1;
+    text-align: left;
+    font-size: 0.9rem;
+}
 
-.delete-item-btn {
-    color: var(--danger-color);
+.item-details strong {
+    color: var(--text-dark);
+    font-size: 1rem;
+}
+
+/* Botão de Remover Item da Lista */
+.delete-item-btn { 
     background: none;
     border: none;
+    color: #dc3545; 
     cursor: pointer;
     font-size: 1.2rem;
+    margin-left: 10px;
+    transition: color 0.2s;
 }
 
-/* ==========================================================================
-   10. BOTÕES FLUTUANTES E FOOTER
-   ========================================================================== */
-
-.whatsapp-btn {
-    position: fixed;
-    bottom: 20px; right: 20px;
-    background-color: #25d366;
-    color: white;
-    width: 55px; height: 55px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.8rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 90;
-    text-decoration: none;
-    transition: transform 0.3s;
-}
-.whatsapp-btn:hover { transform: scale(1.1); }
-
-.back-to-top {
-    position: fixed;
-    bottom: 85px; right: 20px;
-    background: var(--primary-color);
-    color: white;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; visibility: hidden;
-    transition: 0.3s;
-    z-index: 89;
-    cursor: pointer;
-}
-.back-to-top.show { opacity: 1; visibility: visible; }
-
-footer {
-    background-color: var(--text-dark);
-    color: var(--bg-light);
-    text-align: center;
-    padding: 20px 0;
-    font-size: 0.8rem;
-    margin-top: 30px;
+.delete-item-btn:hover {
+    color: #a01d2a;
 }
 
-/* ==========================================================================
-   11. MEDIA QUERIES (TABLET & DESKTOP)
-   Transforma o layout para telas maiores (Min-width: 768px)
-   ========================================================================== */
 
+/* ===================== MEDIA QUERY: DESKTOP (WEBSITE LOOK) ===================== */
 @media (min-width: 768px) {
     
     body {
-        font-size: 16px; /* Fonte maior */
+        font-size: 16px;
     }
-
-    /* --- CABEÇALHO DESKTOP --- */
-    header {
-        flex-direction: column; /* Logo em cima, Navegação em baixo */
-        justify-content: center;
-        padding: 20px 0;
-        min-height: auto;
-    }
-
-    /* Logo volta ao topo (remove margem forçada do mobile) */
-    .logo-placeholder {
-        margin-top: 0; 
-        margin-bottom: 10px;
-    }
-
-    .logo-placeholder img {
-        max-width: 120px;
-        box-shadow: none;
-        border: none;
-    }
-
-    header h1 { font-size: 2.2rem; }
-    header p { font-size: 1.1rem; }
-
-    /* --- NAVEGAÇÃO DESKTOP (BARRA HORIZONTAL) --- */
     
-    /* Esconde menu hamburguer e menu lateral */
+    /* Esconde o menu Hamburger no desktop e mostra a navegação horizontal */
     .menu-toggle, .side-menu, .menu-overlay {
         display: none !important; 
     }
 
-    /* Exibe barra horizontal */
-    nav.desktop-nav {
+    header {
+        padding: 20px 0;
+    }
+
+    .logo-placeholder img {
+        max-width: 150px;
+    }
+
+    header h1 {
+        font-size: 2.5rem;
+    }
+
+    header p {
+        font-size: 1.2rem;
+    }
+    
+    /* Nav horizontal reaparece */
+    nav {
         display: flex; 
         justify-content: center;
-        background-color: rgba(0, 0, 0, 0.1);
-        width: 100%;
-        margin-top: 20px;
-        padding: 0;
+        padding: 10px 0;
     }
 
-    nav.desktop-nav a {
+    nav a {
         display: inline-block;
-        padding: 15px 30px;
-        color: var(--white);
-        text-decoration: none;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.95rem;
-        transition: background 0.3s, border-bottom 0.3s;
-        border-bottom: 3px solid transparent;
+        padding: 10px 20px;
+        margin: 0 5px;
+        font-size: 1rem;
     }
 
-    nav.desktop-nav a:hover, nav.desktop-nav a.active {
-        background-color: rgba(255, 255, 255, 0.15);
-        border-bottom-color: var(--accent-color);
-    }
-
-    /* --- TIMER DESKTOP --- */
-    .status-card-header {
-        top: 20px;
-        right: 30px;
-        background-color: rgba(255, 255, 255, 0.15);
-        padding: 12px 20px;
-        min-width: 180px; 
-    }
-
-    .timer-display { font-size: 1.1rem; }
-    .timer-label { font-size: 0.75rem; }
-
-    /* --- CONTEÚDO CENTRALIZADO --- */
+    /* Centraliza o conteúdo principal */
     main {
-        max-width: var(--max-width-desktop);
-        padding: 30px;
+        max-width: 900px;
+        padding: 20px;
     }
 
     section {
-        padding: 40px;
-        margin: 30px auto;
-        max-width: 900px;
+        padding: 30px;
+        margin: 20px auto;
+        max-width: 800px; 
     }
 
-    /* Ajustes específicos para desktop */
-    .carousel-slides .slide { height: 400px; }
+    /* Estilos do Input em Desktop */
+    .input-group {
+        max-width: 450px; 
+    }
 
-    .photo-list {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 20px;
+    /* Carrossel */
+    .carousel-container {
+        max-width: 700px;
+    }
+
+    /* Câmera: Botões de Ação horizontal na galeria */
+    .action-buttons {
+        flex-direction: row; 
+        justify-content: center;
+        max-width: 480px;
+        margin: 10px auto;
     }
     
-    .start-camera-section { min-height: 350px; }
+    .action-btn {
+        max-width: 220px;
+    }
     
-    .action-buttons { flex-direction: row; justify-content: center; }
-    .action-btn { width: auto; min-width: 200px; }
+    /* Câmera: Botão de abrir centralizado no desktop */
+    .start-camera-section {
+        min-height: 400px; 
+    }
     
-    .input-group { max-width: 500px; }
+    .gallery {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+}
+
+--------------------------
+/* Garante que o header seja a referência de posição */
+#cabecalho-principal {
+    position: relative; 
+    padding-right: 120px; /* Abre espaço para o relógio em telas menores */
+}
+
+.status-card-header {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.15); /* Fundo leve para combinar com o header */
+    backdrop-filter: blur(5px); /* Efeito moderno de vidro */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    min-width: 100px;
+}
+
+.dia-rotulo {
+    font-weight: bold;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #ffcc00; /* Destaque para o Hoje/Amanhã */
+}
+
+.info-envio {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+.timer {
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace; /* Fonte mono para os números não pularem */
+}
+
+/* Ajuste para celulares */
+@media (max-width: 600px) {
+    .status-card-header {
+        top: 5px;
+        right: 5px;
+        padding: 5px;
+    }
+    .timer { font-size: 0.9rem; }
+}
+/* Botão de Atualizar */
+.btn-refresh {
+    background: #ffcc00;
+    color: #333;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-refresh:active {
+    transform: scale(0.95);
+}
+
+.btn-refresh i {
+    font-size: 0.7rem;
+}
+
+/* Estado de Urgência (Menos de 30 min) */
+.urgente {
+    background: rgba(255, 0, 0, 0.8) !important;
+    border: 1px solid white !important;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Ajuste no Header para acomodar o botão */
+#cabecalho-principal {
+    position: relative;
+    padding-bottom: 15px;
 }
