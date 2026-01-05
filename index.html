@@ -61,15 +61,62 @@
         }
 
         .auth-logo {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 20px;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 25px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3rem;
+            overflow: hidden;
+        }
+
+        .auth-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .auth-logo i {
+            font-size: 3rem;
+            color: var(--white);
+        }
+
+        /* Campo de senha com toggle de visibilidade */
+        .auth-password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .auth-input {
+            flex: 1;
+        }
+
+        .auth-password-toggle {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--dark-bg);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease;
+        }
+
+        .auth-password-toggle:hover {
+            color: var(--accent-color);
+        }
+
+        .auth-password-toggle:active {
+            transform: scale(0.95);
         }
 
         .auth-modal h2 {
@@ -184,20 +231,30 @@
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-modal">
             <div class="auth-logo">
-                <i class="fas fa-lock"></i>
+                <img src="./images/logo-qdelicia.png" alt="Logo Qdelícia">
             </div>
             <h1>Bem vindo à Área do Promotor Qdelícia Frutas</h1>
             <h2>Acesso Seguro</h2>
             <p>Digite a senha para acessar o sistema</p>
             
             <form class="auth-form" id="authForm">
-                <input 
-                    type="password" 
-                    class="auth-input" 
-                    id="authPassword" 
-                    placeholder="Senha"
-                    autocomplete="off"
-                >
+                <div class="auth-password-wrapper">
+                    <input 
+                        type="password" 
+                        class="auth-input" 
+                        id="authPassword" 
+                        placeholder="Senha"
+                        autocomplete="off"
+                    >
+                    <button 
+                        type="button" 
+                        class="auth-password-toggle" 
+                        id="authPasswordToggle"
+                        aria-label="Mostrar/Ocultar Senha"
+                    >
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
                 <button type="submit" class="auth-btn">
                     <i class="fas fa-unlock"></i> Acessar
                 </button>
@@ -580,6 +637,7 @@
             const authForm = document.getElementById('authForm');
             const authPassword = document.getElementById('authPassword');
             const authError = document.getElementById('authError');
+            const authPasswordToggle = document.getElementById('authPasswordToggle');
 
             // Se já está autenticado, esconde o modal
             if (isAuthenticated()) {
@@ -590,6 +648,23 @@
                 document.body.classList.add('auth-active');
                 authPassword.focus();
             }
+
+            // Toggle para mostrar/ocultar senha
+            authPasswordToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const isPassword = authPassword.type === 'password';
+                authPassword.type = isPassword ? 'text' : 'password';
+                
+                // Atualiza o ícone
+                const icon = authPasswordToggle.querySelector('i');
+                if (isPassword) {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
 
             // Submissão do formulário
             authForm.addEventListener('submit', function(e) {
