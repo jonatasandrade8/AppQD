@@ -44,45 +44,111 @@
             });
         });
     }
-    function atualizarRelogio() {
+    /**
+ * LÓGICA DE CRONÔMETROS (Estoque Diário + Caixas Quinzenal)
+ */
+
+// CONFIGURAÇÃO: Defina UMA segunda-feira que teve contagem de caixas no passado.
+// O sistema calculará as próximas quinzenas automaticamente somando 14 dias a partir daqui.
+// Ex: 06 de Janeiro de 2025 foi uma segunda-feira.
+const DATA_REFERENCIA_CAIXAS = new Date(2025, 0, 6, 14, 0, 0); // (Ano, Mês-1, Dia, Hora, Min) -> Mês 0 é Janeiro
+
+function atualizarRelogios() {
     const agora = new Date();
-    const meta = new Date();
+
+    // --- RELÓGIO 1: ESTOQUE (Diário 14h) ---
+    const metaEstoque = new Date();
+    metaEstoque.setHours(14, 0, 0, 0);
+
+    let textoDiaEstoque = 'Hoje';
     
-    meta.setHours(14, 0, 0, 0);
-
-    if (agora >= meta) {
-        meta.setDate(meta.getDate() + 1);
-        document.getElementById('dia-rotulo').innerText = 'Amanhã';
-        document.getElementById('status-envio').classList.remove('urgente');
-    } else {
-        document.getElementById('dia-rotulo').innerText = 'Hoje';
+    // Se já passou das 14h, a meta é amanhã
+    if (agora >= metaEstoque) {
+        metaEstoque.setDate(metaEstoque.getDate() + 1);
+        textoDiaEstoque = 'Amanhã';
     }
 
+    atualizarDisplayTimer(agora, metaEstoque, 'timer-estoque', 'dia-rotulo-estoque', textoDiaEstoque, 'row-estoque');
+
+
+    // --- RELÓGIO 2: CAIXAS (Quinzenal - Segundas 14h) ---
+    // Encontrar a próxima data quinzenal
+    let metaCaixas = new Date(DATA_REFERENCIA_CAIXAS);
+    
+    // Enquanto a meta de caixas for menor que agora, soma 14 dias
+    while (metaCaixas <= agora) {
+        metaCaixas.setDate(metaCaixas.getDate() + 14);
+    }
+
+    // Verifica se a meta de caixas é hoje
+    let textoDiaCaixas = '';
+    const diferencaDias = Math.floor((metaCaixas - agora) / (1000 * 60 * 60 * 24));
+    
+    if (metaCaixas.toDateString() === agora.toDateString()) {
+        textoDiaCaixas = 'HOJE!';
+    } else if (diferencaDias < 1) {
+        textoDiaCaixas = 'Amanhã';
+    } else {
+        // Mostra a data (Ex: 20/01) se estiver longe
+        const dia = metaCaixas.getDate().toString().padStart(2, '0');
+        const mes = (metaCaixas.getMonth() + 1).toString().padStart(2, '0');
+        textoDiaCaixas = `${dia}/${mes}`;
+    }
+
+    atualizarDisplayTimer(agora, metaCaixas, 'timer-caixas', 'dia-rotulo-caixas', textoDiaCaixas, 'row-caixas');
+}
+
+// Função auxiliar para calcular tempo e atualizar o HTML
+function atualizarDisplayTimer(agora, meta, idDisplay, idRotulo, textoRotulo, idLinha) {
     const diferenca = meta - agora;
-    const totalMinutos = Math.floor(diferenca / (1000 * 60));
+    
+    // Elementos DOM
+    const elDisplay = document.getElementById(idDisplay);
+    const elRotulo = document.getElementById(idRotulo);
+    const elLinha = document.getElementById(idLinha);
 
-    // Lógica de Cor Vermelha (Urgência)
-    const card = document.getElementById('status-envio');
-    if (document.getElementById('dia-rotulo').innerText === 'Hoje' && totalMinutos < 30) {
-        card.classList.add('urgente');
-    } else {
-        card.classList.remove('urgente');
-    }
+    if (!elDisplay || !elRotulo) return;
 
-    // Cálculos de tempo
+    // Atualiza Rótulo (Hoje, Amanhã, Data)
+    elRotulo.innerText = textoRotulo;
+
+    // Cálculos matemáticos
     const horas = Math.floor((diferenca / (1000 * 60 * 60)) % 24);
     const minutos = Math.floor((diferenca / (1000 * 60)) % 60);
     const segundos = Math.floor((diferenca / 1000) % 60);
+    
+    // Se faltar mais de 24h (para as caixas), somamos as horas totais ou mostramos dias
+    const diasTotais = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+    
+    let displayTexto = '';
+    
+    if (diasTotais > 0) {
+        // Se faltar mais de 1 dia, mostra "05d 12h"
+        displayTexto = `${diasTotais}d ${horas}h`;
+    } else {
+        // Formato padrão HH:MM:SS
+        displayTexto = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+    }
 
-    document.getElementById('contagem-regressiva').innerText = 
-        `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+    elDisplay.innerText = displayTexto;
+
+    // Lógica de Urgência (Vermelho)
+    // Regra: Se for "HOJE" e faltar menos de 30 minutos
+    const totalMinutosRestantes = Math.floor(diferenca / (1000 * 60));
+    const ehHoje = (textoRotulo === 'Hoje' || textoRotulo === 'HOJE!');
+
+    if (ehHoje && totalMinutosRestantes < 30) {
+        elDisplay.classList.add('urgente-text');
+        elRotulo.classList.add('urgente-text');
+    } else {
+        elDisplay.classList.remove('urgente-text');
+        elRotulo.classList.remove('urgente-text');
+    }
 }
 
-
-
-setInterval(atualizarRelogio, 1000);
-atualizarRelogio();
-
+// Inicializa
+setInterval(atualizarRelogios, 1000);
+atualizarRelogios();
     // 2. Lógica do Botão Voltar ao Topo
     const backToTop = document.querySelector('.back-to-top');
 
