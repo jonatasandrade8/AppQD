@@ -86,11 +86,26 @@
         <h1>Qdelícia Frutas</h1>
         <p>Página Inicial</p>
         <div id="status-envio" class="status-card-header">
-        <div id="dia-rotulo" class="dia-rotulo">---</div>
-        <div class="info-envio">Estoque</div>
-        <div class="info-envio">Envio até às 14:00</div>
-        <div id="contagem-regressiva" class="timer">00:00:00</div>
+    
+    <div class="timer-row" id="row-estoque">
+        <div class="timer-info">
+            <span id="dia-rotulo-estoque" class="dia-rotulo-sm">---</span>
+            <span class="timer-label">Estoque (14h)</span>
+        </div>
+        <div id="timer-estoque" class="timer-display">00:00:00</div>
     </div>
+
+    <div class="timer-separator"></div>
+
+    <div class="timer-row" id="row-caixas">
+        <div class="timer-info">
+            <span id="dia-rotulo-caixas" class="dia-rotulo-sm">---</span>
+            <span class="timer-label">Caixas (Seg)</span>
+        </div>
+        <div id="timer-caixas" class="timer-display">00:00:00</div>
+    </div>
+
+</div>
     </header>
     
     <nav>
