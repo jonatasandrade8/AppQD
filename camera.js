@@ -182,6 +182,7 @@ function loadAndPopulateDropdowns() {
 
     // Força a validação inicial do botão
     checkCameraAccess();
+    updateActionHighlight();
 }
 
 /**
@@ -274,27 +275,80 @@ if (selectEstado) {
     selectEstado.addEventListener('change', () => {
         populateRede(selectEstado.value);
         saveSelection();
+        updateActionHighlight();
     });
 }
 if (selectRede) {
     selectRede.addEventListener('change', () => {
         populatePromotor(selectEstado.value, selectRede.value);
         saveSelection();
+        updateActionHighlight();
     });
 }
 if (selectPromotor) {
     selectPromotor.addEventListener('change', () => {
         populateLoja(selectEstado.value, selectRede.value, selectPromotor.value);
         saveSelection();
+        updateActionHighlight();
     });
 }
 // NOVO: Adicionado listener para o Tipo de Foto
+// NOVO: Adicionado listener para o Tipo de Foto
 if (selectTipoFoto) {
     // Apenas salva/checa, mas não é persistido (o valor será resetado ao recarregar a página)
-    selectTipoFoto.addEventListener('change', saveSelection);
+    selectTipoFoto.addEventListener('change', () => {
+        saveSelection();
+        updateActionHighlight();
+    });
 }
 if (selectLoja) {
-    selectLoja.addEventListener('change', saveSelection);
+    selectLoja.addEventListener('change', () => {
+        saveSelection();
+        updateActionHighlight();
+    });
+}
+
+/**
+ * @description Destaca o próximo campo obrigatório vazio.
+ * Ordem: Estado -> Rede -> Promotor -> Loja -> Tipo de Foto
+ */
+function updateActionHighlight() {
+    // Remove o destaque de todos primeiro
+    const selects = [selectEstado, selectRede, selectPromotor, selectLoja, selectTipoFoto];
+    selects.forEach(el => {
+        if (el && el.closest('.input-group')) {
+            el.closest('.input-group').classList.remove('highlight-next-step');
+        }
+    });
+
+    // Função auxiliar para adicionar destaque
+    const addHighlight = (el) => {
+        if (el && el.closest('.input-group')) {
+            el.closest('.input-group').classList.add('highlight-next-step');
+        }
+    };
+
+    // Verifica a sequência e destaca o primeiro que estiver vazio/inválido
+    if (!selectEstado.value) {
+        addHighlight(selectEstado);
+        return;
+    }
+    if (!selectRede.value || selectRede.disabled) {
+        addHighlight(selectRede);
+        return;
+    }
+    if (!selectPromotor.value || selectPromotor.disabled) {
+        addHighlight(selectPromotor);
+        return;
+    }
+    if (!selectLoja.value || selectLoja.disabled) {
+        addHighlight(selectLoja);
+        return;
+    }
+    if (!selectTipoFoto.value) {
+        addHighlight(selectTipoFoto);
+        return;
+    }
 }
 
 
@@ -436,7 +490,7 @@ function capturePhoto() {
     // 1. Usar dimensões reais do vídeo para máxima qualidade e desenhar diretamente (sem rotação complexa)
     const videoW = video.videoWidth;
     const videoH = video.videoHeight;
-    
+
     // Definir o tamanho do CANVAS para as dimensões do vídeo
     canvas.width = videoW;
     canvas.height = videoH;
@@ -494,7 +548,7 @@ function capturePhoto() {
 
         ctx.drawImage(logoImage, padding, padding, logoWidth, logoHeight);
     }
-    
+
     // Usar a melhor qualidade (0.9)
     const dataURL = canvas.toDataURL('image/jpeg', 0.9);
 

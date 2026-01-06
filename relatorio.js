@@ -80,7 +80,7 @@ const RELATORIO_DATA = {
         "Abacaxi",
         "Melão",
         "Coco Verde"
-        
+
     ]
 };
 
@@ -103,15 +103,15 @@ const dateTimeElement = document.getElementById('date-time'); // Adicionado para
 // Elementos para Marca D'água (Base)
 const selectEstado = document.getElementById('select-estado'); // NOVO: Estado
 const selectReportType = document.getElementById('select-report-type'); // NOVO: Tipo de Relatório
-const selectPromotor = document.getElementById('select-promotor'); 
-const selectRede = document.getElementById('select-rede'); 
-const selectLoja = document.getElementById('select-loja'); 
+const selectPromotor = document.getElementById('select-promotor');
+const selectRede = document.getElementById('select-rede');
+const selectLoja = document.getElementById('select-loja');
 
 // Elementos Específicos da Câmera de Devolução (para adicionar itens)
-const selectMotivo = document.getElementById('select-motivo'); 
-const selectProduto = document.getElementById('select-produto'); 
-const inputQuantidade = document.getElementById('input-quantidade'); 
-const inputObservacoes = document.getElementById('input-observacoes'); 
+const selectMotivo = document.getElementById('select-motivo');
+const selectProduto = document.getElementById('select-produto');
+const inputQuantidade = document.getElementById('input-quantidade');
+const inputObservacoes = document.getElementById('input-observacoes');
 
 // Novos Elementos para a lista de itens
 const addItemBtn = document.getElementById('add-item-btn');
@@ -123,11 +123,11 @@ let usingFrontCamera = false;
 let photos = [];
 let items = []; // Armazena a lista de itens (produto, motivo, qtd)
 let hasCameraPermission = false; // Adicionado para controle de permissão
-const localStorageKey = 'qdelicia_last_selection'; 
+const localStorageKey = 'qdelicia_last_selection';
 
 // Carregar a imagem da logomarca (mantida para uso apenas no PDF)
 const logoImage = new Image();
-logoImage.src = './images/logo-qdelicia.png'; 
+logoImage.src = './images/logo-qdelicia.png';
 logoImage.onerror = () => console.error("Erro ao carregar a imagem da logomarca. Verifique o caminho.");
 
 
@@ -156,12 +156,12 @@ function saveSelection() {
 function populateSelect(selectElement, data, placeholder) {
     if (!selectElement) return;
     selectElement.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
-    
+
     const isArray = Array.isArray(data);
     const iterableData = isArray ? data : Object.keys(data);
-    
+
     iterableData.forEach(itemKey => {
-        const itemValue = isArray ? itemKey : itemKey; 
+        const itemValue = isArray ? itemKey : itemKey;
         const option = document.createElement('option');
         option.value = itemValue;
         option.textContent = itemValue;
@@ -264,11 +264,11 @@ function loadAndPopulateDropdowns() {
             }
         }
     }
-    
+
     // --- Lógica de Motivo/Produto/Observações ---
     populateSelect(selectMotivo, RELATORIO_DATA.MOTIVOS_DEVOLUCAO, "Selecione o Motivo");
     populateSelect(selectProduto, RELATORIO_DATA.TIPOS_PRODUTO, "Selecione o Produto");
-    
+
     checkCameraAccess();
 }
 
@@ -287,7 +287,7 @@ function handleAddItem() {
     }
 
     items.push({ produto, motivo, quantidade });
-    
+
     updateItemListUI();
     checkCameraAccess();
 
@@ -303,7 +303,7 @@ function handleAddItem() {
 function updateItemListUI() {
     if (!itemListElement) return;
 
-    itemListElement.innerHTML = ''; 
+    itemListElement.innerHTML = '';
     if (items.length === 0) {
         itemListElement.innerHTML = '<li class="empty-list">Nenhum item adicionado.</li>';
     }
@@ -316,18 +316,18 @@ function updateItemListUI() {
                 <i class="fas fa-trash"></i>
             </button>
         `;
-        
+
         // Adiciona o listener de remoção
         li.querySelector('.delete-item-btn').addEventListener('click', (e) => {
             // O índice é lido do atributo data-index do botão
             const indexToRemove = parseInt(e.currentTarget.getAttribute('data-index'));
             // Remove 1 elemento a partir do índice
-            items.splice(indexToRemove, 1); 
+            items.splice(indexToRemove, 1);
             // Atualiza a UI e verifica o acesso à câmera/botões
             updateItemListUI();
             checkCameraAccess();
         });
-        
+
         itemListElement.appendChild(li);
     });
 }
@@ -347,12 +347,12 @@ function clearReportData() {
 
     // 3. Limpa o Tipo de Relatório
     if (selectReportType) {
-        selectReportType.value = ""; 
+        selectReportType.value = "";
     }
 
     // 4. Garante que os botões de câmera/PDF sejam atualizados
     checkCameraAccess();
-    
+
     alert("Dados do Relatório (Itens, Fotos e Tipo) foram limpos com sucesso.");
 }
 
@@ -370,9 +370,9 @@ function checkCameraAccess() {
     const isRedeSelected = selectRede && selectRede.value !== "";
     const isLojaSelected = selectLoja && selectLoja.value !== "";
     const hasItems = items.length > 0;
-    
+
     const isReady = isEstadoSelected && isReportTypeSelected && isPromotorSelected && isRedeSelected && isLojaSelected && hasItems;
-    
+
     if (openCameraBtn) {
         if (isReady) {
             openCameraBtn.disabled = false;
@@ -382,15 +382,60 @@ function checkCameraAccess() {
             openCameraBtn.innerHTML = '<i class="fas fa-lock"></i> Preencha as Informações';
         }
     }
-    
+
     // Habilita/Desabilita botões de download/compartilhamento
     if (downloadAllBtn && shareAllBtn) {
         const canGeneratePdf = isReady && photos.length > 0;
         downloadAllBtn.disabled = !canGeneratePdf;
         shareAllBtn.disabled = !canGeneratePdf;
     }
-    
+
     return isReady;
+}
+return isReady;
+}
+
+/**
+ * @description Destaca o próximo campo obrigatório vazio.
+ * Ordem: Estado -> Rede -> Promotor -> Loja -> Tipo de Relatório
+ */
+function updateActionHighlight() {
+    // Remove o destaque de todos primeiro
+    const selects = [selectEstado, selectRede, selectPromotor, selectLoja, selectReportType];
+    selects.forEach(el => {
+        if (el && el.closest('.input-group')) {
+            el.closest('.input-group').classList.remove('highlight-next-step');
+        }
+    });
+
+    // Função auxiliar para adicionar destaque
+    const addHighlight = (el) => {
+        if (el && el.closest('.input-group')) {
+            el.closest('.input-group').classList.add('highlight-next-step');
+        }
+    };
+
+    // Verifica a sequência e destaca o primeiro que estiver vazio/inválido
+    if (!selectEstado.value) {
+        addHighlight(selectEstado);
+        return;
+    }
+    if (!selectRede.value || selectRede.disabled) {
+        addHighlight(selectRede);
+        return;
+    }
+    if (!selectPromotor.value || selectPromotor.disabled) {
+        addHighlight(selectPromotor);
+        return;
+    }
+    if (!selectLoja.value || selectLoja.disabled) {
+        addHighlight(selectLoja);
+        return;
+    }
+    if (!selectReportType.value) {
+        addHighlight(selectReportType);
+        return;
+    }
 }
 // --- FIM DA LÓGICA DE VALIDAÇÃO ---
 // ==================================================================
@@ -411,9 +456,9 @@ function updateDateTime() {
 }
 
 // Variáveis para Zoom e Flash (Mantidas de camera.js)
-let currentZoom = 1; 
-let maxZoom = 1; 
-let deviceOrientation = 0; 
+let currentZoom = 1;
+let maxZoom = 1;
+let deviceOrientation = 0;
 
 /**
  * @description Solicita permissão da câmera e inicia o stream com qualidade otimizada.
@@ -428,17 +473,17 @@ async function requestCameraPermission() {
         const constraints = {
             video: {
                 facingMode: usingFrontCamera ? "user" : "environment",
-                width: { ideal: 1920 }, 
+                width: { ideal: 1920 },
                 height: { ideal: 1080 },
-                zoom: { ideal: 1 } 
+                zoom: { ideal: 1 }
             },
             audio: false
         };
-        
+
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
-        hasCameraPermission = true; 
-        
+        hasCameraPermission = true;
+
         // Obter capacidades de zoom do dispositivo (De camera.js)
         const videoTrack = currentStream.getVideoTracks()[0];
         if (videoTrack && videoTrack.getCapabilities) {
@@ -449,30 +494,30 @@ async function requestCameraPermission() {
                 // updateZoomButtons(); // Não temos botões de zoom no HTML
             }
         }
-        
+
         currentZoom = 1;
         applyZoom();
-        
+
         // Detectar orientação do dispositivo (De camera.js)
         detectDeviceOrientation();
 
     } catch (err) {
         console.error("Erro ao acessar câmera:", err);
         hasCameraPermission = false;
-        
+
         alert("Não foi possível iniciar a câmera. Verifique as permissões de acesso no seu navegador.");
-        closeCameraFullscreen(); 
+        closeCameraFullscreen();
     }
 }
 
 async function openCameraFullscreen() {
     if (!fullscreenCameraContainer) return;
-    
+
     fullscreenCameraContainer.classList.add('active');
     document.body.style.overflow = 'hidden';
-    
+
     await requestCameraPermission();
-    
+
     // Inicia a atualização da data/hora
     updateDateTime();
     setInterval(updateDateTime, 1000);
@@ -486,7 +531,7 @@ function closeCameraFullscreen() {
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
     }
-    hasCameraPermission = false; 
+    hasCameraPermission = false;
 }
 
 /**
@@ -506,7 +551,7 @@ function applyZoom() {
  */
 function detectDeviceOrientation() {
     if (window.DeviceOrientationEvent) {
-        window.addEventListener('deviceorientation', function(event) {
+        window.addEventListener('deviceorientation', function (event) {
             // Beta (eixo X) e Gamma (eixo Y) são usados para determinar a orientação
             const beta = event.beta; // -180 a 180 (frente/trás)
             const gamma = event.gamma; // -90 a 90 (esquerda/direita)
@@ -530,19 +575,19 @@ function takePhoto() {
         alert("A câmera não está ativa ou as permissões foram negadas.");
         return;
     }
-    
+
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
-    
+
     // Define o tamanho do canvas para o tamanho do vídeo
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
+
     // Desenha o frame do vídeo no canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
+
     // --- APLICAÇÃO DA MARCA D'ÁGUA (APENAS DATA/HORA E DADOS DO RELATÓRIO) ---
-    
+
     const promotor = selectPromotor.value;
     const rede = selectRede.value;
     const loja = selectLoja.value;
@@ -550,36 +595,36 @@ function takePhoto() {
     const now = new Date();
     const dateStr = now.toLocaleDateString('pt-BR');
     const timeStr = now.toLocaleTimeString('pt-BR');
-    
+
     // Configurações de texto
     context.font = "bold 30px Arial";
     context.fillStyle = "white";
     context.strokeStyle = "black";
     context.lineWidth = 2;
     context.textAlign = "left";
-    
+
     const textLines = [
         `${reportType} - ${promotor}`,
         `${rede} - ${loja}`,
         `${dateStr} ${timeStr}`
     ];
-    
+
     const lineHeight = 40;
     let y = canvas.height - (lineHeight * textLines.length) - 20;
     const x = 20;
-    
+
     textLines.forEach(line => {
         context.strokeText(line, x, y); // Contorno preto
         context.fillText(line, x, y);   // Preenchimento branco
         y += lineHeight;
     });
-    
+
     // --- FIM DA MARCA D'ÁGUA ---
-    
+
     // Converte o canvas para Data URL
     const photoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
     photos.push(photoDataUrl);
-    
+
     updateGallery();
     checkCameraAccess(); // Atualiza o estado dos botões de PDF
 }
@@ -589,7 +634,7 @@ function takePhoto() {
  */
 function updateGallery() {
     if (!photoList) return;
-    
+
     photoList.innerHTML = '';
     photos.forEach((photoDataUrl, index) => {
         const div = document.createElement('div');
@@ -600,17 +645,17 @@ function updateGallery() {
                 <i class="fas fa-trash"></i>
             </button>
         `;
-        
+
         div.querySelector('.delete-photo-btn').addEventListener('click', (e) => {
             const indexToRemove = parseInt(e.currentTarget.getAttribute('data-index'));
             photos.splice(indexToRemove, 1);
             updateGallery();
             checkCameraAccess();
         });
-        
+
         photoList.appendChild(div);
     });
-    
+
     if (photoCountElement) {
         photoCountElement.textContent = photos.length;
     }
@@ -641,51 +686,51 @@ async function generatePDFReport(action) {
         alert("ERRO: A biblioteca jsPDF não foi carregada. Verifique o HTML.");
         return;
     }
-    
-    const { jsPDF } = jspdf; 
+
+    const { jsPDF } = jspdf;
     // alert("Iniciando geração do PDF. Isso pode levar um momento."); // LINHA REMOVIDA CONFORME SOLICITADO
 
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
     const margin = 10;
-    
+
     // Configurações para o layout 2x3
     const cols = 2;
     const rows = 3;
     const imgPadding = 3;
     const imgWidth = (pdfWidth - (margin * 2) - ((cols - 1) * imgPadding)) / cols;
     const imgHeight = (pdfHeight - (margin * 2) - ((rows - 1) * imgPadding)) / rows;
-    
-    
+
+
     // --- PARTE 1: ADICIONAR FOTOS (2x3 por página) ---
     let currentPhoto = 0;
-    
+
     for (let i = 0; i < photos.length; i++) {
         const photoIndexOnPage = i % (cols * rows);
-        
+
         if (photoIndexOnPage === 0 && i !== 0) {
             pdf.addPage();
         }
-        
+
         const col = photoIndexOnPage % cols;
         const row = Math.floor(photoIndexOnPage / cols);
-        
+
         const x = margin + (col * (imgWidth + imgPadding));
         const y = margin + (row * (imgHeight + imgPadding));
 
         pdf.setFontSize(8);
-        pdf.text(`Foto ${i + 1}`, x, y - 2); 
-        
+        pdf.text(`Foto ${i + 1}`, x, y - 2);
+
         pdf.addImage(photos[i], 'JPEG', x, y, imgWidth, imgHeight);
         currentPhoto++;
     }
 
     // --- PARTE 2: ADICIONAR RELATÓRIO DE INFORMAÇÕES (NOVA PÁGINA) ---
-    
+
     pdf.addPage();
-    
-    const promotor = selectPromotor.value; 
+
+    const promotor = selectPromotor.value;
     const rede = selectRede.value;
     const loja = selectLoja.value;
     const reportType = selectReportType.value; // Pega o tipo de relatório
@@ -697,14 +742,14 @@ async function generatePDFReport(action) {
     // Cabeçalho e Logomarca
     const logoDataUrl = logoImage.complete ? logoImage.src : null;
     if (logoDataUrl) {
-        pdf.addImage(logoDataUrl, 'PNG', margin, yPos, 40, 15); 
-        yPos += 20; 
+        pdf.addImage(logoDataUrl, 'PNG', margin, yPos, 40, 15);
+        yPos += 20;
     }
-    
+
     pdf.setFontSize(18);
     pdf.text(reportTitle, margin, yPos); // Título dinâmico
-    pdf.line(margin, yPos + 2, pdfWidth - margin, yPos + 2); 
-    yPos += 10; 
+    pdf.line(margin, yPos + 2, pdfWidth - margin, yPos + 2);
+    yPos += 10;
 
     // Dados Gerais
     pdf.setFontSize(11);
@@ -712,25 +757,25 @@ async function generatePDFReport(action) {
     yPos += 7;
     pdf.text(`Data e Hora: ${date}`, margin, yPos);
     yPos += 7;
-    pdf.text(`Promotor: ${promotor}`, margin, yPos); 
+    pdf.text(`Promotor: ${promotor}`, margin, yPos);
     yPos += 7;
     pdf.text(`Rede: ${rede} - Loja: ${loja}`, margin, yPos);
     yPos += 10;
-    
+
     // Itens da Devolução/Qualidade
     pdf.setFontSize(14);
     pdf.text(`Itens do Relatório (${reportTitle})`, margin, yPos);
-    pdf.line(margin, yPos + 2, pdfWidth - margin, yPos + 2); 
+    pdf.line(margin, yPos + 2, pdfWidth - margin, yPos + 2);
     yPos += 7;
-    
+
     pdf.setFontSize(11);
     items.forEach((item, index) => {
         // Ajusta o texto para ser mais genérico (Qualidade/Devolução)
         const text = `• Item ${index + 1}: ${item.produto} (${item.motivo}) - ${item.quantidade} KG`;
         const splitText = pdf.splitTextToSize(text, pdfWidth - (margin * 2));
         pdf.text(splitText, margin, yPos);
-        yPos += (splitText.length * 5) + 2; 
-        
+        yPos += (splitText.length * 5) + 2;
+
         if (yPos > pdfHeight - 20) {
             pdf.addPage();
             yPos = margin;
@@ -743,9 +788,9 @@ async function generatePDFReport(action) {
     // Observações
     pdf.setFontSize(14);
     pdf.text('Observações Gerais', margin, yPos);
-    pdf.line(margin, yPos + 2, pdfWidth - margin, yPos + 2); 
+    pdf.line(margin, yPos + 2, pdfWidth - margin, yPos + 2);
     yPos += 7;
-    
+
     pdf.setFontSize(11);
     const splitObs = pdf.splitTextToSize(observacoes, pdfWidth - (margin * 2));
     pdf.text(splitObs, margin, yPos);
@@ -757,7 +802,7 @@ async function generatePDFReport(action) {
         pdf.save(fileName);
     } else if (action === 'share') {
         const pdfBlob = pdf.output('blob');
-        
+
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], fileName)] })) {
             try {
                 const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
@@ -787,18 +832,37 @@ if (selectEstado) {
     selectEstado.addEventListener('change', () => {
         populateRede(selectEstado.value);
         saveSelection();
+        updateActionHighlight();
     });
 }
 if (selectRede) {
     selectRede.addEventListener('change', () => {
         populatePromotor(selectEstado.value, selectRede.value);
         saveSelection();
+        updateActionHighlight();
     });
 }
 if (selectPromotor) {
     selectPromotor.addEventListener('change', () => {
         populateLoja(selectEstado.value, selectRede.value, selectPromotor.value);
         saveSelection();
+        updateActionHighlight();
+    });
+}
+if (selectLoja) {
+    selectLoja.addEventListener('change', () => {
+        saveSelection();
+        updateActionHighlight();
+    });
+}
+if (selectReportType) {
+    selectReportType.addEventListener('change', () => {
+        // saveSelection(); // Tipo não é salvo, mas o destaque deve atualizar
+        updateActionHighlight();
+        checkCameraAccess();
+    });
+}
+saveSelection();
     });
 }
 if (selectReportType) {
@@ -832,7 +896,7 @@ if (switchBtn) {
     switchBtn.addEventListener('click', () => {
         usingFrontCamera = !usingFrontCamera;
         // Reinicia a câmera com a nova facingMode
-        requestCameraPermission(); 
+        requestCameraPermission();
     });
 }
 
@@ -843,7 +907,7 @@ if (shareAllBtn) shareAllBtn.addEventListener('click', () => generatePDFReport('
 
 // ==================== INICIALIZAÇÃO GERAL ====================
 window.addEventListener('load', () => {
-    loadAndPopulateDropdowns(); 
+    loadAndPopulateDropdowns();
     updateItemListUI();
-    updateGallery(); 
+    updateGallery();
 });
