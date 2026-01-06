@@ -8,6 +8,7 @@ const PHOTO_TYPES = {
     "Bancadas": "Bancadas",
     "Ponto Extra": "Ponto Extra",
     "Caixas Secas": "Caixas Secas",
+    "Qualidade de Produto": "Qualidade de Produto",
     "Ação de Degustação": "Ação de Degustação",
 };
 
