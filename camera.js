@@ -41,7 +41,7 @@ const APP_DATA = {
         },
         "Superfácil": {
             "Neto": ["Emaús"],
-            "David": ["Nazaré"]
+            "Milagres": ["Nazaré"]
         },
         "Mar Vermelho": {
             "Markson": ["Natal", "Parnamirim"]
