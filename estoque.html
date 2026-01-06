@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,67 +9,69 @@
     <title>Estoque - Qdelícia Frutas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-   
+
 </head>
 
 <body>
-    
+
     <div class="menu-overlay"></div>
     <aside class="side-menu">
         <a href="index.html"><i class="fas fa-home"></i> Início</a>
         <a href="estoque.html" class="active"><i class="fas fa-boxes-stacked"></i> Estoque</a>
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
-        <a href="relatorio.html"><i class="fas fa-camera"></i> Relatório/Qualidade</a>
-    </aside>
-   <header id="cabecalho-principal">
-    <button class="menu-toggle" aria-label="Abrir Menu">
-        <i class="fas fa-bars"></i>
-        <span class="menu-label">Menu</span>
-    </button>
-    <div class="logo-placeholder">
-        <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"> 
-    </div>
-    <h1>Qdelícia Frutas</h1>
-    <p>Registro de estoque diário</p>
-    
-    <button onclick="recarregarPagina()" class="btn-refresh">
-        <i class="fas fa-sync-alt"></i> Atualizar Página
-    </button>
 
-    <div id="status-envio" class="notification-board">
-        <div class="notification-item">
-            <div class="notification-label">Estoque</div>
-            <div class="notification-content">
-                <div id="dia-rotulo" class="dia-rotulo">---</div>
-                <div class="timer-label">Envio até às 14:00</div>
-                <div id="contagem-regressiva" class="timer">00:00:00</div>
+    </aside>
+    <header id="cabecalho-principal">
+        <button class="menu-toggle" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
+        </button>
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+        </div>
+        <h1>Qdelícia Frutas</h1>
+        <p>Registro de estoque diário</p>
+
+        <button onclick="recarregarPagina()" class="btn-refresh">
+            <i class="fas fa-sync-alt"></i> Atualizar Página
+        </button>
+
+        <div id="status-envio" class="notification-board">
+            <div class="notification-item">
+                <div class="notification-label">Estoque</div>
+                <div class="notification-content">
+                    <div id="dia-rotulo" class="dia-rotulo">---</div>
+                    <div class="timer-label">Envio até às 14:00</div>
+                    <div id="contagem-regressiva" class="timer">00:00:00</div>
+                </div>
+            </div>
+            <div class="notification-divider"></div>
+            <div class="notification-item">
+                <div class="notification-label">Caixas Secas</div>
+                <div class="notification-content">
+                    <div id="caixas-rotulo" class="dia-rotulo">---</div>
+                    <div class="timer-label">Próximo envio</div>
+                    <div id="timer-caixas" class="timer">00:00:00</div>
+                </div>
             </div>
         </div>
-        <div class="notification-divider"></div>
-        <div class="notification-item">
-            <div class="notification-label">Caixas Secas</div>
-            <div class="notification-content">
-                <div id="caixas-rotulo" class="dia-rotulo">---</div>
-                <div class="timer-label">Próximo envio</div>
-                <div id="timer-caixas" class="timer">00:00:00</div>
-            </div>
-        </div>
-    </div>
-</header>
+    </header>
 
     <nav>
         <a href="index.html">Início</a>
         <a href="estoque.html" class="active">Estoque</a>
         <a href="caixas.html">Caixas</a>
         <a href="camera.html">Câmera</a>
-        <a href="relatorio.html">Relatório/Qualidade</a>
+
     </nav>
     <div>
-        <iframe src="https://script.google.com/macros/s/AKfycbxBY5zCtgdcX2jlGRZImALo0a78R9TLUOzAHYECWCSDis-0-OVWBCJofDADpTbhRPnY/exec" width="100%" height="1000" frameborder="0" marginheight="0" marginwidth="0">Carregando script...</iframe>
-    
+        <iframe
+            src="https://script.google.com/macros/s/AKfycbxBY5zCtgdcX2jlGRZImALo0a78R9TLUOzAHYECWCSDis-0-OVWBCJofDADpTbhRPnY/exec"
+            width="100%" height="1000" frameborder="0" marginheight="0" marginwidth="0">Carregando script...</iframe>
+
     </div>
-        
+
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
     </footer>
@@ -84,4 +87,5 @@
     <script src="script.js"></script>
     <script src="alert.js"></script>
 </body>
+
 </html>
