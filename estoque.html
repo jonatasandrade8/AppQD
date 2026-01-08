@@ -9,7 +9,50 @@
     <title>Estoque - Qdelícia Frutas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Melhorias específicas para o container do iframe */
+        .iframe-container {
+            padding: 15px; /* Cria um espaço nas laterais para o usuário rolar a página principal */
+            background-color: #f4f4f4; /* Fundo suave para contrastar com o branco do formulário */
+        }
 
+        .iframe-wrapper {
+            position: relative;
+            border: 3px solid #1e1b4b; /* Borda com a cor azul escura da marca */
+            border-radius: 15px; /* Bordas arredondadas para um visual moderno */
+            overflow: hidden; /* Garante que o iframe respeite o arredondamento */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* Sombra para dar profundidade */
+            background: white;
+        }
+
+        /* Indicador visual de que o campo é rolável */
+        .iframe-wrapper::after {
+            content: '↕ Arraste dentro da borda para rolar o formulário';
+            display: block;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            padding: 5px;
+            background: #eee;
+            border-top: 1px solid #ddd;
+        }
+
+        iframe {
+            display: block;
+            width: 100%;
+            /* Altura dinâmica para evitar travamentos */
+            height: 85vh; 
+        }
+
+        @media (max-width: 600px) {
+            .iframe-container {
+                padding: 10px 5px; /* Em celulares, reduzimos o recuo */
+            }
+            iframe {
+                height: 75vh;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -20,8 +63,8 @@
         <a href="estoque.html" class="active"><i class="fas fa-boxes-stacked"></i> Estoque</a>
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
-
     </aside>
+
     <header id="cabecalho-principal">
         <button class="menu-toggle" aria-label="Abrir Menu">
             <i class="fas fa-bars"></i>
@@ -63,14 +106,19 @@
         <a href="estoque.html" class="active">Estoque</a>
         <a href="caixas.html">Caixas</a>
         <a href="camera.html">Câmera</a>
-
     </nav>
-    <div>
-        <iframe
-            src="https://script.google.com/macros/s/AKfycbxBRwKvXBsd4aPG-CGMSfwKIq9hB2wlaApPivrM8ykEnO6S_ambdNbp-HhWG8Nr2-8U/exec"
-            width="100%" height="1000" frameborder="0" marginheight="0" marginwidth="0">Carregando script...</iframe>
 
-    </div>
+    <main class="iframe-container">
+        <div class="iframe-wrapper">
+            <iframe
+                src="https://script.google.com/macros/s/AKfycbxBRwKvXBsd4aPG-CGMSfwKIq9hB2wlaApPivrM8ykEnO6S_ambdNbp-HhWG8Nr2-8U/exec"
+                frameborder="0" 
+                marginheight="0" 
+                marginwidth="0">
+                Carregando script...
+            </iframe>
+        </div>
+    </main>
 
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
