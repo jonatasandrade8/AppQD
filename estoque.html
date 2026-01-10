@@ -12,16 +12,22 @@
     <style>
         /* Melhorias específicas para o container do iframe */
         .iframe-container {
-            padding: 15px; /* Cria um espaço nas laterais para o usuário rolar a página principal */
-            background-color: #f4f4f4; /* Fundo suave para contrastar com o branco do formulário */
+            padding: 15px;
+            /* Cria um espaço nas laterais para o usuário rolar a página principal */
+            background-color: #f4f4f4;
+            /* Fundo suave para contrastar com o branco do formulário */
         }
 
         .iframe-wrapper {
             position: relative;
-            border: 3px solid #1e1b4b; /* Borda com a cor azul escura da marca */
-            border-radius: 15px; /* Bordas arredondadas para um visual moderno */
-            overflow: hidden; /* Garante que o iframe respeite o arredondamento */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* Sombra para dar profundidade */
+            border: 3px solid #1e1b4b;
+            /* Borda com a cor azul escura da marca */
+            border-radius: 15px;
+            /* Bordas arredondadas para um visual moderno */
+            overflow: hidden;
+            /* Garante que o iframe respeite o arredondamento */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            /* Sombra para dar profundidade */
             background: white;
         }
 
@@ -41,13 +47,15 @@
             display: block;
             width: 100%;
             /* Altura dinâmica para evitar travamentos */
-            height: 85vh; 
+            height: 85vh;
         }
 
         @media (max-width: 600px) {
             .iframe-container {
-                padding: 10px 5px; /* Em celulares, reduzimos o recuo */
+                padding: 10px 5px;
+                /* Em celulares, reduzimos o recuo */
             }
+
             iframe {
                 height: 75vh;
             }
@@ -80,25 +88,8 @@
             <i class="fas fa-sync-alt"></i> Atualizar Página
         </button>
 
-        <div id="status-envio" class="notification-board">
-            <div class="notification-item">
-                <div class="notification-label">Estoque</div>
-                <div class="notification-content">
-                    <div id="dia-rotulo" class="dia-rotulo">---</div>
-                    <div class="timer-label">Envio até às 14:00</div>
-                    <div id="contagem-regressiva" class="timer">00:00:00</div>
-                </div>
-            </div>
-            <div class="notification-divider"></div>
-            <div class="notification-item">
-                <div class="notification-label">Caixas Secas</div>
-                <div class="notification-content">
-                    <div id="caixas-rotulo" class="dia-rotulo">---</div>
-                    <div class="timer-label">Próximo envio</div>
-                    <div id="timer-caixas" class="timer">00:00:00</div>
-                </div>
-            </div>
-        </div>
+
+    </header>
     </header>
 
     <nav>
@@ -112,9 +103,7 @@
         <div class="iframe-wrapper">
             <iframe
                 src="https://script.google.com/macros/s/AKfycbxBRwKvXBsd4aPG-CGMSfwKIq9hB2wlaApPivrM8ykEnO6S_ambdNbp-HhWG8Nr2-8U/exec"
-                frameborder="0" 
-                marginheight="0" 
-                marginwidth="0">
+                frameborder="0" marginheight="0" marginwidth="0">
                 Carregando script...
             </iframe>
         </div>
@@ -132,6 +121,7 @@
         <i class="fas fa-arrow-up"></i>
     </div>
 
+    <script src="notifications.js"></script>
     <script src="script.js"></script>
     <script src="alert.js"></script>
 </body>

@@ -1307,7 +1307,7 @@ hr {
     }
 
     .notification-label {
-        font-size: 0.55rem;
+        font-size: 0.8rem;
         text-transform: uppercase;
         font-weight: 600;
         opacity: 0.8;
@@ -1323,13 +1323,13 @@ hr {
 
     .dia-rotulo {
         font-weight: bold;
-        font-size: 0.65rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
         color: #ffcc00;
     }
 
     .timer-label {
-        font-size: 0.5rem;
+        font-size: 0.8rem;
         opacity: 0.9;
     }
 
@@ -1391,4 +1391,32 @@ hr {
 #cabecalho-principal {
     position: relative;
     padding-bottom: 15px;
+}
+
+/* NOVO: Estilo para Aviso Sério (Urgente) */
+.urgent-warning {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    animation: pulse-border 2s infinite;
+    box-shadow: 0 0 15px rgba(211, 47, 47, 0.4);
+}
+
+@keyframes pulse-border {
+    0% {
+        box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(211, 47, 47, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(211, 47, 47, 0);
+    }
+}
+
+.warning-message {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 2;
 }
