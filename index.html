@@ -12,12 +12,13 @@
 
     <meta name="author" content="Qdelícia Frutas">
 
-    <title>Home - Qdelícia Frutas</title>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -86,94 +87,99 @@
 
 
 
-        <section class="missao">
-
-            <h2>Nossa Missão:</h2>
-
-            <ul>
-
-                <li>Ter foco no atendimento ao cliente;</li>
-
-                <li>Estar sempre disposto a ouvir e entender o cliente;</li>
-
-                <li>Tornar a experiência do cliente cada vez melhor e única;</li>
-
-                <li>Buscar sempre melhorar a cada dia.</li>
-
-            </ul>
-
+        <section class="missao glass-section">
+            <h2>Bem vindo à Área do Promotor</h2>
+            <h2><i class="fas fa-bullseye"></i> Nossa Missão</h2>
+            <div class="mission-grid">
+                <div class="mission-card">
+                    <i class="fas fa-heart"></i>
+                    <p>Foco no atendimento ao cliente</p>
+                </div>
+                <div class="mission-card">
+                    <i class="fas fa-comments"></i>
+                    <p>Ouvir e entender o cliente</p>
+                </div>
+                <div class="mission-card">
+                    <i class="fas fa-star"></i>
+                    <p>Tornar a Experiência do Cliente Única </p>
+                </div>
+                <div class="mission-card">
+                    <i class="fas fa-chart-line"></i>
+                    <p>Melhoria pessoal contínua diária</p>
+                </div>
+            </div>
         </section>
 
-
-
         <div class="carousel-container">
+            <button class="carousel-arrow prev-arrow" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+            <button class="carousel-arrow next-arrow" aria-label="Próximo"><i class="fas fa-chevron-right"></i></button>
 
             <div class="carousel-slides">
-
                 <img src="./images/01.jpg" alt="foto" class="slide">
-
                 <img src="./images/02.jpg" alt="foto" class="slide">
-
                 <img src="./images/03.jpg" alt="foto" class="slide">
-
                 <img src="./images/04.jpg" alt="foto" class="slide">
-
                 <img src="./images/05.jpg" alt="foto" class="slide">
-
-
-
             </div>
 
-            <div class="carousel-dots">
-
-                <span class="dot active"></span>
-
-                <span class="dot"></span>
-
-                <span class="dot"></span>
-
-                <span class="dot"></span>
-
-                <span class="dot"></span>
-
+            <div class="carousel-dots-wrapper">
+                <div class="carousel-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
             </div>
-
         </div>
 
-        <section>
-
-            <h2>Nossa rotina diária:</h2>
-
-            <ol>
-
-                <section>
-                    <li>Checar Estoque e Bancadas, Caso Esteja Zerado Repassar a Informação Imediatamente Para a Gestão;
-                    </li>
-                </section>
-                <section>
-                    <li>Realizar Abastecimento;</li>
-                </section>
-                <section>
-                    <li>Registrar e Compartilhar Fotos no Grupo Por Meio do App;</li>
-                </section>
-                <section>
-                    <li>As Fotos das Bancadas Precisam ser Registradas em 3 Momentos: No 1º Abastecimento, Antes do
-                        almoço e Antes de Finalizar a Jornada;</li>
-                </section>
-                <section>
-                    <li>Realizar o Registro do Estoque Diário Pelo App;</li>
-                </section>
-                <section>
-                    <li>Realizar a Organização das Caixas 'G' em Blocos de 3 para agilizar o recolhimento; </li>
-                </section>
-                <section>
-                    <li>Registrar e Compartilhar a Foto das Caixas Secas no Grupo Via App;</li>
-                </section>
-
-
-
-            </ol>
-
+        <section class="rotina glass-section">
+            <h2><i class="fas fa-calendar-check"></i> Nossa rotina diária</h2>
+            <div class="routine-list">
+                <div class="routine-item">
+                    <div class="routine-number">1</div>
+                    <div class="routine-content">
+                        <p>Checar Estoque e Bancadas. Repassar informação imediata se estiver zerado.</p>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-number">2</div>
+                    <div class="routine-content">
+                        <p>Realizar Abastecimento.</p>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-number">3</div>
+                    <div class="routine-content">
+                        <p>Registrar e Compartilhar Fotos no Grupo via App.</p>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-number">4</div>
+                    <div class="routine-content">
+                        <p>Fotos em 3 momentos: 1º Abastecimento, Antes do almoço e Antes de Finalizar.</p>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-number">5</div>
+                    <div class="routine-content">
+                        <p>Realizar o Registro do Estoque Diário Pelo App(lembrar de inserir os pontos extras, se
+                            houver).</p>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-number">6</div>
+                    <div class="routine-content">
+                        <p>Organizar as Caixas 'G' em Blocos de 3 para agilizar a coleta.</p>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-number">7</div>
+                    <div class="routine-content">
+                        <p>Registrar e Compartilhar Foto das Caixas Secas no Grupo.</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
     </main>
@@ -201,7 +207,6 @@
         <i class="fas fa-arrow-up"></i>
 
     </div>
-
 
 
     <script>
@@ -369,7 +374,7 @@
     <script src="notifications.js"></script>
     <script src="script.js"></script>
 
-    <script src="alert.js"></script>
+
 </body>
 
 </html>

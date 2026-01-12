@@ -6,25 +6,27 @@
 }
 
 :root {
-    /* Cores e Variáveis */
-    --primary-color: #5d3fd3;
-    /* Roxo principal */
-    --secondary-color: #8b5cf6;
-    /* Roxo mais claro */
-    --tertiary-color: #a78bfa;
-    /* Roxo ainda mais claro */
-    --accent-color: #39ff14;
-    /* Verde neon para destaque (mantido para outros elementos) */
-    --bg-light: #f3f0ff;
-    /* Fundo claro com roxo */
+    /* Cores e Variáveis - Paleta Refinada */
+    --primary-color: #6366f1;
+    /* Indigo */
+    --primary-dark: #4f46e5;
+    --secondary-color: #818cf8;
+    --accent-color: #10b981;
+    /* Emerald */
+    --bg-light: #f8fafc;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
     --white: #ffffff;
-    --text-dark: #2c0e5a;
-    /* Roxo escuro para texto */
-    --shadow: rgba(0, 0, 0, 0.1);
-    --border-radius: 8px;
-    --transition: all 0.3s ease;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --border-radius: 12px;
+    --border-radius-lg: 20px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --max-width: 1200px;
-    --gradient: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    --gradient: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
 }
 
 html {
@@ -32,12 +34,11 @@ html {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.6;
-    font-size: 14px;
-    /* Mobile first */
+    font-size: 15px;
 }
 
 /* ===================== MOBILE FIRST - LAYOUT GERAL (APP LOOK) ===================== */
@@ -190,19 +191,112 @@ main {
 
 section {
     background-color: var(--white);
-    padding: 20px 15px;
-    margin-bottom: 15px;
-    margin-left: 15px;
-    margin-right: 15px;
+    padding: 24px 20px;
+    margin: 20px 15px;
     border-radius: var(--border-radius);
-    box-shadow: 0 4px 10px var(--shadow);
+    box-shadow: var(--shadow);
     text-align: center;
 }
 
-ul {
-    text-align: center;
-    margin-left: 20px;
+/* Glassmorphism Sections */
+.glass-section {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-lg);
+}
+
+section h2 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Mission Grid Cards */
+.mission-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
     margin-top: 10px;
+}
+
+.mission-card {
+    background: var(--white);
+    padding: 20px 15px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.mission-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+    border-color: var(--secondary-color);
+}
+
+.mission-card i {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 12px;
+    display: block;
+}
+
+.mission-card p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    line-height: 1.3;
+}
+
+/* Routine Vertical List */
+.routine-list {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.routine-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: var(--white);
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.routine-item:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow);
+}
+
+.routine-number {
+    background: var(--gradient);
+    color: var(--white);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.routine-content p {
+    font-size: 0.95rem;
+    margin: 0;
+    color: var(--text-dark);
 }
 
 /* Footer */
@@ -261,57 +355,117 @@ footer {
     visibility: visible;
 }
 
-/* ===================== CARROSSEL (Preservado) ===================== */
+/* ===================== CARROSSEL (Refinado) ===================== */
 .carousel-container {
     position: relative;
-    width: 100%;
-    margin: 20px auto;
-    max-width: 100%;
+    width: calc(100% - 30px);
+    margin: 20px 15px;
     overflow: hidden;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 10px var(--shadow);
-    background-color: black;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    background-color: #000;
     box-sizing: border-box;
+    height: 280px;
+    /* Altura reduzida para fotos menores */
 }
 
 .carousel-slides {
     display: flex;
-    transition: transform 0.5s ease;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     width: 500%;
-    /* 5 slides */
+    height: 100%;
 }
 
 .carousel-slides .slide {
     width: 20%;
-    height: 300px;
-    object-fit: cover;
+    height: 100%;
+    object-fit: contain;
+    padding: 10px;
+    /* Espaçamento interno para a foto não tocar as bordas */
     flex-shrink: 0;
-    background-color: var(--text-dark);
+    filter: brightness(0.9);
+    transition: var(--transition);
+    background-color: #000;
+    box-sizing: border-box;
 }
 
-.carousel-dots {
+.carousel-container:hover .slide {
+    filter: brightness(1);
+}
+
+.carousel-arrow {
     position: absolute;
-    bottom: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: var(--transition);
+    opacity: 0;
+}
+
+.carousel-container:hover .carousel-arrow {
+    opacity: 1;
+}
+
+.carousel-arrow:hover {
+    background: var(--white);
+    color: var(--primary-color);
+    box-shadow: var(--shadow);
+}
+
+.prev-arrow {
+    left: 15px;
+}
+
+.next-arrow {
+    right: 15px;
+}
+
+.carousel-dots-wrapper {
+    position: absolute;
+    bottom: 15px;
     left: 0;
     right: 0;
-    text-align: center;
+    display: flex;
+    justify-content: center;
     z-index: 10;
 }
 
+.carousel-dots {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: flex;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .dot {
-    display: inline-block;
-    height: 8px;
-    width: 8px;
-    margin: 0 4px;
-    background-color: #bbb;
+    display: block;
+    height: 6px;
+    width: 6px;
+    background-color: rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color 0.6s ease;
+    transition: var(--transition);
 }
 
 .dot.active {
     background-color: var(--white);
-    width: 15px;
+    width: 18px;
     border-radius: 4px;
 }
 

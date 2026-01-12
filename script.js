@@ -71,12 +71,15 @@
         let currentIndex = 0;
         const totalSlides = slides.length;
 
+        const prevArrow = document.querySelector('.prev-arrow');
+        const nextArrow = document.querySelector('.next-arrow');
+
         function updateCarousel() {
             // Garante que o índice esteja dentro dos limites
             currentIndex = currentIndex % totalSlides;
             if (currentIndex < 0) currentIndex = totalSlides - 1;
 
-            carouselSlides.style.transform = `translateX(${-currentIndex * 100 / totalSlides}%)`;
+            carouselSlides.style.transform = `translateX(${-currentIndex * (100 / totalSlides)}%)`;
 
             dots.forEach(dot => dot.classList.remove('active'));
             if (dots[currentIndex]) {
@@ -89,8 +92,33 @@
             updateCarousel();
         }
 
+        function prevSlide() {
+            currentIndex = currentIndex - 1;
+            updateCarousel();
+        }
+
         // Inicia o carrossel automático
-        setInterval(nextSlide, 3000);
+        let autoPlay = setInterval(nextSlide, 5000);
+
+        // Reset autoPlay ao interagir
+        function resetAutoPlay() {
+            clearInterval(autoPlay);
+            autoPlay = setInterval(nextSlide, 5000);
+        }
+
+        if (nextArrow) {
+            nextArrow.addEventListener('click', () => {
+                nextSlide();
+                resetAutoPlay();
+            });
+        }
+
+        if (prevArrow) {
+            prevArrow.addEventListener('click', () => {
+                prevSlide();
+                resetAutoPlay();
+            });
+        }
 
         // Adiciona funcionalidade aos dots de navegação
         dots.forEach((dot, index) => {
