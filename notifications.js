@@ -43,7 +43,7 @@ const NOTIFICATIONS_CONFIG = {
     // === CONFIGURAÇÃO DO AVISO SÉRIO (BANNER VERMELHO) ===
     // === Na parte 'next' utilizar %d para dias ===
     avisoSerio: {
-        enabled: true,
+        enabled: false,
         timer: 'off', // 'on' ou 'off'
         titulo: "Atenção",
         mensagem: "O Balanço de Caixas foi adiado, em breve teremos uma nova data.",
@@ -329,3 +329,4 @@ const NOTIFICATIONS_CONFIG = {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicializarNotificacoes);
     else inicializarNotificacoes();
 })();
+
