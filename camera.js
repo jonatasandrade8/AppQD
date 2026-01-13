@@ -90,7 +90,6 @@ const shareAllBtn = document.getElementById('share-all');
 const photoCountElement = document.getElementById('photo-count');
 
 // --- Elementos para Rotação e Orientação (ATUALIZADO) ---
-const rotateBtn = document.getElementById('rotate-btn'); // Botão de Rotação Manual
 const orientationArrow = document.getElementById('orientation-arrow'); // Seta de Orientação
 const portraitGuide = document.getElementById('portrait-guide'); // Guia Retrato (Rodapé)
 const landscapeGuide = document.getElementById('landscape-guide'); // Guia Paisagem (Lateral)
@@ -114,6 +113,7 @@ let currentZoom = 1; // Zoom inicial
 let maxZoom = 1; // Zoom máximo suportado pelo dispositivo
 let deviceOrientation = 0; // Orientação do dispositivo em graus
 let manualRotation = 0; // 0 (Retrato) ou 90 (Paisagem) - Inicialmente Retrato
+const MAX_PHOTOS = 5; // Limite máximo de fotos
 
 // Carregar a imagem da logomarca
 const logoImage = new Image();
@@ -257,15 +257,37 @@ function checkCameraAccess() {
     // NOVO: Adicionado selectEstado.value à verificação
     const isReady = selectEstado.value && selectTipoFoto.value && selectPromotor.value && selectRede.value && selectLoja.value;
 
-    if (openCameraBtn) {
-        if (isReady) {
-            // Se os dropdowns estiverem preenchidos, o botão está pronto para TENTAR abrir.
-            openCameraBtn.disabled = false;
-            openCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Abrir Câmera';
+    if (isReady) {
+        // Se os dropdowns estiverem preenchidos, o botão está pronto para TENTAR abrir.
+        openCameraBtn.disabled = false;
+        openCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Abrir Câmera';
+    } else {
+        // Dropdowns não preenchidos, botão bloqueado.
+        openCameraBtn.disabled = true;
+        openCameraBtn.innerHTML = '<i class="fas fa-lock"></i> Preencha as Informações';
+    }
+}
+
+/**
+ * @description Verifica o limite de fotos e atualiza a interface (Mostra/Esconde Botões).
+ */
+function checkPhotoLimit() {
+    const cameraWrapper = document.querySelector('.camera-wrapper');
+    const cameraShareBtn = document.getElementById('camera-share-btn');
+
+    // Atualiza visibilidade do botão de share interno
+    if (cameraShareBtn) {
+        cameraShareBtn.style.display = photos.length > 0 ? 'flex' : 'none';
+
+        // Atualiza o listener para garantir que funcione
+        cameraShareBtn.onclick = sharePhotos;
+    }
+
+    if (cameraWrapper) {
+        if (photos.length >= MAX_PHOTOS) {
+            cameraWrapper.classList.add('limit-reached');
         } else {
-            // Dropdowns não preenchidos, botão bloqueado.
-            openCameraBtn.disabled = true;
-            openCameraBtn.innerHTML = '<i class="fas fa-lock"></i> Preencha as Informações';
+            cameraWrapper.classList.remove('limit-reached');
         }
     }
 }
@@ -435,17 +457,12 @@ function closeCameraFullscreen() {
     }
     hasCameraPermission = false; // Reinicia o estado da permissão
     checkCameraAccess(); // Verifica o estado do botão (que voltará a checar os dropdowns)
+    checkPhotoLimit(); // Garante o estado correto da UI
     window.removeEventListener('deviceorientation', handleDeviceOrientation);
 }
 
 
-function updateDateTime() {
-    const now = new Date();
-    if (dateTimeElement) {
-        dateTimeElement.textContent = now.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
-    }
-}
-setInterval(updateDateTime, 1000);
+
 
 function updatePhotoCounter() {
     if (photoCountElement) {
@@ -461,6 +478,12 @@ function updatePhotoCounter() {
  * // ** LÓGICA DE ROTAÇÃO ANTIGA DELETADA E SUBSTITUÍDA PELO MÉTODO MAIS SIMPLES **
  */
 function capturePhoto() {
+    // Verifica limite antes de tirar foto
+    if (photos.length >= MAX_PHOTOS) {
+        alert("Limite de 5 fotos atingido! Compartilhe ou exclua alguma para continuar.");
+        checkPhotoLimit(); // Garante UI correta
+        return;
+    }
     // NOVO: Adicionada verificação para o novo campo
     if (!selectTipoFoto.value || !selectPromotor.value || !selectRede.value || !selectLoja.value) {
         alert("Por favor, preencha Tipo de Foto, Promotor, Rede e Loja antes de tirar a foto.");
@@ -503,12 +526,13 @@ function capturePhoto() {
     // Valores adaptados para maior qualidade em resoluções grandes
     const padding = Math.max(15, Math.floor(canvas.height / 80)); // Espaçamento adaptativo
     const textBaseColor = '#FFFFFF';
-    const bgColor = 'rgba(0, 0, 0, 0.7)';
+    const bgColor = 'rgba(99, 102, 241, 0.8)'; // Cor Primary (Indigo) da Identidade Visual
     const defaultFontSize = Math.max(20, Math.floor(canvas.height / 40));
 
     // --- 1. Aplicação da Marca D'água (Texto - Canto Inferior Direito) ---
-    ctx.font = `${defaultFontSize * 0.9}px Arial, sans-serif`;
-    ctx.textAlign = 'right';
+    // Fonte mais próxima da identidade visual (Inter, Segoe UI) e em Negrito
+    ctx.font = `bold ${defaultFontSize * 0.9}px "Inter", "Segoe UI", sans-serif`;
+    ctx.textAlign = 'center'; // Centralizado
     ctx.textBaseline = 'bottom';
 
     let totalHeight = 0;
@@ -521,23 +545,45 @@ function capturePhoto() {
     });
     totalHeight -= (padding / 2); // Remove o último espaço extra
 
-    // Desenha o fundo único para todas as linhas
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(
-        canvas.width - maxWidth - 2 * padding, // Posição X (começa da direita para a esquerda)
-        canvas.height - totalHeight - 2 * padding, // Posição Y (de baixo para cima)
-        maxWidth + 2 * padding,
-        totalHeight + 2 * padding
-    );
+    // Adiciona padding extra para a caixa não ficar colada no texto
+    const boxPadding = padding * 1.5;
+    const boxWidth = maxWidth + 2 * boxPadding;
+    const boxHeight = totalHeight + 2 * boxPadding;
+    const boxX = canvas.width - boxWidth - padding;
+    const boxY = canvas.height - boxHeight - padding;
+    const borderRadius = 20; // Bordas arredondadas (20px)
 
-    // Desenha as linhas de texto
+    // Desenha o fundo com Bordas Arredondadas
+    ctx.fillStyle = bgColor;
+    ctx.beginPath();
+    // roundRect é suportado em navegadores modernos. Fallback simples se necessário (mas Chrome/Edge suportam)
+    if (ctx.roundRect) {
+        ctx.roundRect(boxX, boxY, boxWidth, boxHeight, borderRadius);
+    } else {
+        ctx.rect(boxX, boxY, boxWidth, boxHeight); // Fallback quadrado
+    }
+    ctx.fill();
+
+    // Borda Verde (Solicitada: Mais grossa e arredondada)
+    ctx.lineWidth = Math.max(5, Math.floor(canvas.height / 200)); // Aumentado para 5 ou proporcional
+    ctx.strokeStyle = '#33cc33'; // Verde
+    ctx.beginPath();
+    if (ctx.roundRect) {
+        ctx.roundRect(boxX, boxY, boxWidth, boxHeight, borderRadius);
+    } else {
+        ctx.rect(boxX, boxY, boxWidth, boxHeight);
+    }
+    ctx.stroke();
+
+    // Desenha as linhas de texto (Centralizado na caixa)
     ctx.fillStyle = textBaseColor;
-    let lineY = canvas.height - 2 * padding; // Posição inicial para o primeiro texto (dateText)
+    const textCenterX = boxX + (boxWidth / 2);
+    let lineY = boxY + boxHeight - boxPadding; // Começa de baixo, respeitando o padding
 
     // Percorre as linhas e desenha de baixo para cima
     for (let i = 0; i < watermarkLines.length; i++) {
         const line = watermarkLines[i];
-        ctx.fillText(line, canvas.width - padding, lineY);
+        ctx.fillText(line, textCenterX, lineY);
         lineY -= (defaultFontSize * 0.9 + (padding / 2)); // Move para a linha acima
     }
 
@@ -555,6 +601,7 @@ function capturePhoto() {
 
     photos.unshift(dataURL); // Adiciona a nova foto no início
     updatePhotoCounter();
+    checkPhotoLimit(); // Atualiza UI (pode bloquear botão se chegou a 5)
 
     updateGalleryView();
 }
@@ -568,6 +615,7 @@ function removePhoto(index) {
     if (confirm("Tem certeza que deseja remover esta foto?")) {
         photos.splice(index, 1); // Remove 1 elemento a partir do índice
         updatePhotoCounter();
+        checkPhotoLimit(); // Atualiza UI (libera botão se baixou de 5)
         updateGalleryView(); // Re-renderiza a galeria
     }
 }
@@ -669,14 +717,7 @@ function switchCamera() {
 
 // ==================== FUNCIONALIDADES DE ROTAÇÃO MANUAL (NOVO) ====================
 
-/**
- * @description Alterna a rotação manual entre Retrato (0) e Paisagem (90).
- */
-function toggleManualRotation() {
-    // Alterna entre Retrato (0) e Paisagem (90)
-    manualRotation = manualRotation === 0 ? 90 : 0;
-    updateRotationButton();
-}
+
 
 /**
  * @description Atualiza o ícone do botão de rotação e a seta de orientação, e exibe as guias.
@@ -685,42 +726,35 @@ function updateRotationButton() {
     const landscapeText = landscapeGuide ? landscapeGuide.querySelector('.landscape-text') : null;
     const portraitText = portraitGuide ? portraitGuide.querySelector('.portrait-text') : null;
 
-    if (rotateBtn) {
-        if (manualRotation === 0) {
-            // Retrato
-            rotateBtn.innerHTML = '<i class="fas fa-mobile-screen"></i>';
-            rotateBtn.title = 'Modo Retrato Ativo';
+    if (manualRotation === 0) {
+        // Retrato
 
-            if (orientationArrow) {
-                orientationArrow.style.display = 'block';
-                // Para apontar para CIMA (rotaciona o ícone 'fa-arrow-right' em -90deg)
-                orientationArrow.style.transform = 'rotate(-90deg)';
-            }
-            if (portraitGuide) portraitGuide.style.display = 'block';
-            if (landscapeGuide) landscapeGuide.style.display = 'none';
-            if (portraitText) {
-                // Modo Retrato Padrão
-                portraitText.textContent = '------------ Linha de Referência ------------';
-                portraitText.style.transform = 'rotate(0deg)';
-            }
+        if (orientationArrow) {
+            orientationArrow.style.display = 'block';
+            // Para apontar para CIMA (rotaciona o ícone 'fa-arrow-right' em -90deg)
+            orientationArrow.style.transform = 'rotate(-90deg)';
+        }
+        if (portraitGuide) portraitGuide.style.display = 'block';
+        if (landscapeGuide) landscapeGuide.style.display = 'none';
+        if (portraitText) {
+            // Modo Retrato Padrão
+            portraitText.textContent = '------------ Linha de Referência ------------';
+            portraitText.style.transform = 'rotate(0deg)';
+        }
 
-        } else {
-            // Paisagem (90 graus)
-            rotateBtn.innerHTML = '<i class="fas fa-mobile-screen-button"></i>';
-            rotateBtn.title = 'Modo Paisagem Ativo'; // O título do tooltip pode ser mantido
-
-            if (orientationArrow) {
-                orientationArrow.style.display = 'block';
-                // Para apontar para DIREITA (rotação padrão do ícone 'fa-arrow-right' é 0deg)
-                orientationArrow.style.transform = 'rotate(0deg)';
-            }
-            if (portraitGuide) portraitGuide.style.display = 'none';
-            if (landscapeGuide) landscapeGuide.style.display = 'block';
-            if (landscapeText) {
-                // NOVO TEXTO E ROTAÇÃO DE 180º SOLICITADA
-                landscapeText.textContent = '------------ modo paisagem ------------';
-                landscapeText.style.transform = 'rotate(0deg)';
-            }
+    } else {
+        // Paisagem (90 graus)
+        if (orientationArrow) {
+            orientationArrow.style.display = 'block';
+            // Para apontar para DIREITA (rotação padrão do ícone 'fa-arrow-right' é 0deg)
+            orientationArrow.style.transform = 'rotate(0deg)';
+        }
+        if (portraitGuide) portraitGuide.style.display = 'none';
+        if (landscapeGuide) landscapeGuide.style.display = 'block';
+        if (landscapeText) {
+            // NOVO TEXTO E ROTAÇÃO DE 180º SOLICITADA
+            landscapeText.textContent = '------------ modo paisagem ------------';
+            landscapeText.style.transform = 'rotate(0deg)';
         }
     }
 }
@@ -862,10 +896,7 @@ if (switchBtn) {
     switchBtn.addEventListener('click', switchCamera);
 }
 
-// Event listener para Rotação Manual
-if (rotateBtn) {
-    rotateBtn.addEventListener('click', toggleManualRotation);
-}
+
 
 // Event listeners para Zoom
 const zoomInBtn = document.getElementById('zoom-in-btn');
@@ -893,25 +924,34 @@ if (downloadAllBtn) {
     });
 }
 
-// Botão "Compartilhar" (Função original mantida e ATUALIZADA)
-if (shareAllBtn && navigator.share) {
-    shareAllBtn.addEventListener("click", () => {
+// Função de Compartilhamento Unificada
+async function sharePhotos() {
+    if (!navigator.share) {
+        alert("A função de compartilhamento não é suportada por este navegador/dispositivo.");
+        return;
+    }
 
-        // 1. Captura os dados dos dropdowns para a legenda
-        const tipoFoto = selectTipoFoto.options[selectTipoFoto.selectedIndex].text; // NOVO
-        const promotor = selectPromotor.options[selectPromotor.selectedIndex].text;
-        const rede = selectRede.options[selectRede.selectedIndex].text;
-        const loja = selectLoja.options[selectLoja.selectedIndex].text;
+    if (photos.length === 0) {
+        alert("Nenhuma foto para compartilhar.");
+        return;
+    }
 
-        // 2. Cria a legenda dinâmica
-        const now = new Date();
-        const dateOptions = { weekday: 'long', year: '2-digit', month: '2-digit', day: '2-digit' };
-        const dataFormatada = now.toLocaleDateString('pt-BR', dateOptions).replace(/,/, '').replace(/\b\d\b/g, '0$&'); // "Segunda-feira, 03/11/25"
+    // 1. Captura os dados dos dropdowns para a legenda
+    const tipoFoto = selectTipoFoto.options[selectTipoFoto.selectedIndex]?.text || selectTipoFoto.value;
+    const promotor = selectPromotor.options[selectPromotor.selectedIndex]?.text || selectPromotor.value;
+    const rede = selectRede.options[selectRede.selectedIndex]?.text || selectRede.value;
+    const loja = selectLoja.options[selectLoja.selectedIndex]?.text || selectLoja.value;
 
-        // Legenda com 3 linhas: Data, Tipo de Foto, Promotor/Loja
-        const legendaCompartilhada = `${dataFormatada}\n${tipoFoto}\nPromotor: ${promotor}\nLoja: ${rede} ${loja}`;
+    // 2. Cria a legenda dinâmica
+    const now = new Date();
+    const dateOptions = { weekday: 'long', year: '2-digit', month: '2-digit', day: '2-digit' };
+    const dataFormatada = now.toLocaleDateString('pt-BR', dateOptions).replace(/,/, '').replace(/\b\d\b/g, '0$&');
 
-        const files = photos.slice(0, 3).map((img, i) => { // Compartilha as 3 fotos mais recentes
+    // Legenda Completa
+    const legendaCompartilhada = `${dataFormatada}\n${tipoFoto}\nPromotor: ${promotor}\nLoja: ${rede} - ${loja}\n(Fotos: ${photos.length})`;
+
+    try {
+        const files = photos.slice(0, MAX_PHOTOS).map((img, i) => {
             const byteString = atob(img.split(",")[1]);
             const ab = new ArrayBuffer(byteString.length);
             const ia = new Uint8Array(ab);
@@ -921,20 +961,23 @@ if (shareAllBtn && navigator.share) {
             return new File([ab], `Qdelicia_Foto_${i + 1}.jpg`, { type: "image/jpeg" });
         });
 
-        navigator.share({
+        await navigator.share({
             files,
             title: "Fotos Qdelícia Frutas",
-            text: legendaCompartilhada, // Usa a nova legenda dinâmica
-        }).catch((error) => {
-            if (error.name !== 'AbortError') {
-                alert(`Erro ao compartilhar: ${error.message}`);
-            }
+            text: legendaCompartilhada,
         });
-    });
-} else if (shareAllBtn) {
-    shareAllBtn.addEventListener("click", () => {
-        alert("A função de compartilhamento direto de múltiplas fotos não é suportada por este navegador. Por favor, utilize a função 'Baixar Todas' e compartilhe manually.");
-    });
+
+    } catch (error) {
+        if (error.name !== 'AbortError') {
+            console.error(error);
+            alert(`Erro ao compartilhar: ${error.message}`);
+        }
+    }
+}
+
+// Botão "Compartilhar" (Galeria)
+if (shareAllBtn) {
+    shareAllBtn.addEventListener("click", sharePhotos);
 }
 
 // Listener de Rotação (Função original mantida)
@@ -959,5 +1002,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateGalleryView();
     updatePhotoCounter();
     detectDeviceOrientation();
+    checkPhotoLimit(); // Inicializa estado dos botões extras
     updateRotationButton(); // Chama para iniciar os indicadores no modo Retrato
 });

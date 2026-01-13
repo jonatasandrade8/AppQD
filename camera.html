@@ -176,6 +176,7 @@
         <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> Estoque</a>
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="camera.html" class="active"><i class="fas fa-camera"></i> Câmera</a>
+        <a href="visualizacao.html"><i class="fas fa-chart-bar"></i> Envios</a>
 
     </aside>
 
@@ -196,6 +197,7 @@
         <a href="estoque.html">Estoque</a>
         <a href="caixas.html">Caixas</a>
         <a href="camera.html" class="active">Câmera</a>
+        <a href="visualizacao.html">Envios</a>
 
     </nav>
 
@@ -203,16 +205,12 @@
 
         <section class="watermark-settings">
             <h2>Informações da Foto</h2>
-            <p>Para Melhor Qualidade Ative a Rotação Automática do Dispositivo</p>
+            <p>Para Que a Foto Não Fique "de lado" Ative a Rotação Automática do Dispositivo</p>
 
             <div class="input-group">
                 <label for="select-estado"><i class="fas fa-map-marker-alt"></i> Estado</label>
                 <select id="select-estado" required>
                     <option value="" disabled selected>Selecione um Estado</option>
-                    <option value="RN">Rio Grande do Norte</option>
-                    <option value="PE">Pernambuco</option>
-                    <option value="AL">Alagoas</option>
-                    <option value="PB">Paraíba</option>
                 </select>
             </div>
 
@@ -273,13 +271,20 @@
 
             <button id="back-to-gallery-btn"><i class="fas fa-times"></i></button>
 
-            <div id="photo-count">0</div>
+            <!-- Botão de Compartilhar Integrado (Topo Direito) -->
+            <button id="camera-share-btn" class="camera-share-btn" title="Compartilhar Fotos">
+                <i class="fab fa-whatsapp"></i>
+                <span class="share-text">Compartilhar</span>
+                <span id="photo-count" class="badge">0</span>
+            </button>
 
-            <div class="camera-controls-bottom-left">
-                <button id="rotate-btn" class="camera-control-btn" title="Alternar Rotação">
-                    <i class="fas fa-mobile-screen"></i>
-                </button>
+            <!-- Mensagem de Limite Atingido -->
+            <div id="limit-message" class="limit-message">
+                <i class="fas fa-exclamation-circle"></i> Limite de 5 fotos atingido!
+                <br>Compartilhe ou exclua para continuar.
             </div>
+
+
             <div class="camera-controls-right">
                 <button id="zoom-in-btn" class="camera-control-btn" title="Aumentar Zoom">
                     <i class="fas fa-plus"></i>
@@ -304,9 +309,7 @@
             <div id="landscape-guide" class="guide-line landscape-guide">
                 <div class="landscape-text">------------ modo paisagem ------------</div>
             </div>
-            <div class="watermark">
-                <i class="fas fa-clock"></i> <span id="date-time">--/--/---- --:--:--</span>
-            </div>
+
 
             <div class="controls">
                 <button id="switch-btn" class="btn-circle"><i class="fas fa-sync-alt"></i></button>
@@ -329,7 +332,7 @@
 
     <script src="notifications.js"></script>
     <script src="script.js"></script>
-    <script src="localizacao.js"></script>
+
     <script src="camera.js"></script>
 </body>
 

@@ -793,24 +793,144 @@ hr {
     backdrop-filter: blur(4px);
 }
 
-/* Contador de Fotos (Refinado para Badge Discreto no Canto) */
-#photo-count {
+/* --- Botão de Compartilhar Integrado --- */
+.camera-share-btn {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(93, 63, 211, 0.95);
-    color: var(--white);
-    padding: 8px 14px;
+    top: 20px;
+    right: 20px;
+    height: 40px;
+    padding: 0 12px;
     border-radius: 20px;
-    font-weight: bold;
-    font-size: 1.1rem;
-    min-width: 45px;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    z-index: 10;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Fundo escuro padrão */
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 1rem;
+    display: none;
+    /* Oculto se 0 fotos */
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    z-index: 25;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
+.camera-share-btn .share-text {
+    display: inline-block;
+    /* Texto sempre visível */
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Badge do Contador */
+.camera-share-btn .badge {
+    background: #25d366;
+    /* WhatsApp Green */
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.camera-share-btn i {
+    color: #25d366;
+    /* Ícone verde no modo normal */
+    font-size: 1.2rem;
+}
+
+.camera-share-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: scale(1.05);
+}
+
+/* --- Estado: Limite Atingido (5 Fotos) --- */
+.limit-message {
+    position: absolute;
+    top: 40%;
+    /* Subido para não sobrepor */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(99, 102, 241, 0.95);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+    display: none;
+    z-index: 30;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    width: 80%;
+    max-width: 280px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Quando .camera-wrapper tem a classe .limit-reached */
+.camera-wrapper.limit-reached #shutter-btn {
+    display: none !important;
+}
+
+.camera-wrapper.limit-reached .limit-message {
+    display: block;
+}
+
+/* Estilo do Botão de Compartilhar no estado Limit Reached */
+.camera-wrapper.limit-reached .camera-share-btn {
+    top: 55%;
+    /* Posicionado logo abaixo da mensagem */
+    right: auto;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    /* Expande para botão completo */
+    width: auto;
+    height: 50px;
+    padding: 0 25px;
+    background-color: #25d366;
+    /* Fundo verde sólido */
+    border: none;
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+    display: flex !important;
+}
+
+.camera-wrapper.limit-reached .camera-share-btn .share-text {
+    display: inline-block;
+    /* Mostra o texto */
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.camera-wrapper.limit-reached .camera-share-btn i {
+    color: white;
+    /* Ícone branco */
+    font-size: 1.1rem;
+    /* Ícone menor */
+}
+
+.camera-wrapper.limit-reached .camera-share-btn .badge {
+    background: white;
+    color: #25d366;
+    /* Badge invertido */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+
 
 
 /* Controles de Zoom e Flash (Lado Direito) */
@@ -825,13 +945,13 @@ hr {
 }
 
 .camera-control-btn {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: none;
     background: rgba(255, 255, 255, 0.9);
     color: var(--primary-color);
-    font-size: 1.2rem;
+    font-size: 1rem;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -881,8 +1001,8 @@ hr {
 }
 
 .btn-circle {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -896,8 +1016,8 @@ hr {
 }
 
 #shutter-btn {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     border: 4px solid var(--primary-color);
     box-shadow: 0 0 0 4px var(--white);
     background: var(--accent-color);
@@ -1158,17 +1278,15 @@ hr {
     }
 
     /* Ajuste para o conteúdo não ficar atrás da sidebar fixa */
-    body {
-        padding-left: 80px;
-        /* Largura da Mini Sidebar + Espaço */
-    }
-
-    /* REGRAS DA MINI SIDEBAR NO DESKTOP */
-
     /* 1. Esconde o menu Hamburger (botão) e overlay */
     .menu-toggle,
-    .menu-overlay {
+    .menu-overlay,
+    .side-menu {
         display: none !important;
+    }
+
+    body {
+        padding-left: 0 !important;
     }
 
     /* 2. Mostra a Side Menu em modo fixo "Mini" */
@@ -1226,9 +1344,33 @@ hr {
         transform: translateX(0);
     }
 
-    /* Nav horizontal antiga removida */
+    /* Nav horizontal RESTAURADA */
     nav {
-        display: none !important;
+        display: flex !important;
+        justify-content: center;
+        gap: 20px;
+        background: var(--white);
+        padding: 15px;
+        margin: 0 auto 20px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        max-width: 1000px;
+    }
+
+    nav a {
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 20px;
+        transition: var(--transition);
+        font-size: 1rem;
+    }
+
+    nav a:hover,
+    nav a.active {
+        background: var(--primary-color);
+        color: var(--white);
     }
 
     /* ===================== RESPONSIVIDADE - TABLET (768px+) ===================== */
@@ -1271,9 +1413,7 @@ hr {
     }
 
     /* Remove estilos da nav horizontal antiga de tablets */
-    nav {
-        display: none !important;
-    }
+
 
     /* Centraliza o header em desktop */
     header {

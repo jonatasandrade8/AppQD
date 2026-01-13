@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Visualização de Envios - Qdelícia Frutas.">
+    <title>Envios - Qdelícia Frutas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Melhorias específicas para o container do iframe */
+        .iframe-container {
+            padding: 15px;
+            /* Cria um espaço nas laterais para o usuário rolar a página principal */
+            background-color: #f4f4f4;
+            /* Fundo suave para contrastar com o branco do formulário */
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            border: 3px solid #1e1b4b;
+            /* Borda com a cor azul escura da marca */
+            border-radius: 15px;
+            /* Bordas arredondadas para um visual moderno */
+            overflow: hidden;
+            /* Garante que o iframe respeite o arredondamento */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            /* Sombra para dar profundidade */
+            background: white;
+            height: 85vh;
+        }
+
+        iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        @media (max-width: 600px) {
+            .iframe-container {
+                padding: 10px 5px;
+            }
+
+            .iframe-wrapper {
+                height: 75vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="menu-overlay"></div>
+    <aside class="side-menu">
+        <a href="index.html"><i class="fas fa-home"></i> Início</a>
+        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> Estoque</a>
+        <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
+        <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
+        <a href="visualizacao.html" class="active"><i class="fas fa-chart-bar"></i> Envios</a>
+    </aside>
+
+    <header id="cabecalho-principal">
+        <button class="menu-toggle" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
+        </button>
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+        </div>
+        <h1>Qdelícia Frutas</h1>
+        <p>Visualização de Envios</p>
+
+        <button onclick="document.querySelector('iframe').src = document.querySelector('iframe').src"
+            class="btn-refresh">
+            <i class="fas fa-sync-alt"></i> Atualizar
+        </button>
+    </header>
+
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="caixas.html">Caixas</a>
+        <a href="camera.html">Câmera</a>
+        <a href="visualizacao.html" class="active">Envios</a>
+    </nav>
+
+    <main class="iframe-container">
+        <div class="iframe-wrapper">
+            <!-- 
+                IMPORTANTE: Substitua o src abaixo pela URL do seu Web App implantado.
+                Como usar: Adicione "?page=visualizacao" ao final da URL do Executável.
+                Exemplo: https://script.google.com/.../exec?page=visualizacao
+            -->
+            <iframe src="URL_DO_SEU_WEB_APP_AQUI?page=visualizacao" frameborder="0" marginheight="0" marginwidth="0">
+                Carregando visualização...
+            </iframe>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+    </footer>
+
+    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script src="notifications.js"></script>
+    <script src="script.js"></script>
+    <script src="alert.js"></script>
+</body>
+
+</html>
