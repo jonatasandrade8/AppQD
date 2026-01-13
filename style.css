@@ -81,7 +81,7 @@ header p {
     opacity: 0.9;
 }
 
-/* Menu Hamburger (Toggle Button) */
+/* Menu Hamburger (Toggle Button) - Estilo Moderno */
 .menu-toggle {
     display: flex;
     flex-direction: column;
@@ -90,81 +90,132 @@ header p {
     position: absolute;
     top: 15px;
     left: 15px;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
+    width: 55px;
+    /* Mais largo para o layout */
+    height: 55px;
+    /* Mais alto para caber o texto */
+    background: rgba(255, 255, 255, 0.15);
+    /* Glass effect */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: var(--white);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     cursor: pointer;
-    z-index: 100;
-    padding: 10px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    z-index: 1001;
+    /* Acima da sidebar */
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .menu-toggle:active {
-    background: rgba(255, 255, 255, 0.3);
     transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.25);
 }
 
+/* Ícone animado (opcional - simples por enquanto) */
+.menu-toggle i {
+    transition: transform 0.3s ease;
+}
+
+/* Quando o menu está aberto, o botão pode mudar de estilo se quisermons via JS, 
+   mas aqui focamos no visual base */
+
 .menu-label {
+    display: block;
+    /* Traz de volta o texto */
     font-size: 0.65rem;
     margin-top: 2px;
     font-weight: 600;
     letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
-/* Menu Lateral (Side Menu - App Navigation) */
+/* Menu Lateral (Side Menu - Mobile Refined) */
 .side-menu {
     position: fixed;
     top: 0;
-    left: -280px;
-    /* Inicialmente fora da tela */
-    width: 280px;
+    left: 0;
+    /* Fixado na esquerda */
+    width: 300px;
     height: 100%;
-    background: linear-gradient(180deg, var(--text-dark) 0%, #1a0033 100%);
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.6);
-    z-index: 99;
-    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    padding-top: 70px;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* Animação suave no transform */
+    transform: translateX(-100%);
+    /* Escondido totalmente para a esquerda */
+    padding-top: 90px;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
 }
 
 .side-menu.active {
-    left: 0;
+    transform: translateX(0);
+    /* Desliza para dentro */
 }
 
+/* Itens do Menu Mobile */
 .side-menu a {
-    padding: 16px 20px;
-    color: rgba(255, 255, 255, 0.85);
+    padding: 18px 30px;
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
+    font-size: 1.1rem;
+    /* Texto maior para toque */
     font-weight: 500;
+    border-left: 0;
+    /* Remove borda lateral antiga */
+    border-radius: 0 25px 25px 0;
+    /* Arredondado à direita */
+    margin-right: 15px;
     transition: all 0.2s ease;
-    border-left: 4px solid transparent;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Texto do Link */
+.side-menu a .link-text {
+    opacity: 1;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translateX(0);
 }
 
 .side-menu a i {
-    font-size: 1.1rem;
-    width: 24px;
+    width: 30px;
+    font-size: 1.3rem;
     text-align: center;
+    color: var(--secondary-color);
+    transition: color 0.3s;
 }
 
-.side-menu a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-left-color: var(--primary-color);
-    color: var(--white);
-    transform: translateX(4px);
-}
-
+.side-menu a:hover,
 .side-menu a.active {
-    background: linear-gradient(90deg, rgba(93, 63, 211, 0.3) 0%, transparent 100%);
-    border-left-color: var(--accent-color);
+    background: rgba(99, 102, 241, 0.15);
+    /* Primary color com transparência */
     color: var(--white);
-    font-weight: 600;
+    padding-left: 35px;
+    /* Leve indentação ao selecionar */
+}
+
+.side-menu a.active i {
+    color: var(--accent-color);
+}
+
+/* Divisor decorativo opcional */
+.side-menu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .menu-overlay {
@@ -178,8 +229,26 @@ header p {
     display: none;
 }
 
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    /* Efeito Blur no fundo */
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 999;
+    /* Abaixo da sidebar */
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
 .menu-overlay.active {
     display: block;
+    opacity: 1;
 }
 
 
@@ -1084,41 +1153,82 @@ hr {
         font-size: 16px;
     }
 
-    /* Esconde o menu Hamburger no desktop e mostra a navegação horizontal */
-    .menu-toggle,
-    .side-menu,
-    .menu-overlay {
-        display: none !important;
-    }
-
-    header {
-        padding: 20px 0;
-    }
-
-    .logo-placeholder img {
-        max-width: 150px;
-    }
-
-    header h1 {
-        font-size: 2.5rem;
-    }
-
     header p {
         font-size: 1.2rem;
     }
 
-    /* Nav horizontal reaparece */
-    nav {
-        display: flex;
-        justify-content: center;
-        padding: 10px 0;
+    /* Ajuste para o conteúdo não ficar atrás da sidebar fixa */
+    body {
+        padding-left: 80px;
+        /* Largura da Mini Sidebar + Espaço */
     }
 
-    nav a {
+    /* REGRAS DA MINI SIDEBAR NO DESKTOP */
+
+    /* 1. Esconde o menu Hamburger (botão) e overlay */
+    .menu-toggle,
+    .menu-overlay {
+        display: none !important;
+    }
+
+    /* 2. Mostra a Side Menu em modo fixo "Mini" */
+    .side-menu {
+        display: flex !important;
+        left: 0 !important;
+        /* Sempre visível */
+        width: 70px;
+        /* Largura reduzida (só ícones) */
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+        /* Cor mais sólida/profissional */
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        padding-top: 100px;
+        /* Espaço para não cobrir logo se necessário, ou ajuste */
+        z-index: 1000;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 3. Comportamento ao Passar o Mouse (Expandir) */
+    .side-menu:hover {
+        width: 260px;
+        /* Largura expandida */
+    }
+
+    /* 4. Estilo dos Ícones (Centralizados quando fechado) */
+    .side-menu a {
+        padding: 18px 22px;
+        /* Ajuste para centralizar o ícone */
+        justify-content: flex-start;
+        border-left: 4px solid transparent;
+        margin-bottom: 5px;
+    }
+
+    .side-menu a i {
+        font-size: 1.3rem;
+        min-width: 24px;
+        /* Garante tamanho fixo para o ícone */
+        display: flex;
+        justify-content: center;
+        margin-right: 15px;
+        /* Espaço entre ícone e texto */
+    }
+
+    /* 5. Esconder/Mostrar Texto */
+    .side-menu a .link-text {
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+        /* Delay para suavidade */
         display: inline-block;
-        padding: 10px 20px;
-        margin: 0 5px;
-        font-size: 1rem;
+    }
+
+    .side-menu:hover a .link-text {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Nav horizontal antiga removida */
+    nav {
+        display: none !important;
     }
 
     /* ===================== RESPONSIVIDADE - TABLET (768px+) ===================== */
@@ -1160,44 +1270,8 @@ hr {
         }
     }
 
-    /* Esconde o hamburger em tablet/desktop */
-    .menu-toggle {
-        display: none !important;
-    }
-
-    /* Mostra menu horizontal em tablet/desktop */
+    /* Remove estilos da nav horizontal antiga de tablets */
     nav {
-        display: flex;
-        background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        justify-content: center;
-        gap: 30px;
-        padding: 15px 20px;
-        box-shadow: 0 2px 10px var(--shadow);
-        flex-wrap: wrap;
-    }
-
-    nav a {
-        color: var(--white);
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        padding: 8px 12px;
-        border-bottom: 3px solid transparent;
-    }
-
-    nav a:hover {
-        border-bottom-color: var(--accent-color);
-        transform: translateY(-2px);
-    }
-
-    nav a.active {
-        border-bottom-color: var(--accent-color);
-        font-weight: 600;
-    }
-
-    /* Esconde o side-menu overlay */
-    .side-menu,
-    .menu-overlay {
         display: none !important;
     }
 
@@ -1453,6 +1527,7 @@ hr {
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         text-align: center;
+
         min-height: 50px;
     }
 
