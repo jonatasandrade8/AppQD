@@ -936,19 +936,17 @@ async function sharePhotos() {
         return;
     }
 
-    // 1. Captura os dados dos dropdowns para a legenda
-    const tipoFoto = selectTipoFoto.options[selectTipoFoto.selectedIndex]?.text || selectTipoFoto.value;
-    const promotor = selectPromotor.options[selectPromotor.selectedIndex]?.text || selectPromotor.value;
-    const rede = selectRede.options[selectRede.selectedIndex]?.text || selectRede.value;
-    const loja = selectLoja.options[selectLoja.selectedIndex]?.text || selectLoja.value;
+    // 1. Captura os dados dos dropdowns (Texto igual ao da marca d'água)
+    const tipoFotoText = `Tipo: ${selectTipoFoto.value}`;
+    const promotorText = `Promotor: ${selectPromotor.value}`;
+    const redeText = `Rede: ${selectRede.value}`;
+    const lojaText = `Loja: ${selectLoja.value}`;
 
-    // 2. Cria a legenda dinâmica
-    const now = new Date();
-    const dateOptions = { weekday: 'long', year: '2-digit', month: '2-digit', day: '2-digit' };
-    const dataFormatada = now.toLocaleDateString('pt-BR', dateOptions).replace(/,/, '').replace(/\b\d\b/g, '0$&');
+    // Data e Hora (Recaptura para ser atual)
+    const dateText = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
 
-    // Legenda Completa
-    const legendaCompartilhada = `${dataFormatada}\n${tipoFoto}\nPromotor: ${promotor}\nLoja: ${rede} - ${loja}\n(Fotos: ${photos.length})`;
+    // 2. Cria a legenda idêntica à marca d'água (Ordem de leitura: Topo -> Baixo na foto)
+    const legendaCompartilhada = `*Qdelícia Frutas - Relatório Fotográfico*\n\n${tipoFotoText}\n${promotorText}\n${redeText}\n${lojaText}\n${dateText}\n\n(Fotos Anexadas: ${photos.length})`;
 
     try {
         const files = photos.slice(0, MAX_PHOTOS).map((img, i) => {
