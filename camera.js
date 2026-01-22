@@ -978,7 +978,7 @@ async function sharePhotos() {
     const dateText = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'medium' });
 
     // 2. Cria a legenda idêntica à marca d'água (Ordem de leitura: Topo -> Baixo na foto)
-    const legendaCompartilhada = `*Relatório Fotográfico*\n${tipoFotoText}\n${promotorText}\n${redeText}\n${lojaText}\n${dateText}\n(Fotos Anexadas: ${photos.length})`;
+    const legendaCompartilhada = `*Relatório Fotográfico*\n${tipoFotoText}\n${promotorText}\n${redeText}\n${lojaText}\n${dateText}`;
 
     try {
         const files = photos.slice(0, MAX_PHOTOS).map((img, i) => {
