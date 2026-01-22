@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Ponto Digital - Qdelícia Frutas">
+    <meta name="author" content="Qdelícia Frutas">
+    <title>Ponto Digital - Qdelícia Frutas</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ===================== PÁGINA DE PONTO (IFRAME) ===================== */
+        .ponto-page {
+            padding: 0;
+            min-height: calc(100vh - 100px);
+        }
+
+        .ponto-header {
+            background: var(--white);
+            padding: 20px;
+            margin: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .ponto-header h2 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .ponto-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .ponto-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #fbbf24;
+            animation: blink 1.5s infinite;
+        }
+
+        .status-dot.connected {
+            background: var(--accent-color);
+            animation: none;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .ponto-container {
+            position: relative;
+            margin: 0 15px 15px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .ponto-container iframe {
+            width: 100%;
+            height: calc(100vh - 220px);
+            min-height: 500px;
+            border: none;
+            display: block;
+        }
+
+        .iframe-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .iframe-loading.hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--bg-light);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .iframe-loading p {
+            margin-top: 15px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .iframe-error {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dark);
+        }
+
+        .iframe-error i {
+            font-size: 3rem;
+            color: #f59e0b;
+            margin-bottom: 20px;
+        }
+
+        .iframe-error h3 {
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .iframe-error p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .iframe-error button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .iframe-error button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Responsivo */
+        @media (max-width: 480px) {
+            .ponto-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .ponto-container iframe {
+                height: calc(100vh - 280px);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .ponto-container iframe {
+                height: calc(100vh - 200px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="menu-overlay"></div>
+
+    <aside class="side-menu">
+        <a href="index.html"><i class="fas fa-home"></i> <span class="link-text">Início</span></a>
+        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> <span class="link-text">Estoque</span></a>
+        <a href="caixas.html"><i class="fas fa-box-open"></i> <span class="link-text">Caixas</span></a>
+        <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
+        <a href="ponto.html" class="active"><i class="fas fa-clock"></i> <span class="link-text">Ponto</span></a>
+    </aside>
+
+    <header id="cabecalho-principal">
+        <button class="menu-toggle" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
+        </button>
+
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+        </div>
+
+        <h1>Qdelícia Frutas</h1>
+        <p>Ponto Digital</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="caixas.html">Caixas</a>
+        <a href="camera.html">Câmera</a>
+        <a href="ponto.html" class="active">Ponto</a>
+    </nav>
+
+    <main class="ponto-page">
+
+        <div class="ponto-header">
+            <div>
+                <h2><i class="fas fa-clock"></i> Ponto Digital</h2>
+                <p>Registre sua entrada, saída e intervalos</p>
+            </div>
+            <div class="ponto-status">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Carregando...</span>
+            </div>
+        </div>
+
+        <div class="ponto-container">
+            <div class="iframe-loading" id="iframe-loading">
+                <div class="loading-spinner"></div>
+                <p>Carregando sistema de ponto...</p>
+            </div>
+
+            <div class="iframe-error" id="iframe-error" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Sistema Indisponível</h3>
+                <p>Não foi possível carregar o sistema de ponto. Verifique sua conexão.</p>
+                <button onclick="reloadIframe()">
+                    <i class="fas fa-redo"></i> Tentar Novamente
+                </button>
+            </div>
+
+            <!-- 
+                IMPORTANTE: Substitua a URL abaixo pela URL do seu Apps Script publicado.
+                Para obter a URL:
+                1. Abra o projeto Apps Script
+                2. Clique em "Implantar" > "Nova implantação"
+                3. Configure como "Web App" com acesso "Qualquer pessoa"
+                4. Copie a URL gerada e cole abaixo
+            -->
+            <iframe id="ponto-iframe" src="about:blank"
+                data-src="https://script.google.com/macros/s/AKfycbyp-QjRBUpBTfH4GSsbXocLEZ7xoXpCFVbx6bipyA_LeoUZXhoFdbeR46Uznd2LqF4lhA/exec"
+                allow="geolocation; microphone; camera; fullscreen; payment; autoplay" loading="lazy"
+                title="Sistema de Ponto Digital" onload="onIframeLoad()" onerror="onIframeError()">
+            </iframe>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+    </footer>
+
+    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        // ============================================
+        // CONTROLE DO IFRAME
+        // ============================================
+
+        const iframe = document.getElementById('ponto-iframe');
+        const loading = document.getElementById('iframe-loading');
+        const error = document.getElementById('iframe-error');
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+
+        // Iniciar carregamento
+        document.addEventListener('DOMContentLoaded', function () {
+            const url = iframe.dataset.src;
+
+            if (url && url !== 'URL_DO_SEU_APPS_SCRIPT_AQUI') {
+                iframe.src = url;
+            } else {
+                // URL não configurada - mostrar mensagem
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.querySelector('h3').textContent = 'Configuração Necessária';
+                error.querySelector('p').textContent = 'A URL do Apps Script precisa ser configurada no código.';
+                error.querySelector('button').style.display = 'none';
+            }
+        });
+
+        function onIframeLoad() {
+            loading.classList.add('hidden');
+            error.style.display = 'none';
+            statusDot.classList.add('connected');
+            statusText.textContent = 'Conectado';
+        }
+
+        function onIframeError() {
+            loading.style.display = 'none';
+            error.style.display = 'block';
+            statusDot.classList.remove('connected');
+            statusText.textContent = 'Desconectado';
+        }
+
+        function reloadIframe() {
+            loading.style.display = 'flex';
+            loading.classList.remove('hidden');
+            error.style.display = 'none';
+            statusDot.classList.remove('connected');
+            statusText.textContent = 'Reconectando...';
+
+            iframe.src = iframe.dataset.src;
+        }
+
+        // Timeout para detectar falha de carregamento
+        setTimeout(() => {
+            if (!loading.classList.contains('hidden')) {
+                // Ainda carregando após 15 segundos
+                statusText.textContent = 'Carregamento lento...';
+            }
+        }, 15000);
+
+        // Comunicação com o iframe via PostMessage
+        window.addEventListener('message', function (event) {
+            // Validar origem se necessário
+            if (event.data && event.data.type === 'PONTO_EVENT') {
+                console.log('Evento do ponto:', event.data);
+
+                // Exemplo: atualizar UI baseado em eventos do iframe
+                if (event.data.action === 'LOGGED_IN') {
+                    statusText.textContent = `Conectado: ${event.data.data.nome}`;
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

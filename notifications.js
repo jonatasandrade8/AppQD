@@ -55,10 +55,37 @@ const NOTIFICATIONS_CONFIG = {
         corTexto: "#ffffff",
         animacao: true
     },
+
+    // === CONFIGURAÇÃO DE PAGINAS (ON/OFF) ===
+    // Configure aqui quais páginas estão ativas ou desativadas
+    pages: {
+        estoque: {
+            enabled: true,
+            filename: "estoque.html",
+            mensagem: "A página de estoque está temporariamente desativada."
+        },
+        caixas: {
+            enabled: true,
+            filename: "caixas.html",
+            mensagem: "A página de caixas está temporariamente desativada."
+        },
+        camera: {
+            enabled: true,
+            filename: "camera.html",
+            mensagem: "A funcionalidade de câmera está em manutenção."
+        },
+        ponto: {
+            enabled: false,
+            filename: "ponto.html",
+            mensagem: "O registro de ponto está temporariamente indisponível."
+        }
+    }
 };
 
 (function () {
     function inicializarNotificacoes() {
+        gerenciarAcessoPaginas();
+
         const header = document.getElementById('cabecalho-principal');
         const boardExistente = document.getElementById('status-envio');
 
@@ -67,6 +94,44 @@ const NOTIFICATIONS_CONFIG = {
 
         setInterval(atualizarTodosOsTimers, 1000);
         atualizarTodosOsTimers();
+    }
+
+    function gerenciarAcessoPaginas() {
+        const config = NOTIFICATIONS_CONFIG.pages;
+        if (!config) return;
+
+        const path = window.location.pathname;
+        // Pega o nome do arquivo atual (ex: estoque.html)
+        const pageName = path.split("/").pop().split("?")[0];
+
+        // 1. Bloqueio de Acesso à Página Atual
+        for (const key in config) {
+            const pageConfig = config[key];
+            if (pageConfig.filename && pageName.toLowerCase() === pageConfig.filename.toLowerCase()) {
+                if (!pageConfig.enabled) {
+                    alert(pageConfig.mensagem || "Página indisponível");
+                    window.location.href = "index.html";
+                    return;
+                }
+            }
+        }
+
+        // 2. Ocultar Links no Menu
+        const links = document.querySelectorAll('a');
+        links.forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href) return;
+
+            for (const key in config) {
+                const pageConfig = config[key];
+                // Se o link contiver o nome do arquivo desativado
+                if (href.toLowerCase().includes(pageConfig.filename.toLowerCase())) {
+                    if (!pageConfig.enabled) {
+                        link.style.display = 'none';
+                    }
+                }
+            }
+        });
     }
 
     function gerenciarAvisoSerio(header, boardExistente) {

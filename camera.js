@@ -36,7 +36,7 @@ const APP_DATA = {
             "Mateus": ["Loja 04"],
             "Amarildo": ["Loja 05"],
             "Cristiane": ["Loja 07"],
-            "Markson": ["Loja 08","Loja 04"]
+            "Markson": ["Loja 08", "Loja 04"]
         },
         "Carrefour": {
             "Markson": ["Zona Sul"]
@@ -108,7 +108,35 @@ let currentStream = null;
 let usingFrontCamera = false;
 let photos = []; // Array de URLs de fotos (Sempre começará vazio)
 let hasCameraPermission = false; // Inicia como 'false'
+
 const localStorageKey = 'qdelicia_last_selection_v2'; // Chave para persistência (v2 devido à adição do novo campo)
+const PHOTOS_STORAGE_KEY = 'qdelicia_camera_photos_v1'; // Chave para persistência das fotos
+
+/**
+ * @description Salva as fotos atuais no localStorage.
+ */
+function savePhotosToStorage() {
+    try {
+        localStorage.setItem(PHOTOS_STORAGE_KEY, JSON.stringify(photos));
+    } catch (e) {
+        console.error("Erro ao salvar fotos no storage:", e);
+        // Pode acontecer se quota excedida
+    }
+}
+
+/**
+ * @description Carrega as fotos do localStorage.
+ */
+function loadPhotosFromStorage() {
+    try {
+        const saved = localStorage.getItem(PHOTOS_STORAGE_KEY);
+        if (saved) {
+            photos = JSON.parse(saved);
+        }
+    } catch (e) {
+        console.error("Erro ao carregar fotos do storage:", e);
+    }
+}
 
 // Variáveis para Zoom e Flash
 let currentZoom = 1; // Zoom inicial
@@ -602,6 +630,7 @@ function capturePhoto() {
     const dataURL = canvas.toDataURL('image/jpeg', 0.9);
 
     photos.unshift(dataURL); // Adiciona a nova foto no início
+    savePhotosToStorage(); // Salva no storage
     updatePhotoCounter();
     checkPhotoLimit(); // Atualiza UI (pode bloquear botão se chegou a 5)
 
@@ -616,6 +645,7 @@ function capturePhoto() {
 function removePhoto(index) {
     if (confirm("Tem certeza que deseja remover esta foto?")) {
         photos.splice(index, 1); // Remove 1 elemento a partir do índice
+        savePhotosToStorage(); // Atualiza o storage
         updatePhotoCounter();
         checkPhotoLimit(); // Atualiza UI (libera botão se baixou de 5)
         updateGalleryView(); // Re-renderiza a galeria
@@ -967,6 +997,16 @@ async function sharePhotos() {
             text: legendaCompartilhada,
         });
 
+        // =========================================================
+        // SUCESSO NO COMPARTILHAMENTO: LIMPAR FOTOS
+        // =========================================================
+        photos = []; // Limpa array na memória
+        localStorage.removeItem(PHOTOS_STORAGE_KEY); // Limpa do storage
+        updateGalleryView(); // Atualiza UI (mostra msg vazia)
+        updatePhotoCounter(); // Zera contador
+        checkPhotoLimit(); // Reseta estado dos botões
+        // =========================================================
+
     } catch (error) {
         if (error.name !== 'AbortError') {
             console.error(error);
@@ -999,6 +1039,7 @@ try {
 // Inicializa a galeria e os dropdowns ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
     loadAndPopulateDropdowns();
+    loadPhotosFromStorage(); // Carrega fotos salvas anteriormente
     updateGalleryView();
     updatePhotoCounter();
     detectDeviceOrientation();
