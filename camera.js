@@ -35,11 +35,10 @@ const APP_DATA = {
             "J Mauricio": ["Loja 03"],
             "Mateus": ["Loja 04"],
             "Amarildo": ["Loja 05"],
-            "Cristiane": ["Loja 07"],
-            "Markson": ["Loja 08", "Loja 04"]
+            "Markson": ["Loja 08", "Loja 07"]
         },
         "Carrefour": {
-            "Markson": ["Zona Sul"]
+            "Mateus": ["Zona Sul"]
         },
         "Superfácil": {
             "Neto": ["Emaús"],
