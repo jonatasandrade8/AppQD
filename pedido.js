@@ -249,12 +249,28 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let msg = `*SUGESTÃO DE PEDIDO - QDELÍCIA FRUTAS*\n\n`;
+        let msg = `*SUGESTÃO DE PEDIDO - QDELÍCIA FRUTAS*\n`;
+        msg += `---------------------------------------\n`;
         msg += `*Data:* ${data.date}\n`;
         msg += `*Loja:* ${data.loja} (${data.rede})\n`;
-        msg += `*Promotor:* ${data.promotor}\n\n`;
-        msg += `*PRODUTOS SUGERIDOS:*\n`;
-        data.products.forEach(p => msg += `• ${p.name}: ${p.qty}\n`);
+        msg += `*Promotor:* ${data.promotor}\n`;
+        msg += `---------------------------------------\n\n`;
+
+        // WhatsApp professional table format using monospace
+        let tableHeader = `PRODUTO             | QTD      `;
+        let divider = `-------------------------------`;
+
+        msg += "```" + tableHeader + "```\n";
+        msg += "```" + divider + "```\n";
+
+        data.products.forEach(p => {
+            // Pad name to 20 chars, qty to 8 chars
+            const paddedName = p.name.substring(0, 19).padEnd(19, ' ');
+            const paddedQty = p.qty.toString().substring(0, 8).padEnd(8, ' ');
+            msg += "```" + `${paddedName} | ${paddedQty}` + "```\n";
+        });
+
+        msg += `---------------------------------------`;
 
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     };
