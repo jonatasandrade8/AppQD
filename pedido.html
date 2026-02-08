@@ -18,64 +18,193 @@
     <style>
         .order-container {
             padding: 20px;
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
-        .product-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
             margin-top: 20px;
         }
 
-        .product-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .product-card {
             background: var(--white);
-            padding: 12px 15px;
+            padding: 15px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--secondary-color);
+        }
+
+        .product-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-card .product-title {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 1rem;
+        }
+
+        .product-card .product-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 5px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .btn-edit {
+            color: var(--primary-color);
+        }
+
+        .btn-delete {
+            color: #e11d48;
+        }
+
+        .btn-icon:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .product-card .card-body {
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        .product-name {
-            flex: 1;
-            font-weight: 600;
-            color: var(--text-dark);
+        .product-card .qty-display {
+            background: var(--bg-light);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
         }
 
-        .product-qty {
-            width: 80px;
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 25px;
+            border-radius: var(--border-radius-lg);
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .modal-footer {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .btn-confirm {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            color: var(--text-muted);
         }
 
         .btn-add-product {
-            background: var(--accent-color);
+            background: var(--gradient);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 15px;
             border-radius: var(--border-radius);
             font-weight: bold;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 25px;
             width: 100%;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
+            font-size: 1rem;
+            box-shadow: var(--shadow);
         }
 
         .btn-add-product:hover {
-            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .share-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-top: 25px;
+            margin: 30px 0;
         }
 
         .btn-share {
@@ -91,6 +220,7 @@
             transition: var(--transition);
             font-size: 0.9rem;
             color: white;
+            box-shadow: var(--shadow);
         }
 
         .btn-whatsapp {
@@ -106,12 +236,56 @@
             box-shadow: var(--shadow-lg);
         }
 
-        /* Styles for PDF Generation (Hidden on screen) */
+        /* Fixed Products Styling */
+        .fixed-products-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .input-group-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        .input-group-row:focus-within {
+            border-color: var(--primary-color);
+            background: var(--white);
+        }
+
+        .input-group-row label {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            margin: 0;
+            flex: 1;
+        }
+
+        .input-group-row input {
+            width: 100px;
+            border: none;
+            background: var(--bg-light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary-color);
+            outline: none;
+        }
+
+        /* PDF Styles */
         #pdf-content {
             display: none;
             padding: 40px;
             font-family: 'Inter', sans-serif;
-            color: #333;
+            color: #1e293b;
         }
 
         .pdf-header {
@@ -128,30 +302,33 @@
         }
 
         .pdf-info {
-            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
         }
 
         .pdf-info p {
-            margin: 5px 0;
+            margin: 8px 0;
             font-size: 14px;
         }
 
         .pdf-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
         .pdf-table th,
         .pdf-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
             text-align: left;
         }
 
         .pdf-table th {
-            background-color: #f8fafc;
-            color: #1e293b;
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: #475569;
         }
     </style>
 </head>
@@ -166,8 +343,8 @@
         <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
         <a href="ponto.html"><i class="fas fa-clock"></i> <span class="link-text">Ponto</span></a>
         <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
-        <a href="pedido.html" class="active"><i class="fas fa-file-invoice"></i> <span
-                class="link-text">Pedido</span></a>
+        <a href="pedido.html" class="active"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de
+                Pedido</span></a>
     </aside>
 
     <header id="cabecalho-principal">
@@ -176,7 +353,7 @@
             <span class="menu-label">Menu</span>
         </button>
         <div class="logo-placeholder">
-            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelicia Frutas">
         </div>
         <h1>Qdelícia Frutas</h1>
         <p>Sugestão de Pedido</p>
@@ -189,100 +366,129 @@
         <a href="camera.html">Câmera</a>
         <a href="ponto.html">Ponto</a>
         <a href="materiais.html">Materiais</a>
-        <a href="pedido.html" class="active">Pedido</a>
+        <a href="pedido.html" class="active">Sugestão</a>
     </nav>
 
     <main class="order-container">
         <section class="glass-section">
-            <h2><i class="fas fa-info-circle"></i> Informações do Pedido</h2>
+            <h2><i class="fas fa-info-circle"></i> Dados da Loja</h2>
 
             <div class="input-group">
                 <label for="estado"><i class="fas fa-map-marker-alt"></i> Estado</label>
-                <select id="estado">
-                    <option value="">Selecione...</option>
-                    <option value="PE">Pernambuco</option>
-                    <option value="PB">Paraíba</option>
-                    <option value="AL">Alagoas</option>
+                <select id="estado" class="report-input">
+                    <option value="" disabled selected>Selecione o Estado</option>
                 </select>
             </div>
 
             <div class="input-group">
                 <label for="rede"><i class="fas fa-store"></i> Rede</label>
-                <select id="rede">
-                    <option value="">Selecione...</option>
-                    <option value="Atacadão">Atacadão</option>
-                    <option value="Carrefour">Carrefour</option>
-                    <option value="Assaí">Assaí</option>
-                    <option value="Pão de Açúcar">Pão de Açúcar</option>
-                    <option value="Grupo Mateus">Grupo Mateus</option>
+                <select id="rede" class="report-input" disabled>
+                    <option value="" disabled selected>Selecione a Rede</option>
                 </select>
             </div>
 
             <div class="input-group">
                 <label for="promotor"><i class="fas fa-user"></i> Promotor</label>
-                <input type="text" id="promotor" class="report-input" placeholder="Nome do promotor">
+                <select id="promotor" class="report-input" disabled>
+                    <option value="" disabled selected>Selecione o Promotor</option>
+                </select>
             </div>
 
             <div class="input-group">
                 <label for="loja"><i class="fas fa-shopping-cart"></i> Loja</label>
-                <input type="text" id="loja" class="report-input" placeholder="Identificação da loja">
+                <select id="loja" class="report-input" disabled>
+                    <option value="" disabled selected>Selecione a Loja</option>
+                </select>
             </div>
         </section>
 
         <section class="glass-section">
-            <h2><i class="fas fa-list"></i> Produtos</h2>
-            <div id="product-list" class="product-list">
-                <!-- Products will be listed here -->
-                <div class="product-item">
-                    <span class="product-name">Pacovan (kg)</span>
-                    <input type="number" class="report-input product-qty" data-name="Pacovan (kg)" placeholder="0">
+            <h2><i class="fas fa-list-check"></i> Produtos Sugeridos</h2>
+
+            <div class="fixed-products-list">
+                <div class="input-group-row">
+                    <label>Pacovan (kg)</label>
+                    <input type="number" class="report-input fixed-qty" data-name="Pacovan (kg)" placeholder="0"
+                        min="0">
                 </div>
-                <div class="product-item">
-                    <span class="product-name">Prata (kg)</span>
-                    <input type="number" class="report-input product-qty" data-name="Prata (kg)" placeholder="0">
+                <div class="input-group-row">
+                    <label>Prata (kg)</label>
+                    <input type="number" class="report-input fixed-qty" data-name="Prata (kg)" placeholder="0" min="0">
                 </div>
-                <div class="product-item">
-                    <span class="product-name">Nanica (kg)</span>
-                    <input type="number" class="report-input product-qty" data-name="Nanica (kg)" placeholder="0">
+                <div class="input-group-row">
+                    <label>Nanica (kg)</label>
+                    <input type="number" class="report-input fixed-qty" data-name="Nanica (kg)" placeholder="0" min="0">
                 </div>
-                <div class="product-item">
-                    <span class="product-name">Comprida (kg)</span>
-                    <input type="number" class="report-input product-qty" data-name="Comprida (kg)" placeholder="0">
+                <div class="input-group-row">
+                    <label>Comprida (kg)</label>
+                    <input type="number" class="report-input fixed-qty" data-name="Comprida (kg)" placeholder="0"
+                        min="0">
                 </div>
-                <div class="product-item">
-                    <span class="product-name">Leite (un)</span>
-                    <input type="number" class="report-input product-qty" data-name="Leite (un)" placeholder="0">
-                </div>
-                <div class="product-item">
-                    <span class="product-name">Abacaxi (un)</span>
-                    <input type="number" class="report-input product-qty" data-name="Abacaxi (un)" placeholder="0">
-                </div>
-                <div class="product-item">
-                    <span class="product-name">Melão (un)</span>
-                    <input type="number" class="report-input product-qty" data-name="Melão (un)" placeholder="0">
-                </div>
-                <div class="product-item">
-                    <span class="product-name">Mamão (un)</span>
-                    <input type="number" class="report-input product-qty" data-name="Mamão (un)" placeholder="0">
+                <div class="input-group-row">
+                    <label>Leite (Kg)</label>
+                    <input type="number" class="report-input fixed-qty" data-name="Leite (Kg)" placeholder="0" min="0">
                 </div>
             </div>
 
-            <button id="add-product-btn" class="btn-add-product">
-                <i class="fas fa-plus"></i> Adicionar Produto +
+            <hr style="margin: 25px 0; opacity: 0.1;">
+
+            <h3 style="color: var(--primary-color); font-size: 1rem; margin-bottom: 15px;"><i
+                    class="fas fa-plus-circle"></i> Outros Produtos</h3>
+
+            <div id="product-grid" class="product-grid">
+                <!-- Cards injected by JS -->
+            </div>
+
+            <button id="add-product-trigger" class="btn-add-product">
+                <i class="fas fa-cart-plus"></i> Adicionar Outro Produto +
             </button>
         </section>
 
         <div class="share-buttons">
             <button id="share-whatsapp" class="btn-share btn-whatsapp">
                 <i class="fab fa-whatsapp"></i>
-                Compartilhar WhatsApp
+                WhatsApp
             </button>
             <button id="share-pdf" class="btn-share btn-pdf">
-                <i class="fas fa-file-pdf"></i>
+                <i class="fas fa-share-nodes"></i>
                 Compartilhar PDF
             </button>
         </div>
     </main>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Adicionar Produto</h3>
+            </div>
+            <div class="modal-body">
+                <div class="input-group" style="max-width: 100%; margin: 0 0 15px 0;">
+                    <label for="modal-product-name">Nome do Produto</label>
+                    <input type="text" id="modal-product-name" class="report-input" list="default-products"
+                        placeholder="Ex: Pacovan (kg)">
+                    <datalist id="default-products">
+                        <option value="Pacovan (kg)">
+                        <option value="Prata (kg)">
+                        <option value="Nanica (kg)">
+                        <option value="Comprida (kg)">
+                        <option value="Leite (un)">
+                        <option value="Abacaxi (un)">
+                        <option value="Melão (un)">
+                        <option value="Mamão (un)">
+                    </datalist>
+                </div>
+                <div class="input-group" style="max-width: 100%; margin: 0;">
+                    <label for="modal-product-qty">Quantidade</label>
+                    <input type="number" id="modal-product-qty" class="report-input" placeholder="0" min="1">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-modal-cancel" class="btn-modal btn-cancel">Cancelar</button>
+                <button id="btn-modal-confirm" class="btn-modal btn-confirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Hidden Content for PDF Generation -->
     <div id="pdf-content">

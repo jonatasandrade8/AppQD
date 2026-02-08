@@ -87,7 +87,10 @@ const NOTIFICATIONS_CONFIG = {
         pedido: {
             enabled: true,
             filename: "pedido.html",
-            mensagem: "A página de pedidos está temporariamente desativada."
+            mensagem: "A página de pedidos está temporariamente desativada.",
+            features: {
+                pdf_share: false // Alterar para true para ativar o botão na página
+            }
         }
     }
 };
