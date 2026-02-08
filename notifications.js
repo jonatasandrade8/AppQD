@@ -78,6 +78,16 @@ const NOTIFICATIONS_CONFIG = {
             enabled: false,
             filename: "ponto.html",
             mensagem: "O registro de ponto está temporariamente indisponível."
+        },
+        materiais: {
+            enabled: true,
+            filename: "materiais.html",
+            mensagem: "A página de materiais está em manutenção."
+        },
+        pedido: {
+            enabled: true,
+            filename: "pedido.html",
+            mensagem: "A página de pedidos está temporariamente desativada."
         }
     }
 };

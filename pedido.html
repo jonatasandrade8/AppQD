@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sugestão de Pedido - Qdelícia Frutas">
+    <title>Pedido - Qdelícia Frutas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- html2pdf.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .order-container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--white);
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            gap: 10px;
+        }
+
+        .product-name {
+            flex: 1;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .product-qty {
+            width: 80px;
+        }
+
+        .btn-add-product {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-product:hover {
+            filter: brightness(1.1);
+        }
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-share {
+            border: none;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .btn-whatsapp {
+            background-color: #25d366;
+        }
+
+        .btn-pdf {
+            background-color: #e11d48;
+        }
+
+        .btn-share:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Styles for PDF Generation (Hidden on screen) */
+        #pdf-content {
+            display: none;
+            padding: 40px;
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+
+        .pdf-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #6366f1;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .pdf-logo {
+            width: 100px;
+        }
+
+        .pdf-info {
+            margin-bottom: 20px;
+        }
+
+        .pdf-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .pdf-table th,
+        .pdf-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .pdf-table th {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu-overlay"></div>
+
+    <aside class="side-menu">
+        <a href="index.html"><i class="fas fa-home"></i> <span class="link-text">Início</span></a>
+        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> <span class="link-text">Estoque</span></a>
+        <a href="caixas.html"><i class="fas fa-box-open"></i> <span class="link-text">Caixas</span></a>
+        <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
+        <a href="ponto.html"><i class="fas fa-clock"></i> <span class="link-text">Ponto</span></a>
+        <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
+        <a href="pedido.html" class="active"><i class="fas fa-file-invoice"></i> <span
+                class="link-text">Pedido</span></a>
+    </aside>
+
+    <header id="cabecalho-principal">
+        <button class="menu-toggle" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
+        </button>
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+        </div>
+        <h1>Qdelícia Frutas</h1>
+        <p>Sugestão de Pedido</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="caixas.html">Caixas</a>
+        <a href="camera.html">Câmera</a>
+        <a href="ponto.html">Ponto</a>
+        <a href="materiais.html">Materiais</a>
+        <a href="pedido.html" class="active">Pedido</a>
+    </nav>
+
+    <main class="order-container">
+        <section class="glass-section">
+            <h2><i class="fas fa-info-circle"></i> Informações do Pedido</h2>
+
+            <div class="input-group">
+                <label for="estado"><i class="fas fa-map-marker-alt"></i> Estado</label>
+                <select id="estado">
+                    <option value="">Selecione...</option>
+                    <option value="PE">Pernambuco</option>
+                    <option value="PB">Paraíba</option>
+                    <option value="AL">Alagoas</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="rede"><i class="fas fa-store"></i> Rede</label>
+                <select id="rede">
+                    <option value="">Selecione...</option>
+                    <option value="Atacadão">Atacadão</option>
+                    <option value="Carrefour">Carrefour</option>
+                    <option value="Assaí">Assaí</option>
+                    <option value="Pão de Açúcar">Pão de Açúcar</option>
+                    <option value="Grupo Mateus">Grupo Mateus</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="promotor"><i class="fas fa-user"></i> Promotor</label>
+                <input type="text" id="promotor" class="report-input" placeholder="Nome do promotor">
+            </div>
+
+            <div class="input-group">
+                <label for="loja"><i class="fas fa-shopping-cart"></i> Loja</label>
+                <input type="text" id="loja" class="report-input" placeholder="Identificação da loja">
+            </div>
+        </section>
+
+        <section class="glass-section">
+            <h2><i class="fas fa-list"></i> Produtos</h2>
+            <div id="product-list" class="product-list">
+                <!-- Products will be listed here -->
+                <div class="product-item">
+                    <span class="product-name">Pacovan (kg)</span>
+                    <input type="number" class="report-input product-qty" data-name="Pacovan (kg)" placeholder="0">
+                </div>
+                <div class="product-item">
+                    <span class="product-name">Prata (kg)</span>
+                    <input type="number" class="report-input product-qty" data-name="Prata (kg)" placeholder="0">
+                </div>
+                <div class="product-item">
+                    <span class="product-name">Nanica (kg)</span>
+                    <input type="number" class="report-input product-qty" data-name="Nanica (kg)" placeholder="0">
+                </div>
+                <div class="product-item">
+                    <span class="product-name">Comprida (kg)</span>
+                    <input type="number" class="report-input product-qty" data-name="Comprida (kg)" placeholder="0">
+                </div>
+                <div class="product-item">
+                    <span class="product-name">Leite (un)</span>
+                    <input type="number" class="report-input product-qty" data-name="Leite (un)" placeholder="0">
+                </div>
+                <div class="product-item">
+                    <span class="product-name">Abacaxi (un)</span>
+                    <input type="number" class="report-input product-qty" data-name="Abacaxi (un)" placeholder="0">
+                </div>
+                <div class="product-item">
+                    <span class="product-name">Melão (un)</span>
+                    <input type="number" class="report-input product-qty" data-name="Melão (un)" placeholder="0">
+                </div>
+                <div class="product-item">
+                    <span class="product-name">Mamão (un)</span>
+                    <input type="number" class="report-input product-qty" data-name="Mamão (un)" placeholder="0">
+                </div>
+            </div>
+
+            <button id="add-product-btn" class="btn-add-product">
+                <i class="fas fa-plus"></i> Adicionar Produto +
+            </button>
+        </section>
+
+        <div class="share-buttons">
+            <button id="share-whatsapp" class="btn-share btn-whatsapp">
+                <i class="fab fa-whatsapp"></i>
+                Compartilhar WhatsApp
+            </button>
+            <button id="share-pdf" class="btn-share btn-pdf">
+                <i class="fas fa-file-pdf"></i>
+                Compartilhar PDF
+            </button>
+        </div>
+    </main>
+
+    <!-- Hidden Content for PDF Generation -->
+    <div id="pdf-content">
+        <div class="pdf-header">
+            <img src="./images/logo-qdelicia.png" alt="Logo" class="pdf-logo">
+            <div>
+                <h1 style="color: #6366f1; margin: 0;">Qdelícia Frutas</h1>
+                <p style="margin: 0; text-align: right; color: #64748b;">Sugestão de Pedido Profissional</p>
+            </div>
+        </div>
+
+        <div class="pdf-info">
+            <h3><i class="fas fa-info-circle"></i> Detalhes do Pedido</h3>
+            <p><strong>Data:</strong> <span id="pdf-data">--/--/----</span></p>
+            <p><strong>Estado:</strong> <span id="pdf-estado">---</span></p>
+            <p><strong>Rede:</strong> <span id="pdf-rede">---</span></p>
+            <p><strong>Loja:</strong> <span id="pdf-loja">---</span></p>
+            <p><strong>Promotor:</strong> <span id="pdf-promotor">---</span></p>
+        </div>
+
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                </tr>
+            </thead>
+            <tbody id="pdf-table-body">
+                <!-- Rows injected by JS -->
+            </tbody>
+        </table>
+
+        <div
+            style="margin-top: 50px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 12px; color: #64748b; text-align: center;">
+            Documento gerado automaticamente pela Área do Promotor Qdelícia Frutas.
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="notifications.js"></script>
+    <script src="script.js"></script>
+    <script src="pedido.js"></script>
+</body>
+
+</html>
