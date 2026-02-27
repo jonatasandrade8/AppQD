@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="3600">
+    <meta name="description" content="Registro de avarias diário - Qdelícia Frutas.">
+    <title>Avarias - Qdelícia Frutas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Melhorias específicas para o container do iframe */
+        .iframe-container {
+            padding: 15px;
+            background-color: #f4f4f4;
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            border: 3px solid #1e1b4b;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background: white;
+        }
+
+        .iframe-wrapper::after {
+            content: '↕ Arraste dentro da borda para rolar o formulário';
+            display: block;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            padding: 5px;
+            background: #eee;
+            border-top: 1px solid #ddd;
+        }
+
+        iframe {
+            display: block;
+            width: 100%;
+            height: 85vh;
+        }
+
+        @media (max-width: 600px) {
+            .iframe-container {
+                padding: 10px 5px;
+            }
+
+            iframe {
+                height: 75vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="menu-overlay"></div>
+    <aside class="side-menu">
+        <a href="index.html"><i class="fas fa-home"></i> Início</a>
+        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> Estoque</a>
+        <a href="avarias.html" class="active"><i class="fas fa-exclamation-triangle"></i> Avarias</a>
+        <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
+        <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
+        <a href="ponto-aux.html"><i class="fas fa-clock"></i> Ponto - Auxiliar</a>
+        <a href="materiais.html"><i class="fas fa-book"></i> Materiais</a>
+        <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
+        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span
+                class="link-text">Solicitações</span></a>
+        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span
+                class="link-text">Sair</span></a>
+    </aside>
+
+    <header id="cabecalho-principal">
+        <button class="menu-toggle" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
+        </button>
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+        </div>
+        <h1 id="welcome-message">Qdelícia Frutas</h1>
+        <p>Registro de avarias diário</p>
+
+        <button onclick="recarregarPagina()" class="btn-refresh">
+            <i class="fas fa-sync-alt"></i> Atualizar Página
+        </button>
+    </header>
+
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="avarias.html" class="active">Avarias</a>
+        <a href="caixas.html">Caixas</a>
+        <a href="camera.html">Câmera</a>
+        <a href="ponto-aux.html">Ponto - Auxiliar</a>
+        <a href="materiais.html">Materiais</a>
+        <a href="pedido.html">Sugestão</a>
+        <a href="solicitacoes.html">Solicitações</a>
+        <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
+    </nav>
+
+    <main class="iframe-container">
+        <div class="iframe-wrapper">
+            <!-- URL Placeholder: Substitua pela URL de implantação do novo Apps Script -->
+            <iframe
+                src="https://script.google.com/macros/s/AKfycbzqKQ7AAV_ySP9EhHZiaatsAa0AsP6SKsnmkgqf0oFu52U9Kqgzjh_LT_EiBdKUhTjy/exec"
+                frameborder="0" marginheight="0" marginwidth="0">
+                Carregando script...
+            </iframe>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+    </footer>
+
+    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script src="notifications.js"></script>
+    <script src="script.js"></script>
+    <script src="alert.js"></script>
+</body>
+
+</html>

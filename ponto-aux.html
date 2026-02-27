@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Ponto - Qdelícia Frutas">
+    <meta name="author" content="Qdelícia Frutas">
+    <title>Ponto - Qdelícia Frutas</title>
+
+    <!-- Auth Check -->
+    <script>
+        if (!localStorage.getItem('qd_user_session')) {
+            window.location.href = 'login-ponto-aux.html';
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        .ponto-aux-page {
+            padding: 20px 15px;
+            min-height: calc(100vh - 150px);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .status-card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .punch-main-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gradient);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px auto;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .punch-main-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .punch-main-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .punch-main-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .punch-main-btn:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .punch-main-btn.locating {
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(99, 102, 241, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+            }
+        }
+
+        .punch-main-btn i {
+            font-size: 2.5rem;
+        }
+
+        .punches-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .punch-item {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: left;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: var(--transition);
+        }
+
+        .punch-item.recorded {
+            border-left: 4px solid var(--accent-color);
+            background: #f0fdf4;
+        }
+
+        .punch-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .punch-time {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .stats-summary {
+            background: var(--white);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .stat-box h4 {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .stat-box p {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stat-overtime {
+            color: var(--accent-color);
+        }
+
+        .stat-missing {
+            color: var(--danger-color);
+        }
+
+        .timers-display {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .timer-card {
+            flex: 1;
+            background: #1e293b;
+            color: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .timer-card h5 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            opacity: 0.8;
+            letter-spacing: 0.5px;
+        }
+
+        .timer-card .time {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .share-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            font-weight: 700;
+            font-size: 1rem;
+            width: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .download-btn {
+            background: #475569 !important;
+            box-shadow: 0 4px 12px rgba(71, 85, 105, 0.3) !important;
+        }
+
+        .share-btn:disabled {
+            background: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .share-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+            filter: brightness(1.05);
+        }
+
+        .reset-day {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .reset-day button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .geolocation-status {
+            font-size: 0.8rem;
+            margin: 8px 0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 20px;
+            width: fit-content;
+            margin: 10px auto;
+        }
+
+        .geo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+        }
+
+        .geo-dot.active {
+            background: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-color);
+        }
+
+        .geo-dot.error {
+            background: var(--danger-color);
+        }
+
+        @media (min-width: 768px) {
+            .ponto-aux-page {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu-overlay"></div>
+
+    <aside class="side-menu">
+        <a href="index.html"><i class="fas fa-home"></i> <span class="link-text">Início</span></a>
+        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> <span class="link-text">Estoque</span></a>
+        <a href="caixas.html"><i class="fas fa-box-open"></i> <span class="link-text">Caixas</span></a>
+        <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
+        <a href="ponto-aux.html" class="active"><i class="fas fa-fingerprint"></i> <span class="link-text">Ponto -
+                Auxiliar</span></a>
+        <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
+        <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
+        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span
+                class="link-text">Solicitações</span></a>
+        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span
+                class="link-text">Sair</span></a>
+    </aside>
+
+    <header id="cabecalho-principal">
+        <button class="menu-toggle" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
+        </button>
+
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+        </div>
+
+        <h1 id="welcome-message">Qdelícia Frutas</h1>
+        <p>Sistema de Ponto</p>
+
+        <div id="user-auth-label"
+            style="margin-top: 10px; background: rgba(0,0,0,0.15); display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.2);">
+            <i class="fas fa-user-circle"></i> <span id="auth-user-name">Carregando...</span> | <span
+                id="auth-date"></span>
+        </div>
+    </header>
+
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="caixas.html">Caixas</a>
+        <a href="camera.html">Câmera</a>
+        <a href="ponto-aux.html" class="active">Ponto - Auxiliar</a>
+        <a href="materiais.html">Materiais</a>
+        <a href="pedido.html">Sugestão</a>
+        <a href="solicitacoes.html">Solicitações</a>
+        <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
+    </nav>
+
+    <main class="ponto-aux-page">
+        <div class="status-card">
+            <div id="date-display" style="font-weight: 600; color: var(--primary-color); margin-bottom: 10px;"></div>
+
+            <div class="geolocation-status" id="geo-status">
+                <span class="geo-dot" id="geo-dot"></span>
+                <span id="geo-text">Conectando GPS...</span>
+            </div>
+
+            <button id="main-punch-btn" class="punch-main-btn" disabled>
+                <i class="fas fa-fingerprint"></i>
+                <span id="btn-text">Carregando...</span>
+            </button>
+
+            <div class="punches-grid">
+                <div class="punch-item" id="punch-0">
+                    <span class="punch-label">Início</span>
+                    <span class="punch-time">--:--</span>
+                </div>
+                <div class="punch-item" id="punch-1">
+                    <span class="punch-label">Almoço</span>
+                    <span class="punch-time">--:--</span>
+                </div>
+                <div class="punch-item" id="punch-2">
+                    <span class="punch-label">Retorno</span>
+                    <span class="punch-time">--:--</span>
+                </div>
+                <div class="punch-item" id="punch-3">
+                    <span class="punch-label">Fim</span>
+                    <span class="punch-time">--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timers-display">
+            <div class="timer-card">
+                <h5>Tempo Almoço</h5>
+                <div class="time" id="lunch-timer">01:00:00</div>
+            </div>
+            <div class="timer-card">
+                <h5>Fim da Jornada</h5>
+                <div class="time" id="journey-timer">07:20:00</div>
+            </div>
+        </div>
+
+        <div class="stats-summary">
+            <div class="stat-box">
+                <h4>Trabalhadas</h4>
+                <p id="stat-worked">00:00</p>
+            </div>
+            <div class="stat-box">
+                <h4>Extra</h4>
+                <p id="stat-overtime" class="stat-overtime">00:00</p>
+            </div>
+            <div class="stat-box">
+                <h4>A Haver</h4>
+                <p id="stat-missing" class="stat-missing">00:00</p>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button id="download-pdf-btn" class="share-btn download-btn" disabled>
+                <i class="fas fa-file-pdf"></i> Baixar PDF
+            </button>
+            <button id="whatsapp-share-btn" class="share-btn" disabled>
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+        </div>
+
+        <div class="reset-day">
+            <button onclick="confirmReset()">Limpar batidas de hoje</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 15px; margin-bottom: 20px;">
+            <button onclick="logout()" class="share-btn"
+                style="background-color: #ef4444; width: auto; padding: 12px 30px; margin: 0 auto; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                <i class="fas fa-sign-out-alt"></i> Sair do Sistema
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+    </footer>
+
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="notifications.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // --- Configuration & Constants ---
+        const WORK_DAY_BASE_MINUTES = 7 * 60 + 20; // 7:20 = 440 minutes
+        const STORAGE_KEY = 'ponto_aux_today_v1';
+        const STEPS = [
+            { id: 0, label: 'Início Jornada', icon: 'fa-play' },
+            { id: 1, label: 'Início Almoço', icon: 'fa-utensils' },
+            { id: 2, label: 'Retorno Almoço', icon: 'fa-undo' },
+            { id: 3, label: 'Fim Jornada', icon: 'fa-stop' }
+        ];
+
+        let appState = {
+            today: new Date().toLocaleDateString('pt-BR'),
+            punches: [], // { step: 0, time: "08:00", timestamp: long, lat: 0, lng: 0 }
+            currentStep: 0,
+            location: null,
+            isLocating: false
+        };
+
+        // --- DOM Elements ---
+        const mainBtn = document.getElementById('main-punch-btn');
+        const btnText = document.getElementById('btn-text');
+        const downloadBtn = document.getElementById('download-pdf-btn');
+        const whatsappBtn = document.getElementById('whatsapp-share-btn');
+        const geoText = document.getElementById('geo-text');
+        const geoDot = document.getElementById('geo-dot');
+        const dateDisplay = document.getElementById('date-display');
+        const lunchTimerEl = document.getElementById('lunch-timer');
+        const journeyTimerEl = document.getElementById('journey-timer');
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initDate();
+            loadUserData();
+            loadState();
+            startGeoTracking();
+            updateUI();
+
+            // Start Timers Update Loop
+            setInterval(updateTimers, 1000);
+        });
+
+        function loadUserData() {
+            const sessionData = JSON.parse(localStorage.getItem('qd_user_session') || '{}');
+            const userNameEl = document.getElementById('auth-user-name');
+            const authDateEl = document.getElementById('auth-date');
+
+            if (userNameEl && sessionData.name) {
+                userNameEl.textContent = sessionData.name;
+            }
+
+            if (authDateEl) {
+                const now = new Date();
+                authDateEl.textContent = now.toLocaleDateString('pt-BR');
+            }
+        }
+
+        function initDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateDisplay.textContent = now.toLocaleDateString('pt-BR', options);
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.today === appState.today) {
+                    appState = { ...appState, ...parsed };
+                } else {
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+            }
+        }
+
+        function saveState() {
+            const toSave = { ...appState };
+            delete toSave.isLocating;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+        }
+
+        function startGeoTracking() {
+            appState.isLocating = true;
+            geoDot.className = 'geo-dot';
+            geoText.textContent = 'Buscando sinal GPS...';
+            mainBtn.disabled = true;
+            mainBtn.classList.add('locating');
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        appState.location = {
+                            lat: pos.coords.latitude,
+                            lng: pos.coords.longitude
+                        };
+                        appState.isLocating = false;
+                        geoDot.className = 'geo-dot active';
+                        geoText.textContent = 'Localização conectada';
+                        mainBtn.classList.remove('locating');
+                        updateUI();
+                    },
+                    (err) => {
+                        console.error("Geo error:", err);
+                        appState.isLocating = false;
+                        geoDot.className = 'geo-dot error';
+                        geoText.textContent = 'Erro GPS: Ative a localização';
+                        mainBtn.classList.remove('locating');
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                geoText.textContent = 'GPS não suportado no navegador';
+            }
+        }
+
+        // --- Core Logic ---
+
+        mainBtn.addEventListener('click', () => {
+            if (appState.currentStep >= 4 || !appState.location) return;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            appState.punches.push({
+                step: appState.currentStep,
+                time: timeStr,
+                timestamp: now.getTime(),
+                lat: appState.location.lat,
+                lng: appState.location.lng
+            });
+
+            appState.currentStep++;
+            saveState();
+            updateUI();
+
+            if (appState.currentStep < 4) {
+                startGeoTracking();
+            }
+        });
+
+        function updateUI() {
+            for (let i = 0; i < 4; i++) {
+                const punchEl = document.getElementById(`punch-${i}`);
+                const timeEl = punchEl.querySelector('.punch-time');
+                const recorded = appState.punches.find(p => p.step === i);
+
+                if (recorded) {
+                    timeEl.textContent = recorded.time;
+                    punchEl.classList.add('recorded');
+                } else {
+                    timeEl.textContent = '--:--';
+                    punchEl.classList.remove('recorded');
+                }
+            }
+
+            if (appState.currentStep < 4) {
+                const step = STEPS[appState.currentStep];
+                btnText.textContent = step.label;
+                mainBtn.querySelector('i').className = `fas ${step.icon}`;
+                mainBtn.disabled = !appState.location;
+                if (!appState.location) {
+                    btnText.textContent = 'Aguardando GPS...';
+                }
+            } else {
+                btnText.textContent = 'Jornada Concluída';
+                mainBtn.querySelector('i').className = 'fas fa-check-circle';
+                mainBtn.disabled = true;
+                downloadBtn.disabled = false;
+                whatsappBtn.disabled = false;
+            }
+
+            calculateStats();
+        }
+
+        function calculateStats() {
+            if (appState.punches.length < 1) return;
+
+            let totalMinutes = 0;
+            const punches = appState.punches;
+            const now = new Date().getTime();
+
+            if (punches[0]) {
+                const endSeg1 = punches[1] ? punches[1].timestamp : now;
+                totalMinutes += (endSeg1 - punches[0].timestamp) / 60000;
+            }
+
+            if (punches[2]) {
+                const endSeg2 = punches[3] ? punches[3].timestamp : now;
+                totalMinutes += (endSeg2 - punches[2].timestamp) / 60000;
+            }
+
+            totalMinutes = Math.floor(totalMinutes);
+            const h = Math.floor(totalMinutes / 60);
+            const m = totalMinutes % 60;
+            document.getElementById('stat-worked').textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+            let diff = totalMinutes - WORK_DAY_BASE_MINUTES;
+            if (diff > 0) {
+                const eh = Math.floor(diff / 60);
+                const em = diff % 60;
+                document.getElementById('stat-overtime').textContent = `${String(eh).padStart(2, '0')}:${String(em).padStart(2, '0')}`;
+                document.getElementById('stat-missing').textContent = `00:00`;
+            } else {
+                diff = Math.abs(diff);
+                const mh = Math.floor(diff / 60);
+                const mm = diff % 60;
+                document.getElementById('stat-missing').textContent = `${String(mh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+                document.getElementById('stat-overtime').textContent = `00:00`;
+            }
+        }
+
+        function updateTimers() {
+            const now = new Date().getTime();
+            const punches = appState.punches;
+
+            if (punches[1] && !punches[2]) {
+                const elapsed = Math.floor((now - punches[1].timestamp) / 1000);
+                const remaining = Math.max(0, 3600 - elapsed);
+                lunchTimerEl.textContent = formatTimer(remaining);
+                lunchTimerEl.style.color = remaining < 300 ? '#ef4444' : '#10b981';
+            } else if (punches[2]) {
+                lunchTimerEl.textContent = "Retornado";
+                lunchTimerEl.style.color = "#94a3b8";
+            } else {
+                lunchTimerEl.textContent = "01:00:00";
+            }
+
+            if (punches[0] && !punches[3]) {
+                let workedS = 0;
+                const end1 = punches[1] ? punches[1].timestamp : now;
+                workedS += (end1 - punches[0].timestamp) / 1000;
+                if (punches[2]) {
+                    workedS += (now - punches[2].timestamp) / 1000;
+                }
+                const remaining = Math.max(0, 26400 - workedS);
+                journeyTimerEl.textContent = formatTimer(remaining);
+                journeyTimerEl.style.color = remaining <= 0 ? '#10b981' : '#f59e0b';
+            } else if (punches[3]) {
+                journeyTimerEl.textContent = "Concluída";
+            }
+        }
+
+        function formatTimer(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        downloadBtn.addEventListener('click', () => generatePDF('download'));
+        whatsappBtn.addEventListener('click', () => generatePDF('share'));
+
+        async function generatePDF(mode = 'download') {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const session = JSON.parse(localStorage.getItem('qd_user_session') || '{}');
+            const userRef = window.APP_CONFIG.users[session.username] || {};
+            const fullName = userRef.fullName || session.name || "Colaborador";
+            const estado = userRef.estado || session.estado || "N/A";
+
+            doc.setFontSize(18);
+            doc.setTextColor(99, 102, 241);
+            doc.text("Espelho de Ponto Auxiliar", 105, 20, { align: "center" });
+
+            doc.setFontSize(12);
+            doc.setTextColor(40, 40, 40);
+            doc.text(`Colaborador: ${fullName}`, 14, 35);
+            doc.text(`Estado: ${estado}`, 14, 42);
+            doc.text(`Data: ${appState.today}`, 14, 49);
+
+            const columns = [
+                { header: 'Evento', dataKey: 'label' },
+                { header: 'Horário', dataKey: 'time' },
+                { header: 'Localização (Google Maps)', dataKey: 'link' }
+            ];
+            const rows = appState.punches.map(p => ({
+                label: STEPS[p.step].label,
+                time: p.time,
+                link: p.lat ? `https://www.google.com/maps?q=${p.lat},${p.lng}` : 'N/A'
+            }));
+
+            doc.autoTable({
+                startY: 55,
+                columns: columns,
+                body: rows,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] },
+                styles: { fontSize: 9 },
+                didDrawCell: (data) => {
+                    if (data.section === 'body' && data.column.dataKey === 'link' && data.cell.text[0] !== 'N/A') {
+                        doc.setTextColor(0, 0, 255);
+                        doc.link(data.cell.x + 2, data.cell.y + 2, data.cell.width - 4, data.cell.height - 4, { url: data.cell.text[0] });
+                    }
+                }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 15;
+            doc.setFontSize(12);
+            doc.setTextColor(40, 40, 40);
+            doc.text("Resumo do Dia:", 14, finalY);
+            const workedTime = document.getElementById('stat-worked').textContent;
+            const overtime = document.getElementById('stat-overtime').textContent;
+            const missing = document.getElementById('stat-missing').textContent;
+
+            doc.setFontSize(10);
+            doc.text(`Jornada Diária: 07:20`, 14, finalY + 8);
+            doc.text(`Total Efetivado: ${workedTime}`, 14, finalY + 15);
+            doc.setTextColor(16, 185, 129);
+            doc.text(`Saldo Positivo (Extra): ${overtime}`, 14, finalY + 22);
+            doc.setTextColor(239, 68, 68);
+            doc.text(`Saldo Negativo: ${missing}`, 14, finalY + 29);
+
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text("Este documento serve como registro auxiliar de jornada de trabalho, não sendo o meio oficial de registro de ponto.", 14, 280);
+
+            const dateStr = appState.today.replace(/\//g, '-');
+            const fileName = `ponto_${session.username}_${estado}_${dateStr}.pdf`.toLowerCase();
+
+            if (mode === 'download') {
+                doc.save(fileName);
+            } else {
+                // Share Logic
+                if (navigator.share && navigator.canShare) {
+                    try {
+                        const pdfBlob = doc.output('blob');
+                        const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                files: [file],
+                                title: 'Espelho de Ponto',
+                                text: `Espelho de Ponto de ${fullName} - ${appState.today}`
+                            });
+                        } else {
+                            throw new Error("File sharing not supported");
+                        }
+                    } catch (err) {
+                        console.error("Share error:", err);
+                        shareViaWhatsAppFallback(fullName, workedTime, overtime, missing);
+                    }
+                } else {
+                    shareViaWhatsAppFallback(fullName, workedTime, overtime, missing);
+                }
+            }
+        }
+
+        function shareViaWhatsAppFallback(name, worked, extra, missing) {
+            const message = `*Espelho de Ponto - Qdelícia Frutas*%0A` +
+                `*Colaborador:* ${name}%0A` +
+                `*Data:* ${appState.today}%0A%0A` +
+                `*Punches:*%0A` +
+                appState.punches.map(p => `- ${STEPS[p.step].label}: ${p.time}`).join('%0A') +
+                `%0A%0A*Resumo:*%0A` +
+                `- Trabalhadas: ${worked}%0A` +
+                `- Extra: ${extra}%0A` +
+                `- A Haver: ${missing}`;
+
+            window.open(`https://wa.me/?text=${message}`, '_blank');
+        }
+
+        function confirmReset() {
+            if (confirm("Tem certeza que deseja limpar as batidas de hoje? Esta ação não pode ser desfeita.")) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+    </script>
+</body>
+
+</html>

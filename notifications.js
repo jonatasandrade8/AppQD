@@ -75,8 +75,8 @@ const NOTIFICATIONS_CONFIG = {
             mensagem: "A funcionalidade de câmera está em manutenção."
         },
         ponto: {
-            enabled: false,
-            filename: "ponto.html",
+            enabled: true,
+            filename: "ponto-aux.html",
             mensagem: "O registro de ponto está temporariamente indisponível."
         },
         materiais: {

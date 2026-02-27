@@ -19,6 +19,14 @@
         }, 300);
     };
 
+    // Função de Logout global
+    window.logout = function () {
+        if (confirm("Deseja realmente sair?")) {
+            localStorage.removeItem('qd_user_session');
+            window.location.href = 'login-ponto-aux.html';
+        }
+    };
+
     // ... restante do código (atualizarRelogio, etc)
     // 1. Lógica do Menu Hambúrguer (Lateral)
     const menuToggle = document.querySelector('.menu-toggle');
