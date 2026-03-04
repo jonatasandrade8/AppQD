@@ -31,10 +31,10 @@ const APP_DATA = {
             "Cosme": ["Zona Norte"]
         },
         "Nordestão": {
-            "J Mauricio": ["Loja 03"],
+            "Cristiane": ["Loja 07"],
             "Mateus": ["Loja 04"],
             "Amarildo": ["Loja 05"],
-            "Markson": ["Loja 08", "Loja 07"]
+            "Markson": ["Loja 08", "Loja 03"]
         },
         "Carrefour": {
             "Mateus": ["Zona Sul"]
