@@ -308,6 +308,117 @@
                 margin: 0 auto;
             }
         }
+
+        /* === MODAL DE SELFIE === */
+        #selfie-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 20px;
+        }
+
+        #selfie-modal.open {
+            display: flex;
+        }
+
+        .selfie-title {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 0;
+        }
+
+        .selfie-subtitle {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 0.8rem;
+            text-align: center;
+            margin: 0;
+        }
+
+        #selfie-video,
+        #selfie-preview {
+            width: 100%;
+            max-width: 380px;
+            aspect-ratio: 4 / 3;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 3px solid rgba(99, 102, 241, 0.7);
+            background: #000;
+            transform: scaleX(-1);
+            /* espelho natural para selfie */
+        }
+
+        #selfie-preview {
+            transform: none;
+        }
+
+        #selfie-canvas {
+            display: none;
+        }
+
+        .selfie-actions {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .selfie-btn {
+            flex: 1;
+            border: none;
+            padding: 14px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s, filter 0.2s;
+        }
+
+        .selfie-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        #selfie-capture-btn {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.5);
+        }
+
+        #selfie-confirm-btn {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+        }
+
+        #selfie-retry-btn {
+            background: #475569;
+            color: white;
+        }
+
+        .selfie-success-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -430,6 +541,32 @@
             </button>
         </div>
 
+        <!-- MODAL DE SELFIE DE AUTENTICAÇÃO -->
+        <div id="selfie-modal">
+            <p class="selfie-title"><i class="fas fa-shield-alt"></i> Autenticação por Selfie</p>
+            <p class="selfie-subtitle">Tire uma selfie para confirmar o encerramento da jornada.</p>
+
+            <video id="selfie-video" autoplay playsinline muted></video>
+            <canvas id="selfie-canvas"></canvas>
+            <img id="selfie-preview" alt="Selfie de autenticação" style="display:none;" />
+
+            <div id="selfie-success-msg" class="selfie-success-badge" style="display:none;">
+                <i class="fas fa-check-circle"></i> Foto capturada com sucesso!
+            </div>
+
+            <div class="selfie-actions">
+                <button id="selfie-capture-btn" class="selfie-btn">
+                    <i class="fas fa-camera"></i> Tirar Selfie
+                </button>
+                <button id="selfie-retry-btn" class="selfie-btn" style="display:none;">
+                    <i class="fas fa-redo"></i> Nova Foto
+                </button>
+                <button id="selfie-confirm-btn" class="selfie-btn" style="display:none;">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+
         <div class="reset-day">
             <button onclick="confirmReset()">Limpar batidas de hoje</button>
         </div>
@@ -469,7 +606,8 @@
             punches: [], // { step: 0, time: "08:00", timestamp: long, lat: 0, lng: 0 }
             currentStep: 0,
             location: null,
-            isLocating: false
+            isLocating: false,
+            selfieDataUrl: null // base64 da selfie de autenticação
         };
 
         // --- DOM Elements ---
@@ -620,8 +758,15 @@
                 btnText.textContent = 'Jornada Concluída';
                 mainBtn.querySelector('i').className = 'fas fa-check-circle';
                 mainBtn.disabled = true;
-                downloadBtn.disabled = false;
-                whatsappBtn.disabled = false;
+
+                // Só libera os botões se a selfie já foi tirada (ex: ao recarregar a página)
+                if (appState.selfieDataUrl) {
+                    downloadBtn.disabled = false;
+                    whatsappBtn.disabled = false;
+                } else {
+                    // Aguarda um momento para a UI atualizar antes de abrir o modal
+                    setTimeout(openSelfieModal, 400);
+                }
             }
 
             calculateStats();
@@ -705,6 +850,93 @@
         downloadBtn.addEventListener('click', () => generatePDF('download'));
         whatsappBtn.addEventListener('click', () => generatePDF('share'));
 
+        // ====================================================
+        // === LÓGICA DE SELFIE DE AUTENTICAÇÃO ===
+        // ====================================================
+        let selfieStream = null;
+
+        const selfieModal = document.getElementById('selfie-modal');
+        const selfieVideo = document.getElementById('selfie-video');
+        const selfieCanvas = document.getElementById('selfie-canvas');
+        const selfiePreview = document.getElementById('selfie-preview');
+        const selfieSuccessMsg = document.getElementById('selfie-success-msg');
+        const captureSelfieBtn = document.getElementById('selfie-capture-btn');
+        const retrySelfieBtn = document.getElementById('selfie-retry-btn');
+        const confirmSelfieBtn = document.getElementById('selfie-confirm-btn');
+
+        async function openSelfieModal() {
+            selfieModal.classList.add('open');
+            selfieVideo.style.display = 'block';
+            selfiePreview.style.display = 'none';
+            selfieSuccessMsg.style.display = 'none';
+            captureSelfieBtn.style.display = '';
+            retrySelfieBtn.style.display = 'none';
+            confirmSelfieBtn.style.display = 'none';
+
+            try {
+                selfieStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+                    audio: false
+                });
+                selfieVideo.srcObject = selfieStream;
+            } catch (err) {
+                console.warn('Câmera indisponível:', err);
+                selfieModal.classList.remove('open');
+                alert('Câmera não disponível. Os botões de compartilhamento foram liberados sem selfie.');
+                downloadBtn.disabled = false;
+                whatsappBtn.disabled = false;
+            }
+        }
+
+        function stopSelfieStream() {
+            if (selfieStream) {
+                selfieStream.getTracks().forEach(t => t.stop());
+                selfieStream = null;
+            }
+        }
+
+        captureSelfieBtn.addEventListener('click', () => {
+            // Desenha o frame atual do vídeo no canvas
+            selfieCanvas.width = selfieVideo.videoWidth || 640;
+            selfieCanvas.height = selfieVideo.videoHeight || 480;
+            const ctx = selfieCanvas.getContext('2d');
+            // Espelha horizontalmente para corresponder ao preview do vídeo
+            ctx.translate(selfieCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(selfieVideo, 0, 0, selfieCanvas.width, selfieCanvas.height);
+
+            const dataUrl = selfieCanvas.toDataURL('image/jpeg', 0.85);
+            selfiePreview.src = dataUrl;
+
+            // Alterna exibição: esconde vídeo, mostra preview
+            selfieVideo.style.display = 'none';
+            selfiePreview.style.display = 'block';
+            selfieSuccessMsg.style.display = 'flex';
+            captureSelfieBtn.style.display = 'none';
+            retrySelfieBtn.style.display = '';
+            confirmSelfieBtn.style.display = '';
+        });
+
+        retrySelfieBtn.addEventListener('click', () => {
+            // Volta ao modo câmera ao vivo
+            selfieVideo.style.display = 'block';
+            selfiePreview.style.display = 'none';
+            selfieSuccessMsg.style.display = 'none';
+            captureSelfieBtn.style.display = '';
+            retrySelfieBtn.style.display = 'none';
+            confirmSelfieBtn.style.display = 'none';
+        });
+
+        confirmSelfieBtn.addEventListener('click', () => {
+            // Salva a selfie no estado e fecha o modal
+            appState.selfieDataUrl = selfiePreview.src;
+            saveState();
+            stopSelfieStream();
+            selfieModal.classList.remove('open');
+            downloadBtn.disabled = false;
+            whatsappBtn.disabled = false;
+        });
+
         async function generatePDF(mode = 'download') {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -768,6 +1000,35 @@
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
             doc.text("Este documento serve como registro auxiliar de jornada de trabalho, não sendo o meio oficial de registro de ponto.", 14, 280);
+
+            // === PÁGINA 2 — SELFIE DE AUTENTICAÇÃO ===
+            if (appState.selfieDataUrl) {
+                doc.addPage();
+
+                doc.setFontSize(16);
+                doc.setTextColor(99, 102, 241);
+                doc.text("Foto de Autenticação", 105, 20, { align: 'center' });
+
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Colaborador: ${fullName}   |   Data: ${appState.today}`, 105, 28, { align: 'center' });
+
+                // Centraliza a imagem na página (A4: 210mm largura, 297mm altura)
+                const imgW = 130;
+                const imgH = 97; // proporção 4:3
+                const imgX = (210 - imgW) / 2;
+                const imgY = 38;
+                doc.addImage(appState.selfieDataUrl, 'JPEG', imgX, imgY, imgW, imgH);
+
+                // Moldura decorativa ao redor da foto
+                doc.setDrawColor(99, 102, 241);
+                doc.setLineWidth(0.8);
+                doc.roundedRect(imgX - 2, imgY - 2, imgW + 4, imgH + 4, 3, 3, 'S');
+
+                doc.setFontSize(8);
+                doc.setTextColor(150, 150, 150);
+                doc.text(`Selfie registrada ao final da jornada em ${appState.today}.`, 105, imgY + imgH + 12, { align: 'center' });
+            }
 
             const dateStr = appState.today.replace(/\//g, '-');
             const fileName = `ponto_${session.username}_${estado}_${dateStr}.pdf`.toLowerCase();

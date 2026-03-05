@@ -80,7 +80,7 @@ const NOTIFICATIONS_CONFIG = {
             mensagem: "O registro de ponto está temporariamente indisponível."
         },
         materiais: {
-            enabled: true,
+            enabled: false,
             filename: "materiais.html",
             mensagem: "A página de materiais está em manutenção."
         },
@@ -91,6 +91,16 @@ const NOTIFICATIONS_CONFIG = {
             features: {
                 pdf_share: false // Alterar para true para ativar o botão na página
             }
+        },
+        acompanhamento: {
+            enabled: true,
+            filename: "acompanhamento.html",
+            mensagem: "A página de acompanhamento está temporariamente desativada."
+        },
+        solicitacoes: {
+            enabled: false,
+            filename: "solicitacoes.html",
+            mensagem: "A página de solicitações está temporariamente desativada."
         }
     }
 };
