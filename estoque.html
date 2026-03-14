@@ -10,54 +10,106 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Melhorias específicas para o container do iframe */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Container dos botões de alternância */
+        .tab-buttons {
+            display: flex;
+            gap: 15px;
+            padding: 20px 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: var(--white);
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .tab-btn.active {
+            background: var(--gradient);
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-3px);
+        }
+
+        /* Container do iframe */
         .iframe-container {
-            padding: 15px;
-            /* Cria um espaço nas laterais para o usuário rolar a página principal */
-            background-color: #f4f4f4;
-            /* Fundo suave para contrastar com o branco do formulário */
+            padding: 0 15px 20px 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .iframe-wrapper {
             position: relative;
-            border: 3px solid #1e1b4b;
-            /* Borda com a cor azul escura da marca */
-            border-radius: 15px;
-            /* Bordas arredondadas para um visual moderno */
+            border: none;
+            border-radius: var(--border-radius-lg);
             overflow: hidden;
-            /* Garante que o iframe respeite o arredondamento */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            /* Sombra para dar profundidade */
-            background: white;
+            box-shadow: var(--shadow-lg);
+            background: var(--white);
+            flex: 1;
+            display: none;
+            flex-direction: column;
         }
 
-        /* Indicador visual de que o campo é rolável */
         .iframe-wrapper::after {
             content: '↕ Arraste dentro da borda para rolar o formulário';
             display: block;
             text-align: center;
             font-size: 11px;
-            color: #666;
-            padding: 5px;
-            background: #eee;
-            border-top: 1px solid #ddd;
+            color: var(--text-muted);
+            padding: 8px;
+            background: var(--bg-light);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         iframe {
             display: block;
             width: 100%;
-            /* Altura dinâmica para evitar travamentos */
-            height: 85vh;
+            border: none;
+            flex: 1;
+            min-height: 65vh;
         }
 
         @media (max-width: 600px) {
-            .iframe-container {
-                padding: 10px 5px;
-                /* Em celulares, reduzimos o recuo */
+            .tab-buttons {
+                padding: 15px 10px;
+                gap: 10px;
             }
 
-            iframe {
-                height: 75vh;
+            .tab-btn {
+                font-size: 0.95rem;
+                padding: 12px 15px;
+            }
+
+            .iframe-container {
+                padding: 0 10px 15px 10px;
             }
         }
     </style>
@@ -69,7 +121,6 @@
     <aside class="side-menu">
         <a href="index.html"><i class="fas fa-home"></i> Início</a>
         <a href="estoque.html" class="active"><i class="fas fa-boxes-stacked"></i> Estoque</a>
-        <a href="acompanhamento.html"><i class="fas fa-exclamation-triangle"></i> Acompanhamentos</a>
         <a href="caixas.html"><i class="fas fa-box-open"></i> Caixas</a>
         <a href="camera.html"><i class="fas fa-camera"></i> Câmera</a>
         <a href="ponto-aux.html"><i class="fas fa-clock"></i> Ponto - Auxiliar</a>
@@ -77,6 +128,8 @@
         <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
         <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span
                 class="link-text">Solicitações</span></a>
+        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span
+                class="link-text">Sair</span></a>
     </aside>
 
     <header id="cabecalho-principal">
@@ -88,33 +141,38 @@
             <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
         </div>
         <h1>Qdelícia Frutas</h1>
-        <p>Registro de estoque diário</p>
+        <p id="subtitulo-header">Registro de estoque diário</p>
 
         <button onclick="recarregarPagina()" class="btn-refresh">
             <i class="fas fa-sync-alt"></i> Atualizar Página
         </button>
-
-
-    </header>
     </header>
 
     <nav>
         <a href="index.html">Início</a>
         <a href="estoque.html" class="active">Estoque</a>
-        <a href="acompanhamento.html">Acompanhamentos</a>
         <a href="caixas.html">Caixas</a>
         <a href="camera.html">Câmera</a>
         <a href="ponto-aux.html">Ponto - Auxiliar</a>
         <a href="materiais.html">Materiais</a>
         <a href="pedido.html">Sugestão</a>
         <a href="solicitacoes.html">Solicitações</a>
+        <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </nav>
 
-    <main class="iframe-container">
-        <div class="iframe-wrapper">
-            <iframe
-                src="https://script.google.com/macros/s/AKfycbwenIndSJ4segwDsnay1EqNfnI_RHCeh9mGR1udDf_fprOcSX5F8B7w3q-WPvl_cdOj/exec"
-                frameborder="0" marginheight="0" marginwidth="0">
+    <!-- Botões de alternância -->
+    <div class="tab-buttons">
+        <button class="tab-btn" id="btn-inicial" onclick="mostrarFormulario('inicial')">
+            <i class="fas fa-exclamation-triangle"></i> Estoque Inicial / Avarias
+        </button>
+        <button class="tab-btn" id="btn-final" onclick="mostrarFormulario('final')">
+            <i class="fas fa-boxes-stacked"></i> Estoque Final
+        </button>
+    </div>
+
+    <main class="iframe-container" id="container-estoque">
+        <div class="iframe-wrapper" id="wrapper-estoque">
+            <iframe id="iframe-estoque" src="" frameborder="0" marginheight="0" marginwidth="0">
                 Carregando script...
             </iframe>
         </div>
@@ -135,6 +193,33 @@
     <script src="notifications.js"></script>
     <script src="script.js"></script>
     <script src="alert.js"></script>
+    <script>
+        const URLS = {
+            inicial: 'https://script.google.com/macros/s/AKfycbxQ9LvcTKH_4c6nN4OGBE0fxmUAsXxSscWRkkfDL7HOkum9XwoP4ylAwUjnkLnsn9Qk/exec',
+            final: 'https://script.google.com/macros/s/AKfycbweThfeT0m6uIbrkO3p92iiPbbaeOJ6Sp2n0e8QYFjoT5TVnxrs9FYSxr5MMGmPn6zl/exec'
+        };
+
+        function mostrarFormulario(tipo) {
+            const iframe = document.getElementById('iframe-estoque');
+            const wrapper = document.getElementById('wrapper-estoque');
+            const btnInic = document.getElementById('btn-inicial');
+            const btnFinal = document.getElementById('btn-final');
+            const subtitulo = document.getElementById('subtitulo-header');
+
+            wrapper.style.display = 'flex';
+            iframe.src = URLS[tipo];
+
+            if (tipo === 'inicial') {
+                btnInic.classList.add('active');
+                btnFinal.classList.remove('active');
+                subtitulo.textContent = 'Estoque Inicial / Avarias';
+            } else {
+                btnFinal.classList.add('active');
+                btnInic.classList.remove('active');
+                subtitulo.textContent = 'Estoque Final';
+            }
+        }
+    </script>
 </body>
 
 </html>
