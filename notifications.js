@@ -92,11 +92,7 @@ const NOTIFICATIONS_CONFIG = {
                 pdf_share: false // Alterar para true para ativar o botão na página
             }
         },
-        acompanhamento: {
-            enabled: true,
-            filename: "acompanhamento.html",
-            mensagem: "A página de acompanhamento está temporariamente desativada."
-        },
+
         solicitacoes: {
             enabled: false,
             filename: "solicitacoes.html",
