@@ -58,7 +58,7 @@
             transform: translateY(-3px);
         }
 
-        /* Container do iframe */
+        /* Container do iframe - MELHORADO PARA RESPONSIVIDADE */
         .iframe-container {
             padding: 0 15px 20px 15px;
             flex: 1;
@@ -76,6 +76,8 @@
             flex: 1;
             display: none;
             flex-direction: column;
+            min-height: 80vh; /* Garante tamanho no mobile */
+            -webkit-overflow-scrolling: touch; /* Suavidade no iOS */
         }
 
         .iframe-wrapper::after {
@@ -92,9 +94,10 @@
         iframe {
             display: block;
             width: 100%;
+            height: 100%;
             border: none;
             flex: 1;
-            min-height: 65vh;
+            min-height: 80vh;
         }
 
         @media (max-width: 600px) {
@@ -120,17 +123,14 @@
     <div class="menu-overlay"></div>
     <aside class="side-menu">
         <a href="index.html"><i class="fas fa-home"></i> <span class="link-text">Início</span></a>
-        <a href="estoque.html" class="active"><i class="fas fa-boxes-stacked"></i> <span
-                class="link-text">Estoque</span></a>
+        <a href="estoque.html" class="active"><i class="fas fa-boxes-stacked"></i> <span class="link-text">Estoque</span></a>
         <a href="caixas.html"><i class="fas fa-box-open"></i> <span class="link-text">Caixas</span></a>
         <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
         <a href="ponto-aux.html"><i class="fas fa-fingerprint"></i> <span class="link-text">Ponto - Auxiliar</span></a>
         <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
         <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
-        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span
-                class="link-text">Solicitações</span></a>
-        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span
-                class="link-text">Sair</span></a>
+        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span class="link-text">Solicitações</span></a>
+        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span></a>
     </aside>
 
     <header id="cabecalho-principal">
@@ -161,10 +161,9 @@
         <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </nav>
 
-    <!-- Botões de alternância -->
     <div class="tab-buttons">
         <button class="tab-btn" id="btn-inicial" onclick="mostrarFormulario('inicial')">
-            <i class="fas fa-exclamation-triangle"></i> Estoque Inicial / Avarias
+            <i class="fas fa-exclamation-triangle"></i> Estoque Inicial e Devoluções
         </button>
         <button class="tab-btn" id="btn-final" onclick="mostrarFormulario('final')">
             <i class="fas fa-boxes-stacked"></i> Estoque Final
@@ -180,7 +179,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+        <p>&copy; 2026 Qdelícia Frutas. Todos os direitos reservados.</p>
     </footer>
 
     <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
@@ -196,8 +195,8 @@
     <script src="alert.js"></script>
     <script>
         const URLS = {
-            inicial: 'https://script.google.com/macros/s/AKfycbx0V9YbKIPlKujcLbvlgnjEEv2MSNsxnaOY0aTm15cfnCfr41QiPkprnvp79wvCtQJR/exec',
-            final: 'https://script.google.com/macros/s/AKfycbweThfeT0m6uIbrkO3p92iiPbbaeOJ6Sp2n0e8QYFjoT5TVnxrs9FYSxr5MMGmPn6zl/exec'
+            inicial: 'https://script.google.com/macros/s/AKfycbzEiI_eSHOsT4M5i9ZXizH31e7ZxiJC9Am1YFx44ABYllaFHuWDeN982jQFT66q_xRf/exec',
+            final: 'https://script.google.com/macros/s/AKfycbzgp4dEUHD5SK_Co_0XPO5J9lrJjPqrSWXJtlqWfjvI_vudKToMPuRgt9LJA5WU7YGY/exec'
         };
 
         function mostrarFormulario(tipo) {
@@ -213,7 +212,7 @@
             if (tipo === 'inicial') {
                 btnInic.classList.add('active');
                 btnFinal.classList.remove('active');
-                subtitulo.textContent = 'Estoque Inicial / Avarias';
+                subtitulo.textContent = 'Estoque Inicial e Devoluções';
             } else {
                 btnFinal.classList.add('active');
                 btnInic.classList.remove('active');
