@@ -14,22 +14,25 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
         }
 
         /* Container dos botões de alternância */
         .tab-buttons {
             display: flex;
-            gap: 15px;
-            padding: 20px 15px;
+            gap: 10px;
+            padding: 15px;
             flex-wrap: wrap;
             justify-content: center;
+            background: var(--bg-light);
         }
 
         .tab-btn {
             flex: 1;
-            min-width: 200px;
-            padding: 15px 20px;
-            font-size: 1rem;
+            min-width: 160px;
+            padding: 12px 15px;
+            font-size: 0.95rem;
             font-weight: 600;
             border: none;
             border-radius: var(--border-radius);
@@ -40,12 +43,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             box-shadow: var(--shadow);
         }
 
         .tab-btn:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
             background-color: var(--primary-color);
             color: var(--white);
@@ -55,40 +58,41 @@
             background: var(--gradient);
             color: var(--white);
             box-shadow: var(--shadow-lg);
-            transform: translateY(-3px);
         }
 
-        /* Container do iframe - MELHORADO PARA RESPONSIVIDADE */
+        /* Container do iframe OCUPANDO TUDO */
         .iframe-container {
-            padding: 0 15px 20px 15px;
+            padding: 0; /* Removido padding para encostar nas bordas */
             flex: 1;
             display: flex;
             flex-direction: column;
+            width: 100%;
+            background-color: var(--white);
         }
 
         .iframe-wrapper {
             position: relative;
             border: none;
-            border-radius: var(--border-radius-lg);
+            border-radius: 0; /* Removido arredondamento */
             overflow: hidden;
-            box-shadow: var(--shadow-lg);
-            background: var(--white);
             flex: 1;
-            display: none;
+            display: none; /* Ativado via JS */
             flex-direction: column;
-            min-height: 80vh; /* Garante tamanho no mobile */
-            -webkit-overflow-scrolling: touch; /* Suavidade no iOS */
+            width: 100%;
+            min-height: 75vh;
+            -webkit-overflow-scrolling: touch;
         }
 
+        /* Instrução de rolagem opcional */
         .iframe-wrapper::after {
-            content: '↕ Arraste dentro da borda para rolar o formulário';
+            content: '↕ Role dentro do formulário para ver mais';
             display: block;
             text-align: center;
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
-            padding: 8px;
-            background: var(--bg-light);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 5px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
         }
 
         iframe {
@@ -97,22 +101,28 @@
             height: 100%;
             border: none;
             flex: 1;
-            min-height: 80vh;
+        }
+
+        /* Ajuste para não ter scroll duplo no footer */
+        footer {
+            margin-top: auto;
+            padding: 15px;
         }
 
         @media (max-width: 600px) {
             .tab-buttons {
-                padding: 15px 10px;
-                gap: 10px;
+                padding: 10px;
+                gap: 8px;
             }
 
             .tab-btn {
-                font-size: 0.95rem;
-                padding: 12px 15px;
+                font-size: 0.85rem;
+                padding: 10px;
+                min-width: 140px;
             }
 
             .iframe-container {
-                padding: 0 10px 15px 10px;
+                padding: 0;
             }
         }
     </style>
@@ -139,13 +149,13 @@
             <span class="menu-label">Menu</span>
         </button>
         <div class="logo-placeholder">
-            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas" onerror="this.src='https://via.placeholder.com/150?text=QDelicia'">
         </div>
         <h1>Qdelícia Frutas</h1>
         <p id="subtitulo-header">Registro de estoque diário</p>
 
         <button onclick="recarregarPagina()" class="btn-refresh">
-            <i class="fas fa-sync-alt"></i> Atualizar Página
+            <i class="fas fa-sync-alt"></i> Atualizar
         </button>
     </header>
 
@@ -163,7 +173,7 @@
 
     <div class="tab-buttons">
         <button class="tab-btn" id="btn-inicial" onclick="mostrarFormulario('inicial')">
-            <i class="fas fa-exclamation-triangle"></i> Estoque Inicial e Devoluções
+            <i class="fas fa-exclamation-triangle"></i> Inicial/Devoluções
         </button>
         <button class="tab-btn" id="btn-final" onclick="mostrarFormulario('final')">
             <i class="fas fa-boxes-stacked"></i> Estoque Final
@@ -173,7 +183,7 @@
     <main class="iframe-container" id="container-estoque">
         <div class="iframe-wrapper" id="wrapper-estoque">
             <iframe id="iframe-estoque" src="" frameborder="0" marginheight="0" marginwidth="0">
-                Carregando script...
+                Carregando formulário...
             </iframe>
         </div>
     </main>
@@ -207,7 +217,11 @@
             const subtitulo = document.getElementById('subtitulo-header');
 
             wrapper.style.display = 'flex';
-            iframe.src = URLS[tipo];
+            
+            // Apenas recarrega se o SRC for diferente para evitar flashes desnecessários
+            if (iframe.src !== URLS[tipo]) {
+                iframe.src = URLS[tipo];
+            }
 
             if (tipo === 'inicial') {
                 btnInic.classList.add('active');
@@ -218,6 +232,16 @@
                 btnInic.classList.remove('active');
                 subtitulo.textContent = 'Estoque Final';
             }
+            
+            // Scroll suave para o início do formulário no mobile
+            window.scrollTo({
+                top: document.getElementById('container-estoque').offsetTop - 20,
+                behavior: 'smooth'
+            });
+        }
+        
+        function recarregarPagina() {
+            location.reload();
         }
     </script>
 </body>
