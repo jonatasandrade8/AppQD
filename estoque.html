@@ -181,8 +181,12 @@
     </div>
 
     <main class="iframe-container" id="container-estoque">
-        <div class="iframe-wrapper" id="wrapper-estoque">
-            <iframe id="iframe-estoque" src="" frameborder="0" marginheight="0" marginwidth="0">
+        <div class="iframe-wrapper" id="wrapper-estoque" style="display: flex;">
+            <iframe id="iframe-inicial" src="https://script.google.com/macros/s/AKfycbx_dcMiFUawWThCC6u126b9t2Ptzfy68paXRz3ODQ85SH8ShctDpjWWxrt3JBhDMfUn/exec" frameborder="0" marginheight="0" marginwidth="0" style="display: none;">
+                Carregando formulário...
+            </iframe>
+            
+            <iframe id="iframe-final" src="https://script.google.com/macros/s/AKfycby6qt3ZbzcZr5_o_Pk-7gNC5DaLfCr8Xt2JbZe7e8gJMHQrwe8Ewk7lX_78JKlGx4as/exec" frameborder="0" marginheight="0" marginwidth="0" style="display: none;">
                 Carregando formulário...
             </iframe>
         </div>
@@ -204,30 +208,27 @@
     <script src="script.js"></script>
     <script src="alert.js"></script>
     <script>
-        const URLS = {
-            inicial: 'https://script.google.com/macros/s/AKfycbx_dcMiFUawWThCC6u126b9t2Ptzfy68paXRz3ODQ85SH8ShctDpjWWxrt3JBhDMfUn/exec',
-            final: 'https://script.google.com/macros/s/AKfycby6qt3ZbzcZr5_o_Pk-7gNC5DaLfCr8Xt2JbZe7e8gJMHQrwe8Ewk7lX_78JKlGx4as/exec'
-        };
-
         function mostrarFormulario(tipo) {
-            const iframe = document.getElementById('iframe-estoque');
             const wrapper = document.getElementById('wrapper-estoque');
+            const iframeInicial = document.getElementById('iframe-inicial');
+            const iframeFinal = document.getElementById('iframe-final');
             const btnInic = document.getElementById('btn-inicial');
             const btnFinal = document.getElementById('btn-final');
             const subtitulo = document.getElementById('subtitulo-header');
 
             wrapper.style.display = 'flex';
-            
-            // Apenas recarrega se o SRC for diferente para evitar flashes desnecessários
-            if (iframe.src !== URLS[tipo]) {
-                iframe.src = URLS[tipo];
-            }
 
             if (tipo === 'inicial') {
+                iframeInicial.style.display = 'block';
+                iframeFinal.style.display = 'none';
+                
                 btnInic.classList.add('active');
                 btnFinal.classList.remove('active');
                 subtitulo.textContent = 'Estoque Inicial e Devoluções';
             } else {
+                iframeFinal.style.display = 'block';
+                iframeInicial.style.display = 'none';
+                
                 btnFinal.classList.add('active');
                 btnInic.classList.remove('active');
                 subtitulo.textContent = 'Estoque Final';
