@@ -16,7 +16,6 @@
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
-            background-color: #f4f4f4;
         }
 
         /* Container dos botões de alternância */
@@ -26,7 +25,7 @@
             padding: 15px;
             flex-wrap: wrap;
             justify-content: center;
-            background: #f4f4f4;
+            background: var(--bg-light);
         }
 
         .tab-btn {
@@ -36,96 +35,94 @@
             font-size: 0.95rem;
             font-weight: 600;
             border: none;
-            border-radius: 8px;
-            background-color: white;
-            color: #1e1b4b;
+            border-radius: var(--border-radius);
+            background-color: var(--white);
+            color: var(--primary-color);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
 
-        .tab-btn:hover:not(:disabled) {
+        .tab-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-lg);
+            background-color: var(--primary-color);
+            color: var(--white);
         }
 
         .tab-btn.active {
-            background: #1e1b4b;
-            color: white;
+            background: var(--gradient);
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
         }
 
-        /* Estado desativado para o carregamento */
-        .tab-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            filter: grayscale(0.5);
-        }
-
-        /* Implementação das características de caixas.html */
+        /* Container do iframe OCUPANDO TUDO */
         .iframe-container {
-            padding: 15px;
-            background-color: #f4f4f4;
+            padding: 0; /* Removido padding para encostar nas bordas */
             flex: 1;
             display: flex;
             flex-direction: column;
+            width: 100%;
+            background-color: var(--white);
         }
 
         .iframe-wrapper {
             position: relative;
-            border: 3px solid #1e1b4b; /* Idêntico ao caixas.html */
-            border-radius: 15px; /* Idêntico ao caixas.html */
+            border: none;
+            border-radius: 0; /* Removido arredondamento */
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            background: white;
+            flex: 1;
             display: none; /* Ativado via JS */
             flex-direction: column;
+            width: 100%;
+            min-height: 75vh;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* Indicador visual de rolagem idêntico ao caixas.html */
+        /* Instrução de rolagem opcional */
         .iframe-wrapper::after {
-            content: '↕ Arraste dentro da borda para rolar o formulário';
+            content: '↕ Role dentro do formulário para ver mais';
             display: block;
             text-align: center;
-            font-size: 11px;
-            color: #666;
+            font-size: 10px;
+            color: var(--text-muted);
             padding: 5px;
-            background: #eee;
-            border-top: 1px solid #ddd;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
         }
 
         iframe {
             display: block;
             width: 100%;
-            height: 85vh; /* Proporção do caixas.html */
+            height: 100%;
             border: none;
+            flex: 1;
         }
 
-        /* Animação do Spinner */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .fa-spin {
-            animation: spin 1s infinite linear;
+        /* Ajuste para não ter scroll duplo no footer */
+        footer {
+            margin-top: auto;
+            padding: 15px;
         }
 
         @media (max-width: 600px) {
-            .iframe-container {
-                padding: 10px 5px;
-            }
-
-            iframe {
-                height: 75vh; /* Ajuste mobile do caixas.html */
+            .tab-buttons {
+                padding: 10px;
+                gap: 8px;
             }
 
             .tab-btn {
                 font-size: 0.85rem;
                 padding: 10px;
                 min-width: 140px;
+            }
+
+            .iframe-container {
+                padding: 0;
             }
         }
     </style>
@@ -176,16 +173,20 @@
 
     <div class="tab-buttons">
         <button class="tab-btn" id="btn-inicial" onclick="mostrarFormulario('inicial')">
-            <i class="fas fa-exclamation-triangle"></i> <span>Inicial/Devoluções</span>
+            <i class="fas fa-exclamation-triangle"></i> Inicial/Devoluções
         </button>
         <button class="tab-btn" id="btn-final" onclick="mostrarFormulario('final')">
-            <i class="fas fa-boxes-stacked"></i> <span>Estoque Final</span>
+            <i class="fas fa-boxes-stacked"></i> Estoque Final
         </button>
     </div>
 
     <main class="iframe-container" id="container-estoque">
-        <div class="iframe-wrapper" id="wrapper-estoque">
-            <iframe id="iframe-estoque" src="" frameborder="0" marginheight="0" marginwidth="0">
+        <div class="iframe-wrapper" id="wrapper-estoque" style="display: flex;">
+            <iframe id="iframe-inicial" src="https://script.google.com/macros/s/AKfycbx_dcMiFUawWThCC6u126b9t2Ptzfy68paXRz3ODQ85SH8ShctDpjWWxrt3JBhDMfUn/exec" frameborder="0" marginheight="0" marginwidth="0" style="display: none;">
+                Carregando formulário...
+            </iframe>
+            
+            <iframe id="iframe-final" src="https://script.google.com/macros/s/AKfycby6qt3ZbzcZr5_o_Pk-7gNC5DaLfCr8Xt2JbZe7e8gJMHQrwe8Ewk7lX_78JKlGx4as/exec" frameborder="0" marginheight="0" marginwidth="0" style="display: none;">
                 Carregando formulário...
             </iframe>
         </div>
@@ -207,61 +208,33 @@
     <script src="script.js"></script>
     <script src="alert.js"></script>
     <script>
-        const URLS = {
-            inicial: 'https://script.google.com/macros/s/AKfycbx_dcMiFUawWThCC6u126b9t2Ptzfy68paXRz3ODQ85SH8ShctDpjWWxrt3JBhDMfUn/exec',
-            final: 'https://script.google.com/macros/s/AKfycby6qt3ZbzcZr5_o_Pk-7gNC5DaLfCr8Xt2JbZe7e8gJMHQrwe8Ewk7lX_78JKlGx4as/exec'
-        };
-
         function mostrarFormulario(tipo) {
-            const iframe = document.getElementById('iframe-estoque');
             const wrapper = document.getElementById('wrapper-estoque');
+            const iframeInicial = document.getElementById('iframe-inicial');
+            const iframeFinal = document.getElementById('iframe-final');
             const btnInic = document.getElementById('btn-inicial');
             const btnFinal = document.getElementById('btn-final');
             const subtitulo = document.getElementById('subtitulo-header');
-            
-            // Identifica qual botão foi clicado e seu ícone
-            const btnAtivo = tipo === 'inicial' ? btnInic : btnFinal;
-            const icon = btnAtivo.querySelector('i');
-            const originalClass = tipo === 'inicial' ? 'fas fa-exclamation-triangle' : 'fas fa-boxes-stacked';
 
-            // 1. Bloqueia interação e inicia Spinner
-            btnInic.disabled = true;
-            btnFinal.disabled = true;
-            icon.className = "fas fa-spinner fa-spin"; 
-
-            // 2. Exibe o container (mesmo que ainda esteja carregando o src)
             wrapper.style.display = 'flex';
-            
-            // 3. Define o que acontece quando o carregamento termina
-            iframe.onload = function() {
-                icon.className = originalClass; // Restaura ícone original
-                btnInic.disabled = false;
-                btnFinal.disabled = false;
-                
-                // Limpa o evento para evitar execuções duplicadas
-                iframe.onload = null;
-            };
 
-            // 4. Dispara o carregamento do SRC
-            if (iframe.src !== URLS[tipo]) {
-                iframe.src = URLS[tipo];
-            } else {
-                // Se já for o mesmo link, apenas simula o fim do loading
-                setTimeout(() => { iframe.onload(); }, 500);
-            }
-
-            // 5. Estilo visual dos botões (Active)
             if (tipo === 'inicial') {
+                iframeInicial.style.display = 'block';
+                iframeFinal.style.display = 'none';
+                
                 btnInic.classList.add('active');
                 btnFinal.classList.remove('active');
                 subtitulo.textContent = 'Estoque Inicial e Devoluções';
             } else {
+                iframeFinal.style.display = 'block';
+                iframeInicial.style.display = 'none';
+                
                 btnFinal.classList.add('active');
                 btnInic.classList.remove('active');
                 subtitulo.textContent = 'Estoque Final';
             }
             
-            // Scroll suave para o formulário
+            // Scroll suave para o início do formulário no mobile
             window.scrollTo({
                 top: document.getElementById('container-estoque').offsetTop - 20,
                 behavior: 'smooth'
@@ -273,4 +246,5 @@
         }
     </script>
 </body>
+
 </html>
