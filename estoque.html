@@ -47,7 +47,7 @@
             box-shadow: var(--shadow);
         }
 
-        .tab-btn:hover {
+        .tab-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
             background-color: var(--primary-color);
@@ -58,6 +58,15 @@
             background: var(--gradient);
             color: var(--white);
             box-shadow: var(--shadow-lg);
+        }
+
+        /* ESTADO DESATIVADO (CARREGANDO) */
+        .tab-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background-color: #f0f0f0;
+            color: #888;
+            box-shadow: none;
         }
 
         /* Container do iframe OCUPANDO TUDO */
@@ -208,6 +217,37 @@
     <script src="script.js"></script>
     <script src="alert.js"></script>
     <script>
+        // --- NOVO CÓDIGO DE PRÉ-CARREGAMENTO E SPINNERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const iframeInicial = document.getElementById('iframe-inicial');
+            const iframeFinal = document.getElementById('iframe-final');
+            const btnInic = document.getElementById('btn-inicial');
+            const btnFinal = document.getElementById('btn-final');
+
+            // Salva o conteúdo original dos botões
+            const htmlOriginalInic = btnInic.innerHTML;
+            const htmlOriginalFinal = btnFinal.innerHTML;
+
+            // Desativa os botões e aplica o spinner
+            btnInic.disabled = true;
+            btnFinal.disabled = true;
+            btnInic.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+            btnFinal.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+
+            // Libera o botão "Inicial" quando o iframe correspondente carregar
+            iframeInicial.onload = () => {
+                btnInic.disabled = false;
+                btnInic.innerHTML = htmlOriginalInic;
+            };
+
+            // Libera o botão "Final" quando o iframe correspondente carregar
+            iframeFinal.onload = () => {
+                btnFinal.disabled = false;
+                btnFinal.innerHTML = htmlOriginalFinal;
+            };
+        });
+        // ---------------------------------------------------
+
         function mostrarFormulario(tipo) {
             const wrapper = document.getElementById('wrapper-estoque');
             const iframeInicial = document.getElementById('iframe-inicial');
