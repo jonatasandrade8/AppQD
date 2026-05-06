@@ -65,7 +65,7 @@ const NOTIFICATIONS_CONFIG = {
             mensagem: "A página de estoque está temporariamente desativada."
         },
         caixas: {
-            enabled: true,
+            enabled: false,
             filename: "caixas.html",
             mensagem: "A página de caixas está temporariamente desativada."
         },
