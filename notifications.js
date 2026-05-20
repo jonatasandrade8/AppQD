@@ -23,7 +23,7 @@ const NOTIFICATIONS_CONFIG = {
     // === CONFIGURAÇÃO DO AVISO SÉRIO (BANNER VERMELHO) ===
     // === Na parte 'next' utilizar %d para dias ===
     avisoSerio: {
-        enabled: true,
+        enabled: false,
         timer: 'off', // 'on' ou 'off'
         titulo: "Atenção",
         mensagem: "O Balanço de Caixas foi agendado para o dia 18/05/2026(segunda-feira), Anote a data para não esquecer.",
