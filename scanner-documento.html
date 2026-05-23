@@ -198,7 +198,7 @@
                 </div>
                 <div class="acoes">
                     <button id="btn-rot" class="out"><i class="fas fa-undo"></i> Girar</button>
-                    <button id="btn-corn" class="per"><i class="fas fa-vector-square"></i> Ajustar Cantos</button>
+                    <button id="btn-corn" class="prim"><i class="fas fa-check"></i> Corrigir</button>
                     <button id="btn-nova" class="out"><i class="fas fa-camera"></i> Nova Foto</button>
                 </div>
             </div>
@@ -334,70 +334,26 @@
                 iW = img.naturalWidth; iH = img.naturalHeight;
                 stage.classList.remove('vazio');
                 revSec.style.display = 'block';
-                cMode = false; corC.style.display = 'none'; bCorn.classList.remove('ativo');
                 bShare.disabled = true;
-                spOn('Detectando documento...');
-                setTimeout(detectarDocumento, 100);
+                cMode = false; corC.style.display = 'none'; bCorn.textContent = 'Corrigir';
+                bCorn.innerHTML = '<i class="fas fa-check"></i> Corrigir';
+                setTimeout(() => { cMode = true; bCorn.innerHTML = '<i class="fas fa-check"></i> Corrigir'; iniciarCantos(); }, 100);
             };
             img.src = url;
-        }
-
-        function detectarDocumento() {
-            if (!rawData) { spOff(); return; }
-            if (!window.cv || !cv.Mat) { spOff(); salvar(); return; }
-            const src = cv.matFromImageData(rawData);
-            const w = rawData.width, h = rawData.height;
-            const g = new cv.Mat(), e = new cv.Mat(), ct = new cv.MatVector(), hier = new cv.Mat();
-            try {
-                cv.cvtColor(src, g, cv.COLOR_RGBA2GRAY);
-                cv.GaussianBlur(g, g, new cv.Size(5,5), 0);
-                cv.Canny(g, e, 50, 150);
-                cv.findContours(e, ct, hier, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-                let mA = 0, doc = null;
-                for (let i = 0; i < ct.size(); i++) {
-                    const c = ct.get(i); const a = cv.contourArea(c);
-                    if (a > mA && a > w*h*0.08) {
-                        const pr = cv.arcLength(c, true); const ap = new cv.Mat();
-                        cv.approxPolyDP(c, ap, 0.02*pr, true);
-                        if (ap.rows === 4 && cv.isContourConvex(ap)) { mA = a; if (doc) doc.delete(); doc = ap; } else ap.delete();
-                    }
-                }
-                if (doc) {
-                    const pts = [];
-                    for (let i = 0; i < 4; i++) pts.push([doc.data32S[i*2], doc.data32S[i*2+1]]);
-                    const ord = orderP(pts);
-                    const dw = Math.max(Math.hypot(ord[1][0]-ord[0][0],ord[1][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[3][0],ord[2][1]-ord[3][1]));
-                    const dh = Math.max(Math.hypot(ord[3][0]-ord[0][0],ord[3][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[1][0],ord[2][1]-ord[1][1]));
-                    const sM = cv.matFromArray(4,1,cv.CV_32FC2,[ord[0][0],ord[0][1],ord[1][0],ord[1][1],ord[2][0],ord[2][1],ord[3][0],ord[3][1]]);
-                    const dM = cv.matFromArray(4,1,cv.CV_32FC2,[0,0,dw-1,0,dw-1,dh-1,0,dh-1]);
-                    const M = cv.getPerspectiveTransform(sM, dM);
-                    const warp = new cv.Mat();
-                    cv.warpPerspective(src, warp, M, new cv.Size(dw, dh));
-                    resC.width = dw; resC.height = dh;
-                    cv.imshow(resC, warp);
-                    rawData = resC.getContext('2d').getImageData(0, 0, dw, dh);
-                    iW = dw; iH = dh;
-                    sM.delete(); dM.delete(); M.delete(); warp.delete(); doc.delete();
-                } else {
-                    cv.imshow(resC, src);
-                    rawData = resC.getContext('2d').getImageData(0, 0, w, h);
-                }
-            } finally { g.delete(); e.delete(); ct.delete(); hier.delete(); src.delete(); }
-            aplicarFiltro(filter);
-            spOff();
         }
 
         // === Filtros ===
         fBtns.forEach(b => b.addEventListener('click', () => {
             if (!rawData) return;
-            cMode = false; corC.style.display = 'none'; bCorn.classList.remove('ativo');
             fBtns.forEach(x => x.classList.remove('ativo')); b.classList.add('ativo');
             filter = b.dataset.f;
             aplicarFiltro(filter);
+            if (cMode) { setTimeout(iniciarCantos, 50); }
         }));
 
         function aplicarFiltro(f) {
-            if (!rawData || !window.cv || !cv.Mat) { if (rawData) { resC.getContext('2d').putImageData(rawData, 0, 0); salvar(); } return; }
+            if (!rawData) return;
+            if (!window.cv || !cv.Mat) { aplicarFiltroCanvas(f); salvar(); return; }
             const src = cv.matFromImageData(rawData);
             const g = new cv.Mat(), r = new cv.Mat();
             try {
@@ -420,6 +376,26 @@
             salvar();
         }
 
+        function aplicarFiltroCanvas(f) {
+            const d = new Uint8ClampedArray(rawData.data);
+            const w = rawData.width, h = rawData.height;
+            for (let i = 0; i < d.length; i += 4) {
+                const r = d[i], g = d[i+1], b = d[i+2];
+                let gray = Math.round(0.299*r + 0.587*g + 0.114*b);
+                if (f === 'document') {
+                    gray = gray < 128 ? 0 : 255;
+                } else if (f === 'enhanced') {
+                    gray = Math.min(255, Math.max(0, Math.round((gray - 128) * 1.4 + 128)));
+                }
+                d[i] = d[i+1] = d[i+2] = f === 'color' ? rawData.data[i] : gray;
+                d[i+3] = 255;
+            }
+            const ctx = resC.getContext('2d');
+            ctx.putImageData(new ImageData(d, w, h), 0, 0);
+            rawData = ctx.getImageData(0, 0, w, h);
+            iW = w; iH = h;
+        }
+
         function salvar() {
             procUrl = resC.toDataURL('image/jpeg', 0.95);
             resC.toBlob(b => { procBlob = b; }, 'image/jpeg', 0.95);
@@ -440,15 +416,19 @@
             rawData = resC.getContext('2d').getImageData(0, 0, h, w);
             iW = h; iH = w;
             salvar();
+            if (cMode) { setTimeout(iniciarCantos, 50); }
         });
 
-        // === Cantos: sobrepostos exatamente à área visível do canvas ===
+        // === Corrigir: aplica correção de perspectiva + filtro ===
         bCorn.addEventListener('click', () => {
             if (!rawData) return;
-            cMode = !cMode;
-            corC.style.display = cMode ? 'block' : 'none';
-            bCorn.classList.toggle('ativo', cMode);
-            if (cMode) iniciarCantos();
+            if (cMode) {
+                aplicarPerspCantos();
+            } else {
+                cMode = true; corC.style.display = 'block';
+                bCorn.innerHTML = '<i class="fas fa-check"></i> Corrigir';
+                iniciarCantos();
+            }
         });
 
         function iniciarCantos() {
@@ -460,8 +440,9 @@
             corC.style.height = rCanvas.height + 'px';
             corC.style.top = (rCanvas.top - rStage.top) + 'px';
             corC.style.left = (rCanvas.left - rStage.left) + 'px';
-            const m = 20;
-            cPts = [[m,m],[corC.width-m,m],[corC.width-m,corC.height-m],[m,corC.height-m]];
+            const m = Math.round(corC.width * 0.12);
+            const my = Math.round(corC.height * 0.12);
+            cPts = [[m,my],[corC.width-m,my],[corC.width-m,corC.height-my],[m,corC.height-my]];
             desenharCantos();
             configurarArrasto();
         }
@@ -476,10 +457,10 @@
                 ctx.fillStyle = 'rgba(99,102,241,0.08)'; ctx.fill();
             }
             for (let i = 0; i < cPts.length; i++) {
-                ctx.beginPath(); ctx.arc(cPts[i][0], cPts[i][1], 12, 0, Math.PI*2);
+                ctx.beginPath(); ctx.arc(cPts[i][0], cPts[i][1], 20, 0, Math.PI*2);
                 ctx.fillStyle = '#6366f1'; ctx.fill();
-                ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
-                ctx.fillStyle = '#fff'; ctx.font = 'bold 13px Inter'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 16px Inter'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.fillText(i+1, cPts[i][0], cPts[i][1]);
             }
         }
@@ -490,16 +471,23 @@
                 return [(e.clientX || (e.touches && e.touches[0].clientX)) - r.left,
                         (e.clientY || (e.touches && e.touches[0].clientY)) - r.top];
             };
-            const down = e => { e.preventDefault(); const [x,y] = gp(e); for (let i = 0; i < cPts.length; i++) { if (Math.hypot(x-cPts[i][0], y-cPts[i][1]) < 24) { dI = i; return; } } };
+            const down = e => { e.preventDefault(); const [x,y] = gp(e); for (let i = 0; i < cPts.length; i++) { if (Math.hypot(x-cPts[i][0], y-cPts[i][1]) < 40) { dI = i; return; } } };
             const move = e => { if (dI < 0) return; e.preventDefault(); const [x,y] = gp(e); cPts[dI] = [x, y]; desenharCantos(); };
-            const up = () => { if (dI >= 0) { dI = -1; aplicarPerspCantos(); } };
+            const up = () => { dI = -1; };
             corC.onmousedown = down; corC.ontouchstart = down;
             corC.onmousemove = move; corC.ontouchmove = move;
             corC.onmouseup = up; corC.ontouchend = up; corC.onmouseleave = up;
         }
 
         function aplicarPerspCantos() {
-            if (!rawData || !window.cv || !cv.Mat) return;
+            if (!rawData) return;
+            if (!window.cv || !cv.Mat) {
+                mostrarToast('OpenCV não disponível. Apenas o filtro será aplicado.', 'error');
+                corC.style.display = 'none'; cMode = false;
+                bCorn.innerHTML = '<i class="fas fa-vector-square"></i> Ajustar';
+                aplicarFiltro(filter);
+                return;
+            }
             const src = cv.matFromImageData(rawData);
             const rw = rawData.width, rh = rawData.height;
             const sx = rw / corC.width, sy = rh / corC.height;
@@ -529,14 +517,18 @@
                 iW = dw; iH = dh;
                 sM.delete(); dM.delete(); M.delete(); warp.delete(); out.delete();
                 salvar();
+                mostrarToast('Documento corrigido com sucesso!', 'success');
             } finally { src.delete(); g.delete(); r.delete(); }
-            corC.style.display = 'none'; cMode = false; bCorn.classList.remove('ativo');
+            corC.style.display = 'none'; cMode = false;
+            bCorn.innerHTML = '<i class="fas fa-vector-square"></i> Ajustar';
         }
 
         // === Nova foto ===
         bNova.addEventListener('click', () => {
             stage.classList.add('vazio'); revSec.style.display = 'none';
             bShare.disabled = true; procUrl = null; procBlob = null; rawData = null;
+            cMode = false; corC.style.display = 'none';
+            bCorn.innerHTML = '<i class="fas fa-check"></i> Corrigir';
         });
 
         // === Compartilhar PDF ===
