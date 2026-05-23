@@ -32,20 +32,23 @@
         .stage {
             width: 100%; max-width: 600px; margin: 0 auto;
             border-radius: var(--border-radius-lg); overflow: hidden; position: relative;
-            background: #f1f5f9; min-height: 300px;
+            background: #f1f5f9;
             display: flex; align-items: center; justify-content: center;
         }
         .stage .placeholder {
-            text-align: center; padding: 40px 20px; color: var(--text-muted);
+            text-align: center; padding: 60px 20px; color: var(--text-muted); width: 100%;
         }
-        .stage .placeholder i { font-size: 3rem; display: block; margin-bottom: 12px; opacity: 0.4; }
-        .stage canvas#res-canvas { width: 100%; display: none; }
+        .stage .placeholder i { font-size: 3.5rem; display: block; margin-bottom: 12px; opacity: 0.3; }
+        .stage .placeholder p { margin: 0; font-size: 0.95rem; }
+        .stage canvas#res-canvas { width: 100%; display: block; }
         .stage canvas#corner-cv {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: none; z-index: 3;
+            position: absolute; z-index: 3;
+            display: none; cursor: move;
         }
-        .stage.has-img .placeholder { display: none; }
-        .stage.has-img canvas#res-canvas { display: block; }
+        .stage.vazio .placeholder { display: block; }
+        .stage.vazio canvas#res-canvas { display: none; }
+        .stage:not(.vazio) .placeholder { display: none; }
+        .stage:not(.vazio) canvas#res-canvas { display: block; }
 
         .filtros { display: flex; gap: 8px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
         .filtros button {
@@ -53,7 +56,6 @@
             font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: var(--transition); color: var(--text-muted);
         }
         .filtros button.ativo { border-color: var(--primary-color); background: var(--primary-color); color: white; }
-        .filtros button:hover { border-color: var(--primary-color); }
 
         .acoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         .acoes button {
@@ -73,14 +75,12 @@
             box-shadow: 0 4px 15px rgba(37,211,102,0.4);
         }
         .share-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
-        .share-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37,211,102,0.5); }
 
         #pdf-content { display: none; padding: 40px; font-family: 'Inter', sans-serif; color: #1e293b; }
         .pdf-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #6366f1; padding-bottom: 20px; margin-bottom: 30px; }
         .pdf-logo { max-width: 90px; }
         .pdf-info { background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
         .pdf-info p { margin: 6px 0; font-size: 14px; }
-        .pdf-img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 
         .spinner-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -93,6 +93,21 @@
         .spinner-box p { margin: 0; color: var(--text-muted); font-weight: 600; }
 
         input[type="file"] { display: none; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: white; padding: 14px 28px; border-radius: 12px;
+            font-weight: 600; font-size: 0.9rem; z-index: 999999;
+            display: none; align-items: center; gap: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            animation: toastIn .35s ease;
+            max-width: 90%;
+        }
+        .toast.show { display: flex; }
+        .toast.success { background: #16a34a; }
+        .toast.error { background: #dc2626; }
+        .toast i { font-size: 1.2rem; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     </style>
 </head>
 <body>
@@ -108,7 +123,7 @@
         <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span class="link-text">Sair</span></a>
     </aside>
     <header id="cabecalho-principal">
-        <button class="menu-toggle" aria-label="Abrir Menu"><i class="fas fa-bars"></i><span class="menu-label">Menu</span></button>
+        <button class="menu-toggle"><i class="fas fa-bars"></i><span class="menu-label">Menu</span></button>
         <div class="logo-placeholder"><img src="./images/logo-qdelicia.png" alt="Qdelícia Frutas"></div>
         <h1>Qdelícia Frutas</h1>
         <p>Scanner de Documentos</p>
@@ -150,23 +165,23 @@
         <section class="glass-section">
             <h2><i class="fas fa-camera"></i> Foto do Documento</h2>
             <p style="color:var(--text-muted);font-size:0.85rem;margin:-10px 0 18px;">
-                <i class="fas fa-info-circle"></i> Use a câmera nativa do celular para melhor qualidade
+                <i class="fas fa-info-circle"></i> Use a câmera nativa para melhor qualidade
             </p>
 
             <div class="pick-area">
-                <div class="pick-btn" id="btn-foto">
+                <div class="pick-btn" id="btn-tirar-foto">
                     <i class="fas fa-camera"></i>
                     <span>Tirar Foto</span>
-                    <small>Abre a câmera nativa</small>
+                    <small>Abre a câmera do celular</small>
                 </div>
-                <div class="pick-btn" id="btn-galeria">
+                <div class="pick-btn" id="btn-escolher">
                     <i class="fas fa-folder-open"></i>
                     <span>Escolher da Galeria</span>
                     <small>Seleciona uma imagem</small>
                 </div>
             </div>
 
-            <div class="stage" id="stage">
+            <div class="stage vazio" id="stage">
                 <div class="placeholder">
                     <i class="fas fa-file-image"></i>
                     <p>Nenhuma foto ainda</p>
@@ -213,14 +228,15 @@
             <p><strong>Rede:</strong> <span id="pdf-rede"></span></p>
             <p><strong>Loja:</strong> <span id="pdf-loja"></span></p>
             <p><strong>Promotor:</strong> <span id="pdf-promotor"></span></p>
-            <p><strong>Tipo de Documento:</strong> <span id="pdf-tipo"></span></p>
+            <p><strong>Tipo:</strong> <span id="pdf-tipo"></span></p>
         </div>
         <div id="pdf-img-wrap" style="text-align:center;margin-bottom:20px;"></div>
         <div style="margin-top:50px;border-top:1px solid #ddd;padding-top:10px;font-size:12px;color:#64748b;text-align:center;">Documento gerado automaticamente pela Área do Promotor Qdelícia Frutas.</div>
     </div>
 
-    <input type="file" id="input-foto" accept="image/*" capture="environment">
-    <input type="file" id="input-galeria" accept="image/*">
+    <input type="file" id="input-arquivo" accept="image/*">
+
+    <div id="toast" class="toast"></div>
 
     <footer><p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p></footer>
 
@@ -234,28 +250,36 @@
         const resC = $('res-canvas'), corC = $('corner-cv');
         const stage = $('stage'), revSec = $('rev-sec');
         const bRot = $('btn-rot'), bCorn = $('btn-corn'), bNova = $('btn-nova'), bShare = $('btn-share');
-        const bFoto = $('btn-foto'), bGaleria = $('btn-galeria');
-        const iFoto = $('input-foto'), iGaleria = $('input-galeria');
+        const bFoto = $('btn-tirar-foto'), bEscolher = $('btn-escolher');
+        const inpFile = $('input-arquivo');
         const fBtns = document.querySelectorAll('[data-f]');
         const sp = $('spinner'), spT = $('spinner-txt');
 
         let promo = null;
         let rawData = null, procUrl = null, procBlob = null;
-        let iW = 0, iH = 0, angle = 0;
+        let iW = 0, iH = 0;
         let filter = 'color';
         let cMode = false, cPts = [], dI = -1;
 
         function spOn(t) { spT.textContent = t || 'Processando...'; sp.classList.add('on'); }
         function spOff() { sp.classList.remove('on'); }
 
+        let tId = null;
+        function mostrarToast(m, tipo) {
+            const t = $('toast');
+            if (tId) { clearTimeout(tId); tId = null; }
+            t.className = 'toast show' + (tipo === 'success' ? ' success' : tipo === 'error' ? ' error' : '');
+            const ic = tipo === 'success' ? '<i class="fas fa-check-circle"></i>' : tipo === 'error' ? '<i class="fas fa-exclamation-circle"></i>' : '<i class="fas fa-info-circle"></i>';
+            t.innerHTML = ic + m;
+            tId = setTimeout(() => { t.classList.remove('show'); tId = null; }, 4000);
+        }
+
         function findP(r,l) { if(!APP_DATA[r])return null; for(const p in APP_DATA[r])if(APP_DATA[r][p].includes(l))return p; return null; }
-        function pFull(n) { if(window.APP_CONFIG&&window.APP_CONFIG.users)for(const k in window.APP_CONFIG.users)if(window.APP_CONFIG.users[k].fullName===n||k===n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""))return window.APP_CONFIG.users[k].fullName; return n; }
 
         sR.innerHTML = '<option value="" disabled selected>Selecione a Rede</option>';
         Object.keys(APP_DATA).forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; sR.appendChild(o); });
         sR.addEventListener('change', () => {
-            const r = sR.value; sL.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
-            promo = null;
+            const r = sR.value; sL.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>'; promo = null;
             if (r && APP_DATA[r]) {
                 const ls = [];
                 for (const p in APP_DATA[r]) APP_DATA[r][p].forEach(l => { if (!ls.includes(l)) ls.push(l); });
@@ -281,99 +305,87 @@
             return r;
         }
 
-        function carregarImagem(url) {
+        // === Entrada de imagem: ambos os botões usam o mesmo input ===
+        bFoto.addEventListener('click', () => {
+            inpFile.setAttribute('capture', 'environment');
+            inpFile.click();
+        });
+        bEscolher.addEventListener('click', () => {
+            inpFile.removeAttribute('capture');
+            inpFile.click();
+        });
+
+        inpFile.addEventListener('change', function(e) {
+            const f = this.files[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = ev => processarImagem(ev.target.result);
+            reader.readAsDataURL(f);
+            this.value = '';
+        });
+
+        function processarImagem(url) {
             const img = new Image();
             img.onload = () => {
                 resC.width = img.naturalWidth;
                 resC.height = img.naturalHeight;
                 resC.getContext('2d').drawImage(img, 0, 0);
                 rawData = resC.getContext('2d').getImageData(0, 0, img.naturalWidth, img.naturalHeight);
-                iW = img.naturalWidth; iH = img.naturalHeight; angle = 0;
-                stage.classList.add('has-img');
+                iW = img.naturalWidth; iH = img.naturalHeight;
+                stage.classList.remove('vazio');
                 revSec.style.display = 'block';
                 cMode = false; corC.style.display = 'none'; bCorn.classList.remove('ativo');
                 bShare.disabled = true;
-                processar();
+                spOn('Detectando documento...');
+                setTimeout(detectarDocumento, 100);
             };
             img.src = url;
         }
 
-        function processar() {
-            if (!rawData) return;
-            spOn('Detectando documento...');
-            setTimeout(() => {
-                try {
-                    if (!window.cv || !cv.Mat) { spOff(); return; }
-                    const src = cv.matFromImageData(rawData);
-                    const w = rawData.width, h = rawData.height;
-                    const g = new cv.Mat(), e = new cv.Mat(), ct = new cv.MatVector(), hier = new cv.Mat();
-                    try {
-                        cv.cvtColor(src, g, cv.COLOR_RGBA2GRAY);
-                        cv.GaussianBlur(g, g, new cv.Size(5,5), 0);
-                        cv.Canny(g, e, 50, 150);
-                        cv.findContours(e, ct, hier, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-                        let mA = 0, doc = null;
-                        for (let i = 0; i < ct.size(); i++) {
-                            const c = ct.get(i); const a = cv.contourArea(c);
-                            if (a > mA && a > w*h*.08) {
-                                const pr = cv.arcLength(c, true); const ap = new cv.Mat();
-                                cv.approxPolyDP(c, ap, .02*pr, true);
-                                if (ap.rows === 4 && cv.isContourConvex(ap)) { mA = a; if (doc) doc.delete(); doc = ap; } else ap.delete();
-                            }
-                        }
-                        if (doc) {
-                            const pts = [];
-                            for (let i = 0; i < 4; i++) pts.push([doc.data32S[i*2], doc.data32S[i*2+1]]);
-                            const ord = orderP(pts);
-                            const dw = Math.max(Math.hypot(ord[1][0]-ord[0][0],ord[1][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[3][0],ord[2][1]-ord[3][1]));
-                            const dh = Math.max(Math.hypot(ord[3][0]-ord[0][0],ord[3][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[1][0],ord[2][1]-ord[1][1]));
-                            const sM = cv.matFromArray(4,1,cv.CV_32FC2,[ord[0][0],ord[0][1],ord[1][0],ord[1][1],ord[2][0],ord[2][1],ord[3][0],ord[3][1]]);
-                            const dM = cv.matFromArray(4,1,cv.CV_32FC2,[0,0,dw-1,0,dw-1,dh-1,0,dh-1]);
-                            const M = cv.getPerspectiveTransform(sM, dM);
-                            const warp = new cv.Mat();
-                            cv.warpPerspective(src, warp, M, new cv.Size(dw, dh));
-                            resC.width = dw; resC.height = dh;
-                            cv.imshow(resC, warp);
-                            rawData = resC.getContext('2d').getImageData(0, 0, dw, dh);
-                            iW = dw; iH = dh;
-                            sM.delete(); dM.delete(); M.delete(); warp.delete(); doc.delete();
-                        } else {
-                            cv.imshow(resC, src);
-                            rawData = resC.getContext('2d').getImageData(0, 0, w, h);
-                        }
-                    } finally { g.delete(); e.delete(); ct.delete(); hier.delete(); src.delete(); }
-                    aplicarFiltro(filter);
-                    spOff();
-                } catch(e) { spOff(); console.error(e); }
-            }, 100);
+        function detectarDocumento() {
+            if (!rawData) { spOff(); return; }
+            if (!window.cv || !cv.Mat) { spOff(); salvar(); return; }
+            const src = cv.matFromImageData(rawData);
+            const w = rawData.width, h = rawData.height;
+            const g = new cv.Mat(), e = new cv.Mat(), ct = new cv.MatVector(), hier = new cv.Mat();
+            try {
+                cv.cvtColor(src, g, cv.COLOR_RGBA2GRAY);
+                cv.GaussianBlur(g, g, new cv.Size(5,5), 0);
+                cv.Canny(g, e, 50, 150);
+                cv.findContours(e, ct, hier, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+                let mA = 0, doc = null;
+                for (let i = 0; i < ct.size(); i++) {
+                    const c = ct.get(i); const a = cv.contourArea(c);
+                    if (a > mA && a > w*h*0.08) {
+                        const pr = cv.arcLength(c, true); const ap = new cv.Mat();
+                        cv.approxPolyDP(c, ap, 0.02*pr, true);
+                        if (ap.rows === 4 && cv.isContourConvex(ap)) { mA = a; if (doc) doc.delete(); doc = ap; } else ap.delete();
+                    }
+                }
+                if (doc) {
+                    const pts = [];
+                    for (let i = 0; i < 4; i++) pts.push([doc.data32S[i*2], doc.data32S[i*2+1]]);
+                    const ord = orderP(pts);
+                    const dw = Math.max(Math.hypot(ord[1][0]-ord[0][0],ord[1][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[3][0],ord[2][1]-ord[3][1]));
+                    const dh = Math.max(Math.hypot(ord[3][0]-ord[0][0],ord[3][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[1][0],ord[2][1]-ord[1][1]));
+                    const sM = cv.matFromArray(4,1,cv.CV_32FC2,[ord[0][0],ord[0][1],ord[1][0],ord[1][1],ord[2][0],ord[2][1],ord[3][0],ord[3][1]]);
+                    const dM = cv.matFromArray(4,1,cv.CV_32FC2,[0,0,dw-1,0,dw-1,dh-1,0,dh-1]);
+                    const M = cv.getPerspectiveTransform(sM, dM);
+                    const warp = new cv.Mat();
+                    cv.warpPerspective(src, warp, M, new cv.Size(dw, dh));
+                    resC.width = dw; resC.height = dh;
+                    cv.imshow(resC, warp);
+                    rawData = resC.getContext('2d').getImageData(0, 0, dw, dh);
+                    iW = dw; iH = dh;
+                    sM.delete(); dM.delete(); M.delete(); warp.delete(); doc.delete();
+                } else {
+                    cv.imshow(resC, src);
+                    rawData = resC.getContext('2d').getImageData(0, 0, w, h);
+                }
+            } finally { g.delete(); e.delete(); ct.delete(); hier.delete(); src.delete(); }
+            aplicarFiltro(filter);
+            spOff();
         }
-
-        // === Entrada: câmera nativa ou galeria ===
-        bFoto.addEventListener('click', () => iFoto.click());
-        bGaleria.addEventListener('click', () => iGaleria.click());
-
-        iFoto.addEventListener('change', e => {
-            const f = e.target.files[0]; if (!f) return;
-            const r = new FileReader();
-            r.onload = ev => carregarImagem(ev.target.result);
-            r.readAsDataURL(f);
-            iFoto.value = '';
-        });
-
-        iGaleria.addEventListener('change', e => {
-            const f = e.target.files[0]; if (!f) return;
-            const r = new FileReader();
-            r.onload = ev => carregarImagem(ev.target.result);
-            r.readAsDataURL(f);
-            iGaleria.value = '';
-        });
-
-        bNova.addEventListener('click', () => {
-            stage.classList.remove('has-img');
-            revSec.style.display = 'none';
-            bShare.disabled = true;
-            procUrl = null; procBlob = null; rawData = null;
-        });
 
         // === Filtros ===
         fBtns.forEach(b => b.addEventListener('click', () => {
@@ -417,7 +429,6 @@
         // === Girar ===
         bRot.addEventListener('click', () => {
             if (!rawData) return;
-            angle = (angle - 90) % 360;
             const c = document.createElement('canvas');
             const w = resC.width, h = resC.height;
             c.width = h; c.height = w;
@@ -431,7 +442,7 @@
             salvar();
         });
 
-        // === Cantos ===
+        // === Cantos: sobrepostos exatamente à área visível do canvas ===
         bCorn.addEventListener('click', () => {
             if (!rawData) return;
             cMode = !cMode;
@@ -441,45 +452,57 @@
         });
 
         function iniciarCantos() {
-            const r = stage.getBoundingClientRect();
-            corC.width = r.width; corC.height = r.height;
+            const rCanvas = resC.getBoundingClientRect();
+            const rStage = stage.getBoundingClientRect();
+            corC.width = Math.round(rCanvas.width);
+            corC.height = Math.round(rCanvas.height);
+            corC.style.width = rCanvas.width + 'px';
+            corC.style.height = rCanvas.height + 'px';
+            corC.style.top = (rCanvas.top - rStage.top) + 'px';
+            corC.style.left = (rCanvas.left - rStage.left) + 'px';
             const m = 20;
-            cPts = [[m,m],[r.width-m,m],[r.width-m,r.height-m],[m,r.height-m]];
-            desenharCantos(); configurarArrasto();
+            cPts = [[m,m],[corC.width-m,m],[corC.width-m,corC.height-m],[m,corC.height-m]];
+            desenharCantos();
+            configurarArrasto();
         }
 
         function desenharCantos() {
             const ctx = corC.getContext('2d');
-            ctx.clearRect(0,0,corC.width,corC.height);
-            if (cPts.length===4) {
-                ctx.strokeStyle='#6366f1'; ctx.lineWidth=3;
-                ctx.beginPath(); ctx.moveTo(cPts[0][0],cPts[0][1]);
-                for(let i=1;i<4;i++) ctx.lineTo(cPts[i][0],cPts[i][1]); ctx.closePath(); ctx.stroke();
-                ctx.fillStyle='rgba(99,102,241,.08)'; ctx.fill();
+            ctx.clearRect(0, 0, corC.width, corC.height);
+            if (cPts.length === 4) {
+                ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(cPts[0][0], cPts[0][1]);
+                for (let i = 1; i < 4; i++) ctx.lineTo(cPts[i][0], cPts[i][1]); ctx.closePath(); ctx.stroke();
+                ctx.fillStyle = 'rgba(99,102,241,0.08)'; ctx.fill();
             }
-            for(let i=0;i<cPts.length;i++) {
-                ctx.beginPath(); ctx.arc(cPts[i][0],cPts[i][1],12,0,Math.PI*2);
-                ctx.fillStyle='#6366f1'; ctx.fill();
-                ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
-                ctx.fillStyle='#fff'; ctx.font='bold 13px Inter'; ctx.textAlign='center'; ctx.textBaseline='middle';
-                ctx.fillText(i+1,cPts[i][0],cPts[i][1]);
+            for (let i = 0; i < cPts.length; i++) {
+                ctx.beginPath(); ctx.arc(cPts[i][0], cPts[i][1], 12, 0, Math.PI*2);
+                ctx.fillStyle = '#6366f1'; ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 13px Inter'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(i+1, cPts[i][0], cPts[i][1]);
             }
         }
 
         function configurarArrasto() {
-            const gp = e => { const r = corC.getBoundingClientRect(); return [(e.clientX||(e.touches&&e.touches[0].clientX))-r.left,(e.clientY||(e.touches&&e.touches[0].clientY))-r.top]; };
-            corC.onmousedown = corC.ontouchstart = e => { e.preventDefault(); const [x,y]=gp(e); for(let i=0;i<cPts.length;i++){if(Math.hypot(x-cPts[i][0],y-cPts[i][1])<24){dI=i;return;}} };
-            const mv = e => { if(dI<0)return; e.preventDefault(); const [x,y]=gp(e); cPts[dI]=[x,y]; desenharCantos(); };
-            const up = () => { if(dI>=0){dI=-1;aplicarPerspCantos();} };
-            corC.onmousemove=mv; corC.ontouchmove=mv; corC.onmouseup=up; corC.ontouchend=up; corC.onmouseleave=up;
+            const gp = e => {
+                const r = corC.getBoundingClientRect();
+                return [(e.clientX || (e.touches && e.touches[0].clientX)) - r.left,
+                        (e.clientY || (e.touches && e.touches[0].clientY)) - r.top];
+            };
+            const down = e => { e.preventDefault(); const [x,y] = gp(e); for (let i = 0; i < cPts.length; i++) { if (Math.hypot(x-cPts[i][0], y-cPts[i][1]) < 24) { dI = i; return; } } };
+            const move = e => { if (dI < 0) return; e.preventDefault(); const [x,y] = gp(e); cPts[dI] = [x, y]; desenharCantos(); };
+            const up = () => { if (dI >= 0) { dI = -1; aplicarPerspCantos(); } };
+            corC.onmousedown = down; corC.ontouchstart = down;
+            corC.onmousemove = move; corC.ontouchmove = move;
+            corC.onmouseup = up; corC.ontouchend = up; corC.onmouseleave = up;
         }
 
         function aplicarPerspCantos() {
-            if (!rawData||!window.cv||!cv.Mat) return;
+            if (!rawData || !window.cv || !cv.Mat) return;
             const src = cv.matFromImageData(rawData);
             const rw = rawData.width, rh = rawData.height;
-            const cR = stage.getBoundingClientRect();
-            const sx = rw/cR.width, sy = rh/cR.height;
+            const sx = rw / corC.width, sy = rh / corC.height;
             const pts = cPts.map(p => [p[0]*sx, p[1]*sy]);
             const ord = orderP(pts);
             const dw = Math.max(Math.hypot(ord[1][0]-ord[0][0],ord[1][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[3][0],ord[2][1]-ord[3][1]));
@@ -507,14 +530,22 @@
                 sM.delete(); dM.delete(); M.delete(); warp.delete(); out.delete();
                 salvar();
             } finally { src.delete(); g.delete(); r.delete(); }
+            corC.style.display = 'none'; cMode = false; bCorn.classList.remove('ativo');
         }
+
+        // === Nova foto ===
+        bNova.addEventListener('click', () => {
+            stage.classList.add('vazio'); revSec.style.display = 'none';
+            bShare.disabled = true; procUrl = null; procBlob = null; rawData = null;
+        });
 
         // === Compartilhar PDF ===
         function getData() { return { rede:sR.value, loja:sL.value, promotor:promo||'', tipo:sT.value, date:new Date().toLocaleDateString('pt-BR') }; }
 
         bShare.addEventListener('click', async () => {
-            if (!sL.value || !sT.value) { alert('Preencha todos os dados.'); return; }
-            if (!procUrl) { salvar(); await new Promise(r => setTimeout(r, 300)); }
+            if (!sL.value || !sT.value) { mostrarToast('Preencha todos os dados do documento.', 'error'); return; }
+            bShare.disabled = true;
+            if (!procUrl) { spOn('Preparando imagem...'); salvar(); await new Promise(r => setTimeout(r, 300)); spOff(); }
             const data = getData();
             const pdf = $('pdf-content'); pdf.style.display = 'block';
             $('pdf-data').textContent = data.date;
@@ -524,7 +555,7 @@
             $('pdf-tipo').textContent = data.tipo;
             const ic = $('pdf-img-wrap'); ic.innerHTML = '';
             const im = document.createElement('img'); im.src = procUrl;
-            im.className = 'pdf-img'; im.style.maxWidth = '100%'; im.style.maxHeight = '700px'; ic.appendChild(im);
+            im.style.maxWidth = '100%'; im.style.maxHeight = '700px'; ic.appendChild(im);
             const fn = `${data.tipo.replace(/\s+/g,'_')}_${data.loja}.pdf`;
             try {
                 spOn('Gerando PDF...');
@@ -532,14 +563,24 @@
                 spOff(); pdf.style.display = 'none';
                 const file = new File([blob], fn, { type:'application/pdf' });
                 if (navigator.share) {
+                    spOn('Compartilhando...');
                     try {
                         if (navigator.canShare && navigator.canShare({ files:[file] })) await navigator.share({ files:[file], title:data.tipo+' - '+data.loja });
                         else await navigator.share({ title:data.tipo+' - '+data.loja, text:data.tipo+'\nRede: '+data.rede+'\nLoja: '+data.loja });
-                    } catch(e) { if (e.name !== 'AbortError') throw e; }
+                        mostrarToast('PDF enviado com sucesso!', 'success');
+                    } catch(e) {
+                        if (e.name !== 'AbortError') throw e;
+                        else { spOff(); bShare.disabled = false; pdf.style.display = 'none'; return; }
+                    }
                 } else {
                     const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = fn; link.click();
+                    mostrarToast('PDF baixado com sucesso!', 'success');
                 }
-            } catch(err) { spOff(); if (err.name !== 'AbortError') { console.error(err); alert('Erro ao gerar PDF.'); } pdf.style.display = 'none'; }
+                spOff(); bShare.disabled = false;
+            } catch(err) {
+                spOff(); pdf.style.display = 'none'; bShare.disabled = false;
+                if (err.name !== 'AbortError') { console.error(err); mostrarToast('Erro ao gerar PDF. Tente novamente.', 'error'); }
+            }
         });
 
         loadCV().catch(() => console.warn('OpenCV não carregou'));
