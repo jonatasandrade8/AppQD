@@ -11,139 +11,88 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * { box-sizing: border-box; }
-        .welcome-banner {
-            background: linear-gradient(135deg,#10b981,#059669); color: white;
-            padding: 12px 16px; border-radius: 12px; font-weight: 600; font-size: .95rem;
-            display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(16,185,129,.3); animation: slideIn .4s ease;
-        }
-        .welcome-banner i { font-size: 1.2rem; }
-        @keyframes slideIn { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:translateY(0) } }
         .scanner-container { padding: 20px; max-width: 960px; margin: 0 auto; }
         .scanner-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .scanner-form .input-group { margin: 0; }
         @media (max-width:600px) { .scanner-form { grid-template-columns: 1fr; } }
 
-        .source-buttons { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; }
-        .source-buttons button {
-            flex:1; max-width:200px; padding:14px 20px; border-radius:var(--border-radius);
-            border:2px solid #e2e8f0; background:var(--white); font-weight:600; font-size:.95rem;
-            cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; gap:8px;
-            color:var(--text-muted);
+        .pick-area {
+            display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;
         }
-        .source-buttons button.active { border-color:var(--primary-color); color:var(--primary-color); background:#f0fdf4; }
-        .source-buttons button:hover { border-color:var(--primary-color); }
+        .pick-btn {
+            flex: 1; max-width: 260px; padding: 24px 20px; border-radius: var(--border-radius-lg);
+            border: 2px solid #e2e8f0; background: var(--white); cursor: pointer;
+            transition: var(--transition); text-align: center;
+        }
+        .pick-btn:hover { border-color: var(--primary-color); background: #f0fdf4; }
+        .pick-btn i { font-size: 2.5rem; color: var(--primary-color); display: block; margin-bottom: 10px; }
+        .pick-btn span { font-weight: 600; color: var(--text-dark); font-size: 1rem; }
+        .pick-btn small { display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; }
 
         .stage {
-            width:100%; max-width:600px; margin:0 auto 20px;
-            border-radius:var(--border-radius-lg); overflow:hidden; position:relative;
-            background:#000; min-height:350px;
+            width: 100%; max-width: 600px; margin: 0 auto;
+            border-radius: var(--border-radius-lg); overflow: hidden; position: relative;
+            background: #f1f5f9; min-height: 300px;
+            display: flex; align-items: center; justify-content: center;
         }
-        .stage video, .stage canvas.result-canvas {
-            width:100%; display:block; object-fit:contain;
+        .stage .placeholder {
+            text-align: center; padding: 40px 20px; color: var(--text-muted);
         }
-        .stage canvas.result-canvas { display:none; }
-        .stage.has-result video { display:none; }
-        .stage.has-result canvas.result-canvas { display:block; }
-        .stage canvas.overlay {
-            position:absolute; top:0; left:0; width:100%; height:100%;
-            pointer-events:none; display:none;
+        .stage .placeholder i { font-size: 3rem; display: block; margin-bottom: 12px; opacity: 0.4; }
+        .stage canvas#res-canvas { width: 100%; display: none; }
+        .stage canvas#corner-cv {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; z-index: 3;
         }
-        .stage.show-overlay canvas.overlay { display:block; }
-        .stage canvas.corner-cv {
-            position:absolute; top:0; left:0; width:100%; height:100%;
-            display:none; z-index:3;
-        }
+        .stage.has-img .placeholder { display: none; }
+        .stage.has-img canvas#res-canvas { display: block; }
 
-        .frame-guide {
-            position:absolute; top:6%; left:6%; width:88%; height:88%;
-            border:2px dashed rgba(255,255,255,.4); border-radius:4px;
-            pointer-events:none; box-shadow:0 0 0 9999px rgba(0,0,0,.2); z-index:2;
-            transition:border-color .3s;
+        .filtros { display: flex; gap: 8px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
+        .filtros button {
+            padding: 8px 20px; border-radius: 20px; border: 2px solid #e2e8f0; background: var(--white);
+            font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: var(--transition); color: var(--text-muted);
         }
-        .frame-guide.detected { border-color:#10b981; border-style:solid; }
-        .frame-guide .c {
-            position:absolute; width:22px; height:22px; border-color:#fff; border-style:solid;
-        }
-        .frame-guide .tl { top:-1px; left:-1px; border-width:3px 0 0 3px; }
-        .frame-guide .tr { top:-1px; right:-1px; border-width:3px 3px 0 0; }
-        .frame-guide .bl { bottom:-1px; left:-1px; border-width:0 0 3px 3px; }
-        .frame-guide .br { bottom:-1px; right:-1px; border-width:0 3px 3px 0; }
+        .filtros button.ativo { border-color: var(--primary-color); background: var(--primary-color); color: white; }
+        .filtros button:hover { border-color: var(--primary-color); }
 
-        .toolbar { display:flex; justify-content:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
-        .toolbar button {
-            width:56px; height:56px; border-radius:50%; border:none; background:var(--primary-color);
-            color:white; font-size:1.3rem; cursor:pointer; transition:var(--transition);
-            display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow);
+        .acoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .acoes button {
+            padding: 10px 22px; border-radius: var(--border-radius); border: none; font-weight: 600;
+            font-size: 0.85rem; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px;
         }
-        .toolbar button:active { transform:scale(.92); }
-        .toolbar button.sec { background:var(--text-muted); }
-        .toolbar button.on { background:#f59e0b; }
+        .acoes .prim { background: var(--primary-color); color: white; }
+        .acoes .out { background: #f8fafc; color: var(--text-dark); border: 1px solid #e2e8f0; }
+        .acoes .per { background: #eef2ff; color: #6366f1; border: 1px solid #c7d2fe; }
+        .acoes .per.ativo { background: #6366f1; color: white; }
 
-        .zoom-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:12px; }
-        .zoom-row button {
-            width:38px; height:38px; border-radius:50%; border:none; background:rgba(0,0,0,.5);
-            color:#fff; font-size:.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
-        }
-        .zoom-row span {
-            color:#fff; font-weight:700; font-size:.85rem;
-            background:rgba(0,0,0,.5); padding:4px 12px; border-radius:20px; min-width:48px; text-align:center;
-        }
-
-        .filters { display:flex; gap:8px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
-        .filters button {
-            padding:7px 16px; border-radius:20px; border:2px solid #e2e8f0; background:var(--white);
-            font-weight:600; font-size:.8rem; cursor:pointer; transition:var(--transition); color:var(--text-muted);
-        }
-        .filters button.active { border-color:var(--primary-color); background:var(--primary-color); color:white; }
-
-        .actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
-        .actions button {
-            padding:10px 20px; border-radius:var(--border-radius); border:none; font-weight:600;
-            font-size:.85rem; cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:6px;
-        }
-        .actions .p { background:var(--primary-color); color:white; }
-        .actions .o { background:#f8fafc; color:var(--text-dark); border:1px solid #e2e8f0; }
-        .actions .x { background:#f1f5f9; color:var(--text-muted); }
-        .actions .corn { background:#eef2ff; color:#6366f1; border:1px solid #c7d2fe; }
-        .actions .corn.on { background:#6366f1; color:white; }
-
-        .share-wrap { text-align:center; margin:20px 0; }
+        .share-wrap { text-align: center; margin: 20px 0; }
         .share-btn {
-            border:none; padding:16px 40px; border-radius:50px; font-weight:700; cursor:pointer;
-            display:inline-flex; align-items:center; justify-content:center; gap:10px;
-            transition:var(--transition); font-size:1.05rem; color:white; background:#25d366;
-            box-shadow:0 4px 15px rgba(37,211,102,.4);
+            border: none; padding: 16px 40px; border-radius: 50px; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            transition: var(--transition); font-size: 1.05rem; color: white; background: #25d366;
+            box-shadow: 0 4px 15px rgba(37,211,102,0.4);
         }
-        .share-btn:disabled { opacity:.4; cursor:not-allowed; box-shadow:none; }
-        .share-btn:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 8px 25px rgba(37,211,102,.5); }
+        .share-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+        .share-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37,211,102,0.5); }
 
-        #pdf-content { display:none; padding:40px; font-family:'Inter',sans-serif; color:#1e293b; }
-        .pdf-header { display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #6366f1; padding-bottom:20px; margin-bottom:30px; }
-        .pdf-logo { max-width:90px; }
-        .pdf-info { background:#f8fafc; padding:20px; border-radius:12px; margin-bottom:30px; border:1px solid #e2e8f0; }
-        .pdf-info p { margin:6px 0; font-size:14px; }
-        .pdf-img { max-width:100%; height:auto; display:block; margin:0 auto; }
+        #pdf-content { display: none; padding: 40px; font-family: 'Inter', sans-serif; color: #1e293b; }
+        .pdf-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #6366f1; padding-bottom: 20px; margin-bottom: 30px; }
+        .pdf-logo { max-width: 90px; }
+        .pdf-info { background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
+        .pdf-info p { margin: 6px 0; font-size: 14px; }
+        .pdf-img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 
         .spinner-overlay {
-            position:fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index:99999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 99999;
         }
-        .spinner-overlay.on { display:flex; }
-        .spinner-box { background:white; padding:30px 40px; border-radius:16px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3); max-width:320px; }
-        .spinner-box .spin {
-            width:48px; height:48px; border:5px solid #e2e8f0; border-top-color:var(--primary-color);
-            border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 15px;
-        }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        .spinner-box p { margin:0; color:var(--text-muted); font-weight:600; }
+        .spinner-overlay.on { display: flex; }
+        .spinner-box { background: white; padding: 30px 40px; border-radius: 16px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 320px; }
+        .spinner-box .spin { width: 48px; height: 48px; border: 5px solid #e2e8f0; border-top-color: var(--primary-color); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner-box p { margin: 0; color: var(--text-muted); font-weight: 600; }
 
-        #up-input { display:none; }
-        .up-area { text-align:center; padding:40px 20px; border:2px dashed #e2e8f0; border-radius:var(--border-radius-lg); background:#f8fafc; cursor:pointer; transition:var(--transition); }
-        .up-area:hover { border-color:var(--primary-color); background:#f0fdf4; }
-        .up-area i { font-size:3rem; color:var(--text-muted); margin-bottom:15px; display:block; }
-        .up-area p { color:var(--text-muted); margin-bottom:15px; }
+        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
@@ -178,9 +127,6 @@
     <main class="scanner-container">
         <section class="glass-section">
             <h2><i class="fas fa-info-circle"></i> Dados do Documento</h2>
-            <div id="welcome-banner" class="welcome-banner" style="display:none;">
-                <i class="fas fa-user-check"></i><span id="welcome-txt"></span>
-            </div>
             <div class="scanner-form">
                 <div class="input-group">
                     <label><i class="fas fa-store"></i> Rede</label>
@@ -202,63 +148,50 @@
         </section>
 
         <section class="glass-section">
-            <h2><i class="fas fa-file-image"></i> Digitalizar</h2>
-            <div class="source-buttons">
-                <button id="src-cam" class="active"><i class="fas fa-camera"></i> Câmera</button>
-                <button id="src-up"><i class="fas fa-folder-open"></i> Galeria</button>
-            </div>
+            <h2><i class="fas fa-camera"></i> Foto do Documento</h2>
+            <p style="color:var(--text-muted);font-size:0.85rem;margin:-10px 0 18px;">
+                <i class="fas fa-info-circle"></i> Use a câmera nativa do celular para melhor qualidade
+            </p>
 
-            <div id="cam-sec">
-                <div class="stage" id="stage">
-                    <video id="video" autoplay playsinline></video>
-                    <canvas id="res-canvas" class="result-canvas"></canvas>
-                    <canvas id="ov-canvas" class="overlay"></canvas>
-                    <canvas id="corner-cv" class="corner-cv"></canvas>
-                    <div class="frame-guide" id="frame-guide">
-                        <div class="c tl"></div><div class="c tr"></div>
-                        <div class="c bl"></div><div class="c br"></div>
-                    </div>
+            <div class="pick-area">
+                <div class="pick-btn" id="btn-foto">
+                    <i class="fas fa-camera"></i>
+                    <span>Tirar Foto</span>
+                    <small>Abre a câmera nativa</small>
                 </div>
-                <div class="zoom-row" id="zoom-row">
-                    <button id="zoom-out"><i class="fas fa-minus"></i></button>
-                    <span id="zoom-lbl">1.0x</span>
-                    <button id="zoom-in"><i class="fas fa-plus"></i></button>
-                </div>
-                <div class="toolbar" id="cam-toolbar">
-                    <button id="btn-flash" class="sec" title="Flash"><i class="fas fa-bolt"></i></button>
-                    <button id="btn-cap" title="Capturar"><i class="fas fa-camera"></i></button>
-                    <button id="btn-retake" class="sec" title="Refazer" style="display:none"><i class="fas fa-redo"></i></button>
+                <div class="pick-btn" id="btn-galeria">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Escolher da Galeria</span>
+                    <small>Seleciona uma imagem</small>
                 </div>
             </div>
 
-            <div id="up-sec" style="display:none">
-                <div class="up-area" id="up-area">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Clique para selecionar uma imagem</p>
-                    <button class="share-btn" style="display:inline-flex;padding:12px 30px;font-size:.95rem;pointer-events:none;">
-                        <i class="fas fa-folder-open"></i> Escolher Imagem
-                    </button>
+            <div class="stage" id="stage">
+                <div class="placeholder">
+                    <i class="fas fa-file-image"></i>
+                    <p>Nenhuma foto ainda</p>
                 </div>
+                <canvas id="res-canvas"></canvas>
+                <canvas id="corner-cv"></canvas>
             </div>
 
             <div id="rev-sec" style="display:none">
-                <div class="filters">
-                    <button data-f="color" class="active">Colorido</button>
+                <div class="filtros">
+                    <button data-f="color" class="ativo">Colorido</button>
                     <button data-f="enhanced">Realçado</button>
                     <button data-f="document">Documento</button>
                 </div>
-                <div class="actions">
-                    <button id="btn-rot" class="o"><i class="fas fa-undo"></i> Girar</button>
-                    <button id="btn-corn" class="corn"><i class="fas fa-vector-square"></i> Ajustar Cantos</button>
-                    <button id="btn-cancel" class="x"><i class="fas fa-times"></i> Refazer</button>
-                    <button id="btn-ok" class="p"><i class="fas fa-check"></i> Confirmar</button>
+                <div class="acoes">
+                    <button id="btn-rot" class="out"><i class="fas fa-undo"></i> Girar</button>
+                    <button id="btn-corn" class="per"><i class="fas fa-vector-square"></i> Ajustar Cantos</button>
+                    <button id="btn-nova" class="out"><i class="fas fa-camera"></i> Nova Foto</button>
                 </div>
             </div>
         </section>
 
         <div class="share-wrap">
             <button id="btn-share" class="share-btn" disabled>
-                <i class="fab fa-whatsapp"></i> Compartilhar PDF no WhatsApp
+                <i class="fab fa-whatsapp"></i> Compartilhar PDF
             </button>
         </div>
     </main>
@@ -286,7 +219,9 @@
         <div style="margin-top:50px;border-top:1px solid #ddd;padding-top:10px;font-size:12px;color:#64748b;text-align:center;">Documento gerado automaticamente pela Área do Promotor Qdelícia Frutas.</div>
     </div>
 
-    <input type="file" id="up-input" accept="image/*">
+    <input type="file" id="input-foto" accept="image/*" capture="environment">
+    <input type="file" id="input-galeria" accept="image/*">
+
     <footer><p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p></footer>
 
     <script src="notifications.js"></script>
@@ -296,28 +231,19 @@
 
         const $ = id => document.getElementById(id);
         const sR = $('sel-rede'), sL = $('sel-loja'), sT = $('sel-tipo');
-        const vid = $('video'), resC = $('res-canvas'), ovC = $('ov-canvas'), corC = $('corner-cv');
-        const stage = $('stage'), guide = $('frame-guide');
-        const bFlash = $('btn-flash'), bCap = $('btn-cap'), bRetake = $('btn-retake');
-        const bCam = $('src-cam'), bUp = $('src-up');
-        const bCap2 = $('btn-cap'), bShare = $('btn-share');
-        const camSec = $('cam-sec'), upSec = $('up-sec'), revSec = $('rev-sec');
-        const bCancel = $('btn-cancel'), bOk = $('btn-ok');
-        const bRot = $('btn-rot'), bCorn = $('btn-corn');
+        const resC = $('res-canvas'), corC = $('corner-cv');
+        const stage = $('stage'), revSec = $('rev-sec');
+        const bRot = $('btn-rot'), bCorn = $('btn-corn'), bNova = $('btn-nova'), bShare = $('btn-share');
+        const bFoto = $('btn-foto'), bGaleria = $('btn-galeria');
+        const iFoto = $('input-foto'), iGaleria = $('input-galeria');
         const fBtns = document.querySelectorAll('[data-f]');
-        const zI = $('zoom-in'), zO = $('zoom-out'), zL = $('zoom-lbl');
         const sp = $('spinner'), spT = $('spinner-txt');
-        const upArea = $('up-area'), upInput = $('up-input');
 
-        let stream = null, flash = false, zoom = 1;
         let promo = null;
         let rawData = null, procUrl = null, procBlob = null;
         let iW = 0, iH = 0, angle = 0;
         let filter = 'color';
-        let isCam = true;
         let cMode = false, cPts = [], dI = -1;
-        let ovW = 0, ovH = 0;
-        let detectTimer = null;
 
         function spOn(t) { spT.textContent = t || 'Processando...'; sp.classList.add('on'); }
         function spOff() { sp.classList.remove('on'); }
@@ -329,7 +255,7 @@
         Object.keys(APP_DATA).forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; sR.appendChild(o); });
         sR.addEventListener('change', () => {
             const r = sR.value; sL.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
-            $('welcome-banner').style.display = 'none'; promo = null;
+            promo = null;
             if (r && APP_DATA[r]) {
                 const ls = [];
                 for (const p in APP_DATA[r]) APP_DATA[r][p].forEach(l => { if (!ls.includes(l)) ls.push(l); });
@@ -337,10 +263,7 @@
                 sL.disabled = false;
             } else sL.disabled = true;
         });
-        sL.addEventListener('change', () => {
-            const p = findP(sR.value, sL.value); promo = p;
-            if (p) { $('welcome-txt').textContent = 'Bem-vindo, ' + pFull(p) + '!'; $('welcome-banner').style.display = 'flex'; }
-        });
+        sL.addEventListener('change', () => { promo = findP(sR.value, sL.value); });
 
         function loadCV() {
             return new Promise((resolve, reject) => {
@@ -353,122 +276,31 @@
         }
 
         function orderP(pts) {
-            let r = [[0,0],[0,0],[0,0],[0,0]], sm = Infinity, sM = -Infinity, dm = Infinity, dM = -Infinity;
-            for (const p of pts) { const s = p[0]+p[1], d = p[0]-p[1]; if (s<sm) { sm=s; r[0]=p; } if (s>sM) { sM=s; r[2]=p; } if (d<dm) { dm=d; r[3]=p; } if (d>dM) { dM=d; r[1]=p; } }
+            let r = [[0,0],[0,0],[0,0],[0,0]], sm=Infinity, sM=-Infinity, dm=Infinity, dM=-Infinity;
+            for (const p of pts) { const s=p[0]+p[1], d=p[0]-p[1]; if(s<sm){sm=s;r[0]=p;} if(s>sM){sM=s;r[2]=p;} if(d<dm){dm=d;r[3]=p;} if(d>dM){dM=d;r[1]=p;} }
             return r;
         }
 
-        async function startCam() {
-            if (stream) { stream.getTracks().forEach(t => t.stop()); }
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: { ideal: 4096 }, height: { ideal: 3072 } },
-                    audio: false
-                });
-                vid.srcObject = stream;
-                await vid.play();
-                stage.classList.remove('has-result');
-                guide.style.display = 'block'; ovC.style.display = 'block';
-                bCap.style.display = 'inline-flex'; bRetake.style.display = 'none';
-                revSec.style.display = 'none'; corC.style.display = 'none';
+        function carregarImagem(url) {
+            const img = new Image();
+            img.onload = () => {
+                resC.width = img.naturalWidth;
+                resC.height = img.naturalHeight;
+                resC.getContext('2d').drawImage(img, 0, 0);
+                rawData = resC.getContext('2d').getImageData(0, 0, img.naturalWidth, img.naturalHeight);
+                iW = img.naturalWidth; iH = img.naturalHeight; angle = 0;
+                stage.classList.add('has-img');
+                revSec.style.display = 'block';
+                cMode = false; corC.style.display = 'none'; bCorn.classList.remove('ativo');
                 bShare.disabled = true;
-                startDetect();
-            } catch(e) { alert('Erro câmera: ' + e.message); }
+                processar();
+            };
+            img.src = url;
         }
 
-        function stopCam() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
-
-        async function setZ(v) {
-            if (!stream) return;
-            const t = stream.getVideoTracks()[0]; if (!t) return;
-            const cap = t.getCapabilities && t.getCapabilities();
-            if (!cap || !cap.zoom) return;
-            v = Math.max(cap.zoom.min||1, Math.min(cap.zoom.max||1, v));
-            try { await t.applyConstraints({ advanced: [{ zoom: v }] }); zoom = v; zL.textContent = v.toFixed(1) + 'x'; } catch(e) {}
-        }
-        zI.addEventListener('click', () => setZ(zoom + .5));
-        zO.addEventListener('click', () => setZ(zoom - .5));
-
-        bFlash.addEventListener('click', async () => {
-            if (!stream) return;
-            const t = stream.getVideoTracks()[0]; if (!t) return;
-            const cap = t.getCapabilities && t.getCapabilities();
-            if (!cap || !cap.torch) { alert('Flash não disponível.'); return; }
-            flash = !flash;
-            try { await t.applyConstraints({ advanced: [{ torch: flash }] }); bFlash.classList.toggle('on', flash); } catch(e) {}
-        });
-
-        function startDetect() { stopDetect(); detectTimer = setInterval(detect, 500); }
-        function stopDetect() { if (detectTimer) { clearInterval(detectTimer); detectTimer = null; } }
-
-        function detect() {
-            if (!stream || stage.classList.contains('has-result') || !vid.videoWidth) return;
-            if (!window.cv || !cv.Mat) { guide.classList.remove('detected'); return; }
-            const vw = vid.videoWidth, vh = vid.videoHeight;
-            const sc = Math.min(400 / vw, 400 / vh);
-            const sw = Math.round(vw * sc), sh = Math.round(vh * sc);
-            const tC = document.createElement('canvas'); tC.width = sw; tC.height = sh;
-            tC.getContext('2d').drawImage(vid, 0, 0, sw, sh);
-            const src = cv.matFromImageData(tC.getContext('2d').getImageData(0, 0, sw, sh));
-            const g = new cv.Mat(), e = new cv.Mat(), ct = new cv.MatVector(), h = new cv.Mat();
-            try {
-                cv.cvtColor(src, g, cv.COLOR_RGBA2GRAY);
-                cv.GaussianBlur(g, g, new cv.Size(5,5), 0);
-                cv.Canny(g, e, 50, 150);
-                cv.findContours(e, ct, h, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-                let mA = 0, best = null;
-                for (let i = 0; i < ct.size(); i++) {
-                    const c = ct.get(i); const a = cv.contourArea(c);
-                    if (a > mA && a > sw*sh*.08) {
-                        const per = cv.arcLength(c, true); const ap = new cv.Mat();
-                        cv.approxPolyDP(c, ap, .02*per, true);
-                        if (ap.rows === 4) { if (best) best.delete(); mA = a; best = ap; } else ap.delete();
-                    }
-                }
-                const st = stage.getBoundingClientRect();
-                ovC.width = st.width; ovC.height = st.height;
-                const ctx = ovC.getContext('2d'); ctx.clearRect(0, 0, ovC.width, ovC.height);
-                const sx = ovC.width/sw, sy = ovC.height/sh;
-                if (best) {
-                    const pts = [];
-                    for (let i = 0; i < 4; i++) pts.push([best.data32S[i*2]*sx, best.data32S[i*2+1]*sy]);
-                    const ord = orderP(pts);
-                    ctx.strokeStyle = '#10b981'; ctx.lineWidth = 3;
-                    ctx.beginPath(); ctx.moveTo(ord[0][0], ord[0][1]);
-                    for (let i = 1; i < 4; i++) ctx.lineTo(ord[i][0], ord[i][1]); ctx.closePath(); ctx.stroke();
-                    ctx.fillStyle = 'rgba(16,185,129,.1)'; ctx.fill();
-                    for (const p of ord) {
-                        ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(p[0], p[1], 5, 0, Math.PI*2); ctx.fill();
-                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
-                    }
-                    guide.classList.add('detected');
-                    best.delete();
-                } else { guide.classList.remove('detected'); }
-            } finally { src.delete(); g.delete(); e.delete(); ct.delete(); h.delete(); }
-        }
-
-        function doCap() {
-            if (!stream) return;
-            const tr = stream.getVideoTracks()[0]; if (!tr) return;
-            const s = tr.getSettings();
-            const w = s.width || 1920, h = s.height || 1080;
-            resC.width = w; resC.height = h;
-            resC.getContext('2d').drawImage(vid, 0, 0, w, h);
-            rawData = resC.getContext('2d').getImageData(0, 0, w, h);
-            iW = w; iH = h;
-            stopDetect(); stopCam();
-            stage.classList.add('has-result'); guide.style.display = 'none'; ovC.style.display = 'none';
-            bCap.style.display = 'none'; bRetake.style.display = 'inline-flex';
-            revSec.style.display = 'block'; angle = 0; cMode = false; corC.style.display = 'none';
-            bCorn.classList.remove('on');
-            procDoc();
-        }
-
-        bCap.addEventListener('click', doCap);
-
-        function procDoc() {
+        function processar() {
             if (!rawData) return;
-            spOn('Processando...');
+            spOn('Detectando documento...');
             setTimeout(() => {
                 try {
                     if (!window.cv || !cv.Mat) { spOff(); return; }
@@ -484,8 +316,8 @@
                         for (let i = 0; i < ct.size(); i++) {
                             const c = ct.get(i); const a = cv.contourArea(c);
                             if (a > mA && a > w*h*.08) {
-                                const per = cv.arcLength(c, true); const ap = new cv.Mat();
-                                cv.approxPolyDP(c, ap, .02*per, true);
+                                const pr = cv.arcLength(c, true); const ap = new cv.Mat();
+                                cv.approxPolyDP(c, ap, .02*pr, true);
                                 if (ap.rows === 4 && cv.isContourConvex(ap)) { mA = a; if (doc) doc.delete(); doc = ap; } else ap.delete();
                             }
                         }
@@ -493,8 +325,8 @@
                             const pts = [];
                             for (let i = 0; i < 4; i++) pts.push([doc.data32S[i*2], doc.data32S[i*2+1]]);
                             const ord = orderP(pts);
-                            const dw = Math.max(Math.hypot(ord[1][0]-ord[0][0], ord[1][1]-ord[0][1]), Math.hypot(ord[2][0]-ord[3][0], ord[2][1]-ord[3][1]));
-                            const dh = Math.max(Math.hypot(ord[3][0]-ord[0][0], ord[3][1]-ord[0][1]), Math.hypot(ord[2][0]-ord[1][0], ord[2][1]-ord[1][1]));
+                            const dw = Math.max(Math.hypot(ord[1][0]-ord[0][0],ord[1][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[3][0],ord[2][1]-ord[3][1]));
+                            const dh = Math.max(Math.hypot(ord[3][0]-ord[0][0],ord[3][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[1][0],ord[2][1]-ord[1][1]));
                             const sM = cv.matFromArray(4,1,cv.CV_32FC2,[ord[0][0],ord[0][1],ord[1][0],ord[1][1],ord[2][0],ord[2][1],ord[3][0],ord[3][1]]);
                             const dM = cv.matFromArray(4,1,cv.CV_32FC2,[0,0,dw-1,0,dw-1,dh-1,0,dh-1]);
                             const M = cv.getPerspectiveTransform(sM, dM);
@@ -510,30 +342,50 @@
                             rawData = resC.getContext('2d').getImageData(0, 0, w, h);
                         }
                     } finally { g.delete(); e.delete(); ct.delete(); hier.delete(); src.delete(); }
-                    applyFil(filter);
+                    aplicarFiltro(filter);
                     spOff();
                 } catch(e) { spOff(); console.error(e); }
-            }, 50);
+            }, 100);
         }
 
-        bRetake.addEventListener('click', () => {
-            stage.classList.remove('has-result'); guide.style.display = 'block'; ovC.style.display = 'block';
-            bCap.style.display = 'inline-flex'; bRetake.style.display = 'none';
-            revSec.style.display = 'none'; cMode = false; corC.style.display = 'none';
-            bShare.disabled = true; procUrl = null; procBlob = null; rawData = null; angle = 0;
-            startCam();
+        // === Entrada: câmera nativa ou galeria ===
+        bFoto.addEventListener('click', () => iFoto.click());
+        bGaleria.addEventListener('click', () => iGaleria.click());
+
+        iFoto.addEventListener('change', e => {
+            const f = e.target.files[0]; if (!f) return;
+            const r = new FileReader();
+            r.onload = ev => carregarImagem(ev.target.result);
+            r.readAsDataURL(f);
+            iFoto.value = '';
         });
 
+        iGaleria.addEventListener('change', e => {
+            const f = e.target.files[0]; if (!f) return;
+            const r = new FileReader();
+            r.onload = ev => carregarImagem(ev.target.result);
+            r.readAsDataURL(f);
+            iGaleria.value = '';
+        });
+
+        bNova.addEventListener('click', () => {
+            stage.classList.remove('has-img');
+            revSec.style.display = 'none';
+            bShare.disabled = true;
+            procUrl = null; procBlob = null; rawData = null;
+        });
+
+        // === Filtros ===
         fBtns.forEach(b => b.addEventListener('click', () => {
             if (!rawData) return;
-            cMode = false; corC.style.display = 'none'; bCorn.classList.remove('on');
-            fBtns.forEach(x => x.classList.remove('active')); b.classList.add('active');
+            cMode = false; corC.style.display = 'none'; bCorn.classList.remove('ativo');
+            fBtns.forEach(x => x.classList.remove('ativo')); b.classList.add('ativo');
             filter = b.dataset.f;
-            applyFil(filter);
+            aplicarFiltro(filter);
         }));
 
-        function applyFil(f) {
-            if (!rawData || !window.cv || !cv.Mat) { if (rawData) resC.getContext('2d').putImageData(rawData, 0, 0); return; }
+        function aplicarFiltro(f) {
+            if (!rawData || !window.cv || !cv.Mat) { if (rawData) { resC.getContext('2d').putImageData(rawData, 0, 0); salvar(); } return; }
             const src = cv.matFromImageData(rawData);
             const g = new cv.Mat(), r = new cv.Mat();
             try {
@@ -553,22 +405,16 @@
                 iW = resC.width; iH = resC.height;
                 out.delete();
             } finally { src.delete(); g.delete(); r.delete(); }
-            saveRes();
+            salvar();
         }
 
-        function saveRes() {
+        function salvar() {
             procUrl = resC.toDataURL('image/jpeg', 0.95);
             resC.toBlob(b => { procBlob = b; }, 'image/jpeg', 0.95);
             bShare.disabled = false;
         }
 
-        bOk.addEventListener('click', () => {
-            cMode = false; corC.style.display = 'none'; bCorn.classList.remove('on');
-            saveRes();
-        });
-
-        bCancel.addEventListener('click', () => { if (isCam) bRetake.click(); else resetUp(); });
-
+        // === Girar ===
         bRot.addEventListener('click', () => {
             if (!rawData) return;
             angle = (angle - 90) % 360;
@@ -582,27 +428,27 @@
             resC.getContext('2d').drawImage(c, 0, 0);
             rawData = resC.getContext('2d').getImageData(0, 0, h, w);
             iW = h; iH = w;
-            saveRes();
+            salvar();
         });
 
-        // === Corners ===
+        // === Cantos ===
         bCorn.addEventListener('click', () => {
             if (!rawData) return;
             cMode = !cMode;
             corC.style.display = cMode ? 'block' : 'none';
-            bCorn.classList.toggle('on', cMode);
-            if (cMode) initCorn();
+            bCorn.classList.toggle('ativo', cMode);
+            if (cMode) iniciarCantos();
         });
 
-        function initCorn() {
+        function iniciarCantos() {
             const r = stage.getBoundingClientRect();
             corC.width = r.width; corC.height = r.height;
             const m = 20;
             cPts = [[m,m],[r.width-m,m],[r.width-m,r.height-m],[m,r.height-m]];
-            drawCorn(); setupDrag();
+            desenharCantos(); configurarArrasto();
         }
 
-        function drawCorn() {
+        function desenharCantos() {
             const ctx = corC.getContext('2d');
             ctx.clearRect(0,0,corC.width,corC.height);
             if (cPts.length===4) {
@@ -612,22 +458,23 @@
                 ctx.fillStyle='rgba(99,102,241,.08)'; ctx.fill();
             }
             for(let i=0;i<cPts.length;i++) {
-                ctx.fillStyle='#6366f1'; ctx.beginPath(); ctx.arc(cPts[i][0],cPts[i][1],12,0,Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(cPts[i][0],cPts[i][1],12,0,Math.PI*2);
+                ctx.fillStyle='#6366f1'; ctx.fill();
                 ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
                 ctx.fillStyle='#fff'; ctx.font='bold 13px Inter'; ctx.textAlign='center'; ctx.textBaseline='middle';
                 ctx.fillText(i+1,cPts[i][0],cPts[i][1]);
             }
         }
 
-        function setupDrag() {
+        function configurarArrasto() {
             const gp = e => { const r = corC.getBoundingClientRect(); return [(e.clientX||(e.touches&&e.touches[0].clientX))-r.left,(e.clientY||(e.touches&&e.touches[0].clientY))-r.top]; };
             corC.onmousedown = corC.ontouchstart = e => { e.preventDefault(); const [x,y]=gp(e); for(let i=0;i<cPts.length;i++){if(Math.hypot(x-cPts[i][0],y-cPts[i][1])<24){dI=i;return;}} };
-            const mv = e => { if(dI<0)return; e.preventDefault(); const [x,y]=gp(e); cPts[dI]=[x,y]; drawCorn(); };
-            const up = () => { if(dI>=0){dI=-1;applyCornPersp();} };
+            const mv = e => { if(dI<0)return; e.preventDefault(); const [x,y]=gp(e); cPts[dI]=[x,y]; desenharCantos(); };
+            const up = () => { if(dI>=0){dI=-1;aplicarPerspCantos();} };
             corC.onmousemove=mv; corC.ontouchmove=mv; corC.onmouseup=up; corC.ontouchend=up; corC.onmouseleave=up;
         }
 
-        function applyCornPersp() {
+        function aplicarPerspCantos() {
             if (!rawData||!window.cv||!cv.Mat) return;
             const src = cv.matFromImageData(rawData);
             const rw = rawData.width, rh = rawData.height;
@@ -644,73 +491,30 @@
             try {
                 cv.cvtColor(src, g, cv.COLOR_RGBA2GRAY);
                 if (filter === 'document') {
-                    const clahe = new cv.CLAHE(2, new cv.Size(8,8)); const cl = new cv.Mat();
-                    clahe.apply(g, cl); cv.adaptiveThreshold(cl, r, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, 6);
+                    const clahe = new cv.CLAHE(2,new cv.Size(8,8)); const cl = new cv.Mat();
+                    clahe.apply(g,cl); cv.adaptiveThreshold(cl,r,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,cv.THRESH_BINARY,15,6);
                     cl.delete(); clahe.delete();
                 } else if (filter === 'enhanced') {
-                    const clahe = new cv.CLAHE(3, new cv.Size(8,8));
-                    clahe.apply(g, r); clahe.delete();
+                    const clahe = new cv.CLAHE(3,new cv.Size(8,8));
+                    clahe.apply(g,r); clahe.delete();
                 } else { g.copyTo(r); }
-                const out = new cv.Mat(); cv.cvtColor(r, out, cv.COLOR_GRAY2RGBA);
+                const out = new cv.Mat(); cv.cvtColor(r,out,cv.COLOR_GRAY2RGBA);
                 const warp = new cv.Mat();
-                cv.warpPerspective(out, warp, M, new cv.Size(dw, dh));
-                cv.imshow(resC, warp);
+                cv.warpPerspective(out,warp,M,new cv.Size(dw,dh));
+                cv.imshow(resC,warp);
                 rawData = resC.getContext('2d').getImageData(0,0,dw,dh);
                 iW = dw; iH = dh;
                 sM.delete(); dM.delete(); M.delete(); warp.delete(); out.delete();
-                saveRes();
+                salvar();
             } finally { src.delete(); g.delete(); r.delete(); }
         }
 
-        // === Source switching ===
-        bCam.addEventListener('click', () => {
-            bCam.classList.add('active'); bUp.classList.remove('active');
-            isCam = true; upSec.style.display = 'none'; camSec.style.display = 'block';
-            revSec.style.display = 'none'; bShare.disabled = true;
-            startCam();
-        });
-        bUp.addEventListener('click', () => {
-            bCam.classList.remove('active'); bUp.classList.add('active');
-            isCam = false; stopDetect(); stopCam();
-            camSec.style.display = 'none'; upSec.style.display = 'block';
-            revSec.style.display = 'none'; bShare.disabled = true;
-        });
-
-        upArea.addEventListener('click', () => upInput.click());
-        upInput.addEventListener('change', e => {
-            const f = e.target.files[0]; if (!f) return;
-            const r = new FileReader();
-            r.onload = ev => {
-                const img = new Image();
-                img.onload = () => {
-                    resC.width = img.width; resC.height = img.height;
-                    resC.getContext('2d').drawImage(img, 0, 0);
-                    rawData = resC.getContext('2d').getImageData(0, 0, img.width, img.height);
-                    iW = img.width; iH = img.height; angle = 0;
-                    stage.classList.add('has-result'); guide.style.display = 'none';
-                    bRetake.style.display = 'inline-flex'; revSec.style.display = 'block'; upSec.style.display = 'none';
-                    cMode = false; corC.style.display = 'none';
-                    procDoc();
-                };
-                img.src = ev.target.result;
-            };
-            r.readAsDataURL(f);
-        });
-
-        function resetUp() {
-            stage.classList.remove('has-result'); guide.style.display = 'block';
-            bCap.style.display = 'inline-flex'; bRetake.style.display = 'none';
-            revSec.style.display = 'none'; corC.style.display = 'none';
-            bShare.disabled = true; procUrl = null; procBlob = null; rawData = null;
-            bUp.click();
-        }
-
-        // === Share ===
+        // === Compartilhar PDF ===
         function getData() { return { rede:sR.value, loja:sL.value, promotor:promo||'', tipo:sT.value, date:new Date().toLocaleDateString('pt-BR') }; }
 
         bShare.addEventListener('click', async () => {
             if (!sL.value || !sT.value) { alert('Preencha todos os dados.'); return; }
-            if (!procUrl) { if (rawData) { saveRes(); await new Promise(r => setTimeout(r, 300)); } else { alert('Capture um documento.'); return; } }
+            if (!procUrl) { salvar(); await new Promise(r => setTimeout(r, 300)); }
             const data = getData();
             const pdf = $('pdf-content'); pdf.style.display = 'block';
             $('pdf-data').textContent = data.date;
@@ -721,7 +525,7 @@
             const ic = $('pdf-img-wrap'); ic.innerHTML = '';
             const im = document.createElement('img'); im.src = procUrl;
             im.className = 'pdf-img'; im.style.maxWidth = '100%'; im.style.maxHeight = '700px'; ic.appendChild(im);
-            const fn = `${data.tipo.replace(/\s+/g, '_')}_${data.loja}.pdf`;
+            const fn = `${data.tipo.replace(/\s+/g,'_')}_${data.loja}.pdf`;
             try {
                 spOn('Gerando PDF...');
                 const blob = await html2pdf().set({ margin:10, filename:fn, image:{type:'jpeg',quality:.95}, html2canvas:{scale:2,useCORS:true,logging:false}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} }).from(pdf).output('blob');
@@ -738,8 +542,7 @@
             } catch(err) { spOff(); if (err.name !== 'AbortError') { console.error(err); alert('Erro ao gerar PDF.'); } pdf.style.display = 'none'; }
         });
 
-        loadCV().then(startCam).catch(() => { console.warn('OpenCV fallback'); startCam(); });
-        window.addEventListener('beforeunload', stopCam);
+        loadCV().catch(() => console.warn('OpenCV não carregou'));
     </script>
 </body>
 </html>
