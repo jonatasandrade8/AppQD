@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Scanner de Documentos - Qdelícia Frutas">
+    <title>Scanner - Qdelícia Frutas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .welcome-banner {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            animation: slideIn 0.4s ease;
+        }
+        .welcome-banner i { font-size: 1.2rem; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .scanner-container {
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .scanner-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .scanner-form .input-group { margin: 0; }
+        @media (max-width: 600px) {
+            .scanner-form { grid-template-columns: 1fr; }
+        }
+        .scanner-preview {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            background: #000;
+            aspect-ratio: 3/4;
+        }
+        .scanner-preview video,
+        .scanner-preview canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .scanner-preview canvas { display: none; }
+        .scanner-preview.scanned canvas { display: block; }
+        .scanner-preview.scanned video { display: none; }
+        .frame-overlay {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            border: 3px dashed rgba(255,255,255,0.7);
+            border-radius: 8px;
+            pointer-events: none;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.3);
+            z-index: 2;
+            transition: border-color 0.3s;
+        }
+        .frame-overlay.detected {
+            border-color: #10b981;
+            border-style: solid;
+        }
+        .frame-corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-color: #fff;
+            border-style: solid;
+        }
+        .frame-corner.tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; border-radius: 8px 0 0 0; }
+        .frame-corner.tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; border-radius: 0 8px 0 0; }
+        .frame-corner.bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; border-radius: 0 0 0 8px; }
+        .frame-corner.br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; border-radius: 0 0 8px 0; }
+        .scanner-toolbar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .scanner-toolbar button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+        }
+        .scanner-toolbar button:active { transform: scale(0.92); }
+        .scanner-toolbar button.btn-secondary { background: var(--text-muted); }
+        .scanner-toolbar button.btn-danger { background: #e11d48; }
+        .scanner-toolbar button.flash-on { background: #f59e0b; }
+        .scanner-toolbar button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ocr-result {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            border: 1px solid #e2e8f0;
+            min-height: 60px;
+        }
+        .ocr-result.empty { color: var(--text-muted); font-style: italic; }
+        .share-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .btn-share {
+            border: none;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        .btn-whatsapp { background-color: #25d366; }
+        .btn-pdf { background-color: #e11d48; }
+        .btn-share:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+        #pdf-content {
+            display: none;
+            padding: 40px;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+        .pdf-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #6366f1;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .pdf-logo { width: 100px; }
+        .pdf-info {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .pdf-info p { margin: 8px 0; font-size: 14px; }
+        .pdf-page-break {
+            page-break-after: always;
+            border-bottom: 2px dashed #e2e8f0;
+            margin: 30px 0;
+            padding-bottom: 20px;
+        }
+        .pdf-ocr-text {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            font-size: 13px;
+            line-height: 1.6;
+            border: 1px solid #e2e8f0;
+        }
+        .pdf-doc-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .spinner-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        }
+        .spinner-overlay.active { display: flex; }
+        .spinner-box {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .spinner-box .spinner {
+            width: 48px; height: 48px;
+            border: 5px solid #e2e8f0;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner-box p { margin: 0; color: var(--text-muted); font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="menu-overlay"></div>
+    <aside class="side-menu">
+        <a href="index.html"><i class="fas fa-home"></i> <span class="link-text">Início</span></a>
+        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> <span class="link-text">Estoque</span></a>
+        <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
+        <a href="scanner-documento.html" class="active"><i class="fas fa-file-alt"></i> <span class="link-text">Scanner</span></a>
+        <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
+        <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
+        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span class="link-text">Solicitações</span></a>
+        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span></a>
+    </aside>
+
+    <header id="cabecalho-principal">
+        <button class="menu-toggle" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
+        </button>
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+        </div>
+        <h1>Qdelícia Frutas</h1>
+        <p>Scanner de Documentos</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="camera.html">Câmera</a>
+        <a href="scanner-documento.html" class="active">Scanner</a>
+        <a href="materiais.html">Materiais</a>
+        <a href="pedido.html">Sugestão</a>
+        <a href="solicitacoes.html">Solicitações</a>
+        <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
+    </nav>
+
+    <main class="scanner-container">
+        <section class="glass-section">
+            <h2><i class="fas fa-info-circle"></i> Dados do Documento</h2>
+
+            <div id="welcome-message" class="welcome-banner" style="display:none;">
+                <i class="fas fa-user-check"></i>
+                <span id="welcome-text"></span>
+            </div>
+
+            <div class="scanner-form">
+                <div class="input-group">
+                    <label for="rede"><i class="fas fa-store"></i> Rede</label>
+                    <select id="rede" class="report-input">
+                        <option value="" disabled selected>Selecione a Rede</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="loja"><i class="fas fa-shopping-cart"></i> Loja</label>
+                    <select id="loja" class="report-input" disabled>
+                        <option value="" disabled selected>Selecione a Loja</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="tipo-documento"><i class="fas fa-tag"></i> Tipo de Documento</label>
+                    <select id="tipo-documento" class="report-input">
+                        <option value="" disabled selected>Selecione o Tipo</option>
+                        <option value="Nota de Falta">Nota de Falta</option>
+                        <option value="Nota de Devolução">Nota de Devolução</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-section">
+            <h2><i class="fas fa-camera"></i> Scanner</h2>
+
+            <div class="scanner-preview" id="scanner-preview">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+                <div class="frame-overlay" id="frame-overlay">
+                    <div class="frame-corner tl"></div>
+                    <div class="frame-corner tr"></div>
+                    <div class="frame-corner bl"></div>
+                    <div class="frame-corner br"></div>
+                </div>
+            </div>
+
+            <div class="scanner-toolbar" id="scanner-toolbar">
+                <button id="btn-flash" class="btn-secondary" title="Flash"><i class="fas fa-bolt"></i></button>
+                <button id="btn-capture" title="Capturar"><i class="fas fa-camera"></i></button>
+                <button id="btn-enhance" class="btn-secondary" title="Melhorar Qualidade"><i class="fas fa-magic"></i></button>
+                <button id="btn-ocr" class="btn-secondary" title="Ler Texto (OCR)"><i class="fas fa-font"></i></button>
+                <button id="btn-retake" class="btn-secondary" title="Refazer" style="display:none;"><i class="fas fa-redo"></i></button>
+            </div>
+
+            <div class="ocr-result empty" id="ocr-result">
+                <i class="fas fa-info-circle"></i> Clique em <strong>OCR</strong> após capturar para extrair o texto do documento.
+            </div>
+        </section>
+
+        <div class="share-buttons">
+            <button id="share-whatsapp" class="btn-share btn-whatsapp" disabled>
+                <i class="fab fa-whatsapp"></i> Compartilhar no WhatsApp
+            </button>
+            <button id="share-pdf" class="btn-share btn-pdf" disabled>
+                <i class="fas fa-share-nodes"></i> Compartilhar PDF
+            </button>
+        </div>
+    </main>
+
+    <div id="spinner-overlay" class="spinner-overlay">
+        <div class="spinner-box">
+            <div class="spinner"></div>
+            <p id="spinner-text">Processando...</p>
+        </div>
+    </div>
+
+    <div id="pdf-content">
+        <div class="pdf-header">
+            <img src="./images/logo-qdelicia.png" alt="Logo" class="pdf-logo">
+            <div>
+                <h1 style="color:#6366f1;margin:0;">Qdelícia Frutas</h1>
+                <p style="margin:0;text-align:right;color:#64748b;">Documento Digitalizado</p>
+            </div>
+        </div>
+        <div class="pdf-info">
+            <p><strong>Data:</strong> <span id="pdf-data"></span></p>
+            <p><strong>Rede:</strong> <span id="pdf-rede"></span></p>
+            <p><strong>Loja:</strong> <span id="pdf-loja"></span></p>
+            <p><strong>Promotor:</strong> <span id="pdf-promotor"></span></p>
+            <p><strong>Tipo de Documento:</strong> <span id="pdf-tipo"></span></p>
+        </div>
+        <div id="pdf-image-container" style="text-align:center;margin-bottom:20px;"></div>
+        <h3 style="color:#6366f1;">Texto Extraído (OCR)</h3>
+        <div class="pdf-ocr-text" id="pdf-ocr-text"><em>Nenhum texto extraído.</em></div>
+        <div style="margin-top:50px;border-top:1px solid #ddd;padding-top:10px;font-size:12px;color:#64748b;text-align:center;">
+            Documento gerado automaticamente pela Área do Promotor Qdelícia Frutas.
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="notifications.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const APP_DATA = {
+            "Atacadão": {
+                "Vivian": ["BR - Zona Sul"],
+                "Nilson": ["Parnamirim"],
+                "Inácio": ["Prudente"],
+                "Amarildo": ["Zona Norte"]
+            },
+            "Assaí": {
+                "Reginaldo": ["Zona Sul"],
+                "Erivan": ["Maria Lacerda"],
+                "Miqueias": ["Ponta Negra"],
+                "Cosme": ["Zona Norte"]
+            },
+            "Nordestão": {
+                "J Mauricio": ["Loja 03"],
+                "Mateus": ["Loja 04"],
+                "Amarildo": ["Loja 05"],
+                "Markson": ["Loja 08"],
+                "Cristiane":["Loja 07"]
+            },
+            "Carrefour": {
+                "Mateus": ["Zona Sul"]
+            },
+            "Superfácil": {
+                "Neto": ["Emaús"],
+                "Milagres": ["Nazaré"]
+            },
+            "Mar Vermelho": {
+                "Markson": ["Natal", "Parnamirim"]
+            }
+        };
+
+        const $ = id => document.getElementById(id);
+        const selectRede = $('rede');
+        const selectLoja = $('loja');
+        const selectTipo = $('tipo-documento');
+        const video = $('video');
+        const canvas = $('canvas');
+        const preview = $('scanner-preview');
+        const frameOverlay = $('frame-overlay');
+        const btnFlash = $('btn-flash');
+        const btnCapture = $('btn-capture');
+        const btnEnhance = $('btn-enhance');
+        const btnOcr = $('btn-ocr');
+        const btnRetake = $('btn-retake');
+        const ocrResult = $('ocr-result');
+        const shareWpp = $('share-whatsapp');
+        const sharePdf = $('share-pdf');
+        const spinnerOverlay = $('spinner-overlay');
+        const spinnerText = $('spinner-text');
+
+        let currentStream = null;
+        let flashOn = false;
+        let capturedBlob = null;
+        let capturedDataUrl = null;
+        let enhancedDataUrl = null;
+        let ocrText = '';
+        let currentPromotor = null;
+
+        function findPromotor(rede, loja) {
+            if (!APP_DATA[rede]) return null;
+            for (const prom in APP_DATA[rede]) {
+                if (APP_DATA[rede][prom].includes(loja)) return prom;
+            }
+            return null;
+        }
+
+        function getPromotorFullName(nome) {
+            if (window.APP_CONFIG && window.APP_CONFIG.users) {
+                for (const key in window.APP_CONFIG.users) {
+                    if (window.APP_CONFIG.users[key].fullName === nome || key === nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")) {
+                        return window.APP_CONFIG.users[key].fullName;
+                    }
+                }
+            }
+            return nome;
+        }
+
+        selectRede.innerHTML = '<option value="" disabled selected>Selecione a Rede</option>';
+        Object.keys(APP_DATA).forEach(rede => {
+            const opt = document.createElement('option');
+            opt.value = rede; opt.textContent = rede;
+            selectRede.appendChild(opt);
+        });
+        selectRede.disabled = false;
+
+        selectRede.addEventListener('change', () => {
+            const rede = selectRede.value;
+            selectLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
+            $('welcome-message').style.display = 'none';
+            currentPromotor = null;
+            if (rede && APP_DATA[rede]) {
+                const allLojas = [];
+                for (const prom in APP_DATA[rede]) {
+                    APP_DATA[rede][prom].forEach(loja => { if (!allLojas.includes(loja)) allLojas.push(loja); });
+                }
+                allLojas.forEach(loja => {
+                    const opt = document.createElement('option');
+                    opt.value = loja; opt.textContent = loja;
+                    selectLoja.appendChild(opt);
+                });
+                selectLoja.disabled = false;
+            } else {
+                selectLoja.disabled = true;
+            }
+        });
+
+        selectLoja.addEventListener('change', () => {
+            const promotor = findPromotor(selectRede.value, selectLoja.value);
+            currentPromotor = promotor;
+            if (promotor) {
+                const fullName = getPromotorFullName(promotor);
+                $('welcome-text').textContent = `Bem-vindo, ${fullName}!`;
+                $('welcome-message').style.display = 'flex';
+            }
+        });
+
+        async function startCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(t => t.stop());
+            }
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    },
+                    audio: false
+                };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                currentStream = stream;
+                video.srcObject = stream;
+                await video.play();
+                preview.classList.remove('scanned');
+                frameOverlay.style.display = 'block';
+            } catch (err) {
+                alert('Erro ao acessar a câmera: ' + err.message);
+            }
+        }
+
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(t => t.stop());
+                currentStream = null;
+            }
+        }
+
+        btnFlash.addEventListener('click', async () => {
+            if (!currentStream) return;
+            const track = currentStream.getVideoTracks()[0];
+            if (!track) return;
+            const capabilities = track.getCapabilities && track.getCapabilities();
+            if (!capabilities || !capabilities.torch) {
+                alert('Flash não disponível neste dispositivo.');
+                return;
+            }
+            flashOn = !flashOn;
+            try {
+                await track.applyConstraints({ advanced: [{ torch: flashOn }] });
+                btnFlash.classList.toggle('flash-on', flashOn);
+            } catch (e) {
+                alert('Erro ao controlar o flash.');
+            }
+        });
+
+        function captureImage() {
+            if (!currentStream) return;
+            const track = currentStream.getVideoTracks()[0];
+            if (!track) return;
+            const cap = track.getCapabilities && track.getCapabilities();
+            let targetW = 1920, targetH = 1080;
+            if (cap && cap.width && cap.width.max) targetW = Math.min(cap.width.max, 1920);
+            if (cap && cap.height && cap.height.max) targetH = Math.min(cap.height.max, 1080);
+
+            const trackSettings = track.getSettings();
+            canvas.width = trackSettings.width || targetW;
+            canvas.height = trackSettings.height || targetH;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            capturedDataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+            canvas.toBlob(blob => {
+                capturedBlob = blob;
+                enhancedDataUrl = null;
+                ocrText = '';
+                ocrResult.innerHTML = '<i class="fas fa-info-circle"></i> Documento capturado. Clique em <strong>Melhorar</strong> para ajustar a qualidade ou <strong>OCR</strong> para extrair texto.';
+                ocrResult.className = 'ocr-result empty';
+                shareWpp.disabled = false;
+                sharePdf.disabled = false;
+                btnRetake.style.display = 'inline-flex';
+                preview.classList.add('scanned');
+                frameOverlay.style.display = 'none';
+            }, 'image/jpeg', 0.95);
+        }
+
+        btnCapture.addEventListener('click', captureImage);
+
+        btnRetake.addEventListener('click', () => {
+            preview.classList.remove('scanned');
+            frameOverlay.style.display = 'block';
+            capturedBlob = null;
+            capturedDataUrl = null;
+            enhancedDataUrl = null;
+            ocrText = '';
+            ocrResult.innerHTML = '<i class="fas fa-info-circle"></i> Clique em <strong>OCR</strong> após capturar para extrair o texto do documento.';
+            ocrResult.className = 'ocr-result empty';
+            shareWpp.disabled = true;
+            sharePdf.disabled = true;
+            btnRetake.style.display = 'none';
+        });
+
+        function enhanceImage(dataUrl) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const w = img.width, h = img.height;
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.filter = 'contrast(1.3) brightness(1.1) saturate(1.1)';
+                    ctx.drawImage(img, 0, 0);
+                    ctx.filter = 'none';
+
+                    const imageData = ctx.getImageData(0, 0, w, h);
+                    const data = imageData.data;
+                    const threshold = 200;
+                    for (let i = 0; i < data.length; i += 4) {
+                        const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        if (avg > threshold) {
+                            data[i] = 255; data[i + 1] = 255; data[i + 2] = 255;
+                        } else if (avg < 60) {
+                            data[i] = 0; data[i + 1] = 0; data[i + 2] = 0;
+                        }
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                    resolve(canvas.toDataURL('image/jpeg', 0.92));
+                };
+                img.src = dataUrl;
+            });
+        }
+
+        btnEnhance.addEventListener('click', async () => {
+            if (!capturedDataUrl) {
+                alert('Capture um documento primeiro.');
+                return;
+            }
+            showSpinner('Melhorando imagem...');
+            try {
+                enhancedDataUrl = await enhanceImage(capturedDataUrl);
+                const img = new Image();
+                img.onload = () => {
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width; canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    hideSpinner();
+                };
+                img.src = enhancedDataUrl;
+            } catch (e) {
+                hideSpinner();
+                alert('Erro ao melhorar imagem.');
+            }
+        });
+
+        async function loadTesseract() {
+            if (window.Tesseract) return;
+            await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        btnOcr.addEventListener('click', async () => {
+            const src = enhancedDataUrl || capturedDataUrl;
+            if (!src) {
+                alert('Capture um documento primeiro.');
+                return;
+            }
+            showSpinner('Carregando OCR...');
+            try {
+                await loadTesseract();
+                hideSpinner();
+                showSpinner('Reconhecendo texto...');
+
+                const result = await Tesseract.recognize(
+                    src,
+                    'por',
+                    {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                const pct = Math.round(m.progress * 100);
+                                spinnerText.textContent = `Reconhecendo texto... ${pct}%`;
+                            }
+                        }
+                    }
+                );
+                ocrText = result.data.text;
+                ocrResult.textContent = ocrText || '(Nenhum texto encontrado)';
+                ocrResult.className = 'ocr-result';
+                hideSpinner();
+
+                if (navigator.vibrate) navigator.vibrate(100);
+
+            } catch (e) {
+                hideSpinner();
+                ocrResult.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#e11d48;"></i> Erro no OCR: ' + e.message;
+                ocrResult.className = 'ocr-result empty';
+            }
+        });
+
+        function showSpinner(text) {
+            spinnerText.textContent = text || 'Processando...';
+            spinnerOverlay.classList.add('active');
+        }
+
+        function hideSpinner() {
+            spinnerOverlay.classList.remove('active');
+        }
+
+        shareWpp.addEventListener('click', () => {
+            if (!selectLoja.value || !selectTipo.value) {
+                alert('Preencha todos os dados do documento.');
+                return;
+            }
+            const data = getDocData();
+            let msg = `*${data.tipo} - QDELÍCIA FRUTAS*\n`;
+            msg += `---------------------------------------\n`;
+            msg += `*Data:* ${data.date}\n`;
+            msg += `*Rede:* ${data.rede}\n`;
+            msg += `*Loja:* ${data.loja}\n`;
+            msg += `*Promotor:* ${data.promotor}\n`;
+            msg += `*Tipo:* ${data.tipo}\n`;
+            if (ocrText) {
+                msg += `---------------------------------------\n`;
+                msg += `*Texto Extraído:*\n${ocrText.substring(0, 1000)}\n`;
+            }
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        });
+
+        function getDocData() {
+            return {
+                rede: selectRede.value,
+                loja: selectLoja.value,
+                promotor: currentPromotor || '',
+                tipo: selectTipo.value,
+                date: new Date().toLocaleDateString('pt-BR')
+            };
+        }
+
+        sharePdf.addEventListener('click', async () => {
+            if (!selectLoja.value || !selectTipo.value) {
+                alert('Preencha todos os dados do documento.');
+                return;
+            }
+            if (!capturedDataUrl) {
+                alert('Capture um documento primeiro.');
+                return;
+            }
+            const data = getDocData();
+            const pdfEl = $('pdf-content');
+            $('pdf-data').textContent = data.date;
+            $('pdf-rede').textContent = data.rede;
+            $('pdf-loja').textContent = data.loja;
+            $('pdf-promotor').textContent = data.promotor;
+            $('pdf-tipo').textContent = data.tipo;
+            $('pdf-ocr-text').innerHTML = ocrText || '<em>Nenhum texto extraído.</em>';
+
+            const imgContainer = $('pdf-image-container');
+            imgContainer.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = enhancedDataUrl || capturedDataUrl;
+            img.className = 'pdf-doc-image';
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            imgContainer.appendChild(img);
+
+            pdfEl.style.display = 'block';
+
+            const opt = {
+                margin: 10,
+                filename: `${data.tipo.replace(/\s+/g, '_')}_${data.loja}.pdf`,
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                showSpinner('Gerando PDF...');
+                const pdfBlob = await html2pdf().set(opt).from(pdfEl).output('blob');
+                hideSpinner();
+                pdfEl.style.display = 'none';
+
+                const file = new File([pdfBlob], opt.filename, { type: 'application/pdf' });
+
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: data.tipo,
+                        text: `${data.tipo} - ${data.loja}`
+                    });
+                } else if (navigator.share) {
+                    await navigator.share({
+                        title: data.tipo,
+                        text: `${data.tipo} - ${data.loja}\n\n${ocrText ? 'Texto extraído: ' + ocrText.substring(0, 500) : ''}`
+                    });
+                } else {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(pdfBlob);
+                    link.download = opt.filename;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                }
+            } catch (err) {
+                hideSpinner();
+                if (err.name !== 'AbortError') {
+                    console.error('Erro ao gerar/compartilhar PDF:', err);
+                    alert('Erro ao gerar PDF.');
+                }
+                pdfEl.style.display = 'none';
+            }
+        });
+
+        startCamera();
+
+        window.addEventListener('beforeunload', stopCamera);
+    </script>
+</body>
+</html>
