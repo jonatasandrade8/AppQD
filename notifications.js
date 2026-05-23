@@ -67,6 +67,11 @@ const NOTIFICATIONS_CONFIG = {
             enabled: false,
             filename: "solicitacoes.html",
             mensagem: "A página de solicitações está temporariamente desativada."
+        },
+        scanner: {
+            enabled: true,
+            filename: "scanner-documento.html",
+            mensagem: "O scanner de documentos está temporariamente desativado."
         }
     }
 };
