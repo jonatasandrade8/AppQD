@@ -108,6 +108,42 @@
         .toast.error { background: #dc2626; }
         .toast i { font-size: 1.2rem; }
         @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        .scanner-cam-overlay {
+            position: fixed; inset: 0; z-index: 999999;
+            background: #000; display: none;
+        }
+        .scanner-cam-overlay.active { display: block; }
+        .scanner-cam-wrapper {
+            width: 100%; height: 100%; position: relative;
+            display: flex; flex-direction: column;
+        }
+        .scanner-cam-view {
+            flex: 1; overflow: hidden; position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .scanner-cam-view video { width: 100%; height: 100%; object-fit: contain; }
+        .scanner-cam-close {
+            position: absolute; top: 16px; right: 16px; z-index: 10;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(0,0,0,0.5); color: white; border: none;
+            font-size: 1.4rem; cursor: pointer;
+        }
+        .scanner-cam-close:active { background: rgba(0,0,0,0.8); }
+        .scanner-cam-controls {
+            position: absolute; bottom: 40px; left: 0; right: 0;
+            display: flex; justify-content: center; z-index: 10;
+        }
+        .scanner-shutter {
+            width: 72px; height: 72px; border-radius: 50%;
+            border: 4px solid white; background: rgba(255,255,255,0.3);
+            cursor: pointer; position: relative;
+        }
+        .scanner-shutter::after {
+            content: ''; position: absolute; inset: 6px;
+            border-radius: 50%; background: white;
+        }
+        .scanner-shutter:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -211,6 +247,18 @@
         </div>
     </main>
 
+    <div id="scanner-cam-overlay" class="scanner-cam-overlay">
+        <div class="scanner-cam-wrapper">
+            <button id="scanner-cam-close" class="scanner-cam-close"><i class="fas fa-times"></i></button>
+            <div class="scanner-cam-view">
+                <video id="scanner-video" autoplay playsinline></video>
+            </div>
+            <div class="scanner-cam-controls">
+                <button id="scanner-shutter" class="scanner-shutter"></button>
+            </div>
+        </div>
+    </div>
+
     <div id="spinner" class="spinner-overlay">
         <div class="spinner-box">
             <div class="spin"></div>
@@ -305,13 +353,48 @@
             return r;
         }
 
-        // === Entrada de imagem: ambos os botões usam o mesmo input ===
-        bFoto.addEventListener('click', () => {
-            inpFile.setAttribute('capture', 'environment');
-            inpFile.click();
-        });
+        // === Câmera via getUserMedia (baseado em camera.html) ===
+        let scannerStream = null;
+
+        async function abrirCameraScanner() {
+            try {
+                const constraints = {
+                    video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
+                    audio: false
+                };
+                scannerStream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = $('scanner-video');
+                video.srcObject = scannerStream;
+                $('scanner-cam-overlay').classList.add('active');
+            } catch (e) {
+                mostrarToast('Erro ao acessar câmera. Verifique as permissões.', 'error');
+            }
+        }
+
+        function fecharCameraScanner() {
+            if (scannerStream) {
+                scannerStream.getTracks().forEach(t => t.stop());
+                scannerStream = null;
+            }
+            $('scanner-cam-overlay').classList.remove('active');
+        }
+
+        function capturarDaCamera() {
+            const video = $('scanner-video');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            fecharCameraScanner();
+            processarImagem(canvas.toDataURL('image/jpeg', 0.95));
+        }
+
+        bFoto.addEventListener('click', abrirCameraScanner);
+        $('scanner-cam-close').addEventListener('click', fecharCameraScanner);
+        $('scanner-shutter').addEventListener('click', capturarDaCamera);
+
+        // === Galeria via input file ===
         bEscolher.addEventListener('click', () => {
-            inpFile.removeAttribute('capture');
             inpFile.click();
         });
 
@@ -345,10 +428,10 @@
         // === Filtros ===
         fBtns.forEach(b => b.addEventListener('click', () => {
             if (!rawData) return;
+            if (cMode) { corC.style.display = 'none'; cMode = false; }
             fBtns.forEach(x => x.classList.remove('ativo')); b.classList.add('ativo');
             filter = b.dataset.f;
             aplicarFiltro(filter);
-            if (cMode) { setTimeout(iniciarCantos, 50); }
         }));
 
         function aplicarFiltro(f) {
