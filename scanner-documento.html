@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Scanner de Documentos - Qdelícia Frutas">
     <title>Scanner - Qdelícia Frutas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,238 +11,159 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        * { box-sizing: border-box; }
         .welcome-banner {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            padding: 12px 16px; border-radius: 12px;
-            font-weight: 600; font-size: 0.95rem;
-            display: flex; align-items: center; gap: 10px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
-            animation: slideIn 0.4s ease;
+            background: linear-gradient(135deg,#10b981,#059669); color: white;
+            padding: 12px 16px; border-radius: 12px; font-weight: 600; font-size: .95rem;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(16,185,129,.3); animation: slideIn .4s ease;
         }
         .welcome-banner i { font-size: 1.2rem; }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideIn { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:translateY(0) } }
         .scanner-container { padding: 20px; max-width: 960px; margin: 0 auto; }
-        .scanner-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px; margin-bottom: 20px;
-        }
+        .scanner-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .scanner-form .input-group { margin: 0; }
         @media (max-width:600px) { .scanner-form { grid-template-columns: 1fr; } }
 
-        .source-buttons {
-            display: flex; gap: 12px; justify-content: center; margin-bottom: 20px;
-        }
+        .source-buttons { display: flex; gap: 12px; justify-content: center; margin-bottom: 20px; }
         .source-buttons button {
-            flex: 1; max-width: 200px;
-            padding: 14px 20px; border-radius: var(--border-radius);
-            border: 2px solid #e2e8f0; background: var(--white);
-            font-weight: 600; font-size: 0.95rem;
-            cursor: pointer; transition: var(--transition);
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            color: var(--text-muted);
+            flex:1; max-width:200px; padding:14px 20px; border-radius:var(--border-radius);
+            border:2px solid #e2e8f0; background:var(--white); font-weight:600; font-size:.95rem;
+            cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; gap:8px;
+            color:var(--text-muted);
         }
-        .source-buttons button.active { border-color: var(--primary-color); color: var(--primary-color); background: #f0fdf4; }
-        .source-buttons button:hover { border-color: var(--primary-color); }
+        .source-buttons button.active { border-color:var(--primary-color); color:var(--primary-color); background:#f0fdf4; }
+        .source-buttons button:hover { border-color:var(--primary-color); }
 
-        .scanner-stage {
-            position: relative;
-            width: 100%; max-width: 600px;
-            margin: 0 auto 20px;
-            border-radius: var(--border-radius-lg);
-            overflow: hidden;
-            background: #000;
-            min-height: 300px;
+        .stage {
+            width:100%; max-width:600px; margin:0 auto 20px;
+            border-radius:var(--border-radius-lg); overflow:hidden; position:relative;
+            background:#000; min-height:350px;
         }
-        .scanner-stage video,
-        .scanner-stage #capture-canvas {
-            width: 100%; height: 100%;
-            object-fit: contain;
-            display: block;
+        .stage video, .stage canvas.result-canvas {
+            width:100%; display:block; object-fit:contain;
         }
-        .scanner-stage #capture-canvas { display: none; }
-        .scanner-stage.captured #capture-canvas { display: block; }
-        .scanner-stage.captured video { display: none; }
-
-        .scanner-stage #overlay-canvas {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            display: none;
+        .stage canvas.result-canvas { display:none; }
+        .stage.has-result video { display:none; }
+        .stage.has-result canvas.result-canvas { display:block; }
+        .stage canvas.overlay {
+            position:absolute; top:0; left:0; width:100%; height:100%;
+            pointer-events:none; display:none;
         }
-        .scanner-stage.show-overlay #overlay-canvas { display: block; }
-
-        .scanner-stage #corner-canvas {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: none;
-            z-index: 3;
+        .stage.show-overlay canvas.overlay { display:block; }
+        .stage canvas.corner-cv {
+            position:absolute; top:0; left:0; width:100%; height:100%;
+            display:none; z-index:3;
         }
 
-        .frame-overlay {
-            position: absolute;
-            top: 5%; left: 5%; width: 90%; height: 90%;
-            border: 2px dashed rgba(255,255,255,0.4);
-            border-radius: 4px;
-            pointer-events: none;
-            box-shadow: 0 0 0 9999px rgba(0,0,0,0.2);
-            z-index: 2;
-            transition: border-color 0.3s, border-style 0.3s;
+        .frame-guide {
+            position:absolute; top:6%; left:6%; width:88%; height:88%;
+            border:2px dashed rgba(255,255,255,.4); border-radius:4px;
+            pointer-events:none; box-shadow:0 0 0 9999px rgba(0,0,0,.2); z-index:2;
+            transition:border-color .3s;
         }
-        .frame-overlay.detected { border-color: #10b981; border-style: solid; }
-        .frame-corner {
-            position: absolute; width: 24px; height: 24px;
-            border-color: #fff; border-style: solid;
+        .frame-guide.detected { border-color:#10b981; border-style:solid; }
+        .frame-guide .c {
+            position:absolute; width:22px; height:22px; border-color:#fff; border-style:solid;
         }
-        .frame-corner.tl { top: -1px; left: -1px; border-width: 3px 0 0 3px; }
-        .frame-corner.tr { top: -1px; right: -1px; border-width: 3px 3px 0 0; }
-        .frame-corner.bl { bottom: -1px; left: -1px; border-width: 0 0 3px 3px; }
-        .frame-corner.br { bottom: -1px; right: -1px; border-width: 0 3px 3px 0; }
+        .frame-guide .tl { top:-1px; left:-1px; border-width:3px 0 0 3px; }
+        .frame-guide .tr { top:-1px; right:-1px; border-width:3px 3px 0 0; }
+        .frame-guide .bl { bottom:-1px; left:-1px; border-width:0 0 3px 3px; }
+        .frame-guide .br { bottom:-1px; right:-1px; border-width:0 3px 3px 0; }
 
-        .scanner-toolbar {
-            display: flex; justify-content: center; gap: 12px;
-            margin-bottom: 16px; flex-wrap: wrap;
+        .toolbar { display:flex; justify-content:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+        .toolbar button {
+            width:56px; height:56px; border-radius:50%; border:none; background:var(--primary-color);
+            color:white; font-size:1.3rem; cursor:pointer; transition:var(--transition);
+            display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow);
         }
-        .scanner-toolbar button {
-            width: 56px; height: 56px; border-radius: 50%;
-            border: none; background: var(--primary-color); color: white;
-            font-size: 1.3rem; cursor: pointer; transition: var(--transition);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: var(--shadow);
-        }
-        .scanner-toolbar button:active { transform: scale(0.92); }
-        .scanner-toolbar button.btn-secondary { background: var(--text-muted); }
-        .scanner-toolbar button.flash-on { background: #f59e0b; }
-        .scanner-toolbar button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .toolbar button:active { transform:scale(.92); }
+        .toolbar button.sec { background:var(--text-muted); }
+        .toolbar button.on { background:#f59e0b; }
 
-        .zoom-controls {
-            display: flex; align-items: center; justify-content: center;
-            gap: 10px; margin-bottom: 12px;
+        .zoom-row { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:12px; }
+        .zoom-row button {
+            width:38px; height:38px; border-radius:50%; border:none; background:rgba(0,0,0,.5);
+            color:#fff; font-size:.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
         }
-        .zoom-controls button {
-            width: 40px; height: 40px; border-radius: 50%;
-            border: none; background: rgba(0,0,0,0.5); color: white;
-            font-size: 1rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .zoom-controls span {
-            color: white; font-weight: 700; font-size: 0.9rem;
-            background: rgba(0,0,0,0.5); padding: 4px 12px; border-radius: 20px;
-            min-width: 50px; text-align: center;
+        .zoom-row span {
+            color:#fff; font-weight:700; font-size:.85rem;
+            background:rgba(0,0,0,.5); padding:4px 12px; border-radius:20px; min-width:48px; text-align:center;
         }
 
-        .filter-selector {
-            display: flex; gap: 8px; justify-content: center;
-            margin-bottom: 16px; flex-wrap: wrap;
+        .filters { display:flex; gap:8px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
+        .filters button {
+            padding:7px 16px; border-radius:20px; border:2px solid #e2e8f0; background:var(--white);
+            font-weight:600; font-size:.8rem; cursor:pointer; transition:var(--transition); color:var(--text-muted);
         }
-        .filter-selector button {
-            padding: 8px 18px; border-radius: 20px;
-            border: 2px solid #e2e8f0; background: var(--white);
-            font-weight: 600; font-size: 0.8rem;
-            cursor: pointer; transition: var(--transition); color: var(--text-muted);
-        }
-        .filter-selector button.active { border-color: var(--primary-color); background: var(--primary-color); color: white; }
-        .filter-selector button:hover { border-color: var(--primary-color); }
+        .filters button.active { border-color:var(--primary-color); background:var(--primary-color); color:white; }
 
-        .review-actions {
-            display: flex; gap: 10px; justify-content: center;
-            flex-wrap: wrap; margin-bottom: 16px;
+        .actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+        .actions button {
+            padding:10px 20px; border-radius:var(--border-radius); border:none; font-weight:600;
+            font-size:.85rem; cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:6px;
         }
-        .review-actions button {
-            padding: 10px 20px; border-radius: var(--border-radius);
-            border: none; font-weight: 600; font-size: 0.85rem;
-            cursor: pointer; transition: var(--transition);
-            display: flex; align-items: center; gap: 6px;
-        }
-        .review-actions .btn-primary { background: var(--primary-color); color: white; }
-        .review-actions .btn-outline { background: #f8fafc; color: var(--text-dark); border: 1px solid #e2e8f0; }
-        .review-actions .btn-cancel { background: #f1f5f9; color: var(--text-muted); }
-        .review-actions .btn-corners { background: #eef2ff; color: #6366f1; border: 1px solid #c7d2fe; }
-        .review-actions .btn-corners.active { background: #6366f1; color: white; }
+        .actions .p { background:var(--primary-color); color:white; }
+        .actions .o { background:#f8fafc; color:var(--text-dark); border:1px solid #e2e8f0; }
+        .actions .x { background:#f1f5f9; color:var(--text-muted); }
+        .actions .corn { background:#eef2ff; color:#6366f1; border:1px solid #c7d2fe; }
+        .actions .corn.on { background:#6366f1; color:white; }
 
-        .btn-share-wrapper { text-align: center; margin: 20px 0; }
-        .btn-share {
-            border: none; padding: 16px 40px; border-radius: 50px;
-            font-weight: 700; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-            transition: var(--transition); font-size: 1.05rem;
-            color: white; background: #25d366;
-            box-shadow: 0 4px 15px rgba(37,211,102,0.4);
+        .share-wrap { text-align:center; margin:20px 0; }
+        .share-btn {
+            border:none; padding:16px 40px; border-radius:50px; font-weight:700; cursor:pointer;
+            display:inline-flex; align-items:center; justify-content:center; gap:10px;
+            transition:var(--transition); font-size:1.05rem; color:white; background:#25d366;
+            box-shadow:0 4px 15px rgba(37,211,102,.4);
         }
-        .btn-share:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
-        .btn-share:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(37,211,102,0.5);
-        }
+        .share-btn:disabled { opacity:.4; cursor:not-allowed; box-shadow:none; }
+        .share-btn:hover:not(:disabled) { transform:translateY(-3px); box-shadow:0 8px 25px rgba(37,211,102,.5); }
 
-        #pdf-content { display: none; padding: 40px; font-family: 'Inter', sans-serif; color: #1e293b; }
-        .pdf-header {
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 2px solid #6366f1; padding-bottom: 20px; margin-bottom: 30px;
-        }
-        .pdf-logo { max-width: 90px; }
-        .pdf-info { background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #e2e8f0; }
-        .pdf-info p { margin: 6px 0; font-size: 14px; }
-        .pdf-doc-image { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+        #pdf-content { display:none; padding:40px; font-family:'Inter',sans-serif; color:#1e293b; }
+        .pdf-header { display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #6366f1; padding-bottom:20px; margin-bottom:30px; }
+        .pdf-logo { max-width:90px; }
+        .pdf-info { background:#f8fafc; padding:20px; border-radius:12px; margin-bottom:30px; border:1px solid #e2e8f0; }
+        .pdf-info p { margin:6px 0; font-size:14px; }
+        .pdf-img { max-width:100%; height:auto; display:block; margin:0 auto; }
 
         .spinner-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.5); display: none;
-            align-items: center; justify-content: center; z-index: 99999;
+            position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index:99999;
         }
-        .spinner-overlay.active { display: flex; }
-        .spinner-box {
-            background: white; padding: 30px 40px; border-radius: 16px;
-            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 320px;
+        .spinner-overlay.on { display:flex; }
+        .spinner-box { background:white; padding:30px 40px; border-radius:16px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3); max-width:320px; }
+        .spinner-box .spin {
+            width:48px; height:48px; border:5px solid #e2e8f0; border-top-color:var(--primary-color);
+            border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 15px;
         }
-        .spinner-box .spinner {
-            width: 48px; height: 48px;
-            border: 5px solid #e2e8f0; border-top-color: var(--primary-color);
-            border-radius: 50%; animation: spin 0.8s linear infinite;
-            margin: 0 auto 15px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .spinner-box p { margin: 0; color: var(--text-muted); font-weight: 600; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .spinner-box p { margin:0; color:var(--text-muted); font-weight:600; }
 
-        #upload-input { display: none; }
-        .upload-area {
-            text-align: center; padding: 40px 20px;
-            border: 2px dashed #e2e8f0; border-radius: var(--border-radius-lg);
-            background: #f8fafc; cursor: pointer;
-            transition: var(--transition);
-        }
-        .upload-area:hover { border-color: var(--primary-color); background: #f0fdf4; }
-        .upload-area i { font-size: 3rem; color: var(--text-muted); margin-bottom: 15px; display: block; }
-        .upload-area p { color: var(--text-muted); margin-bottom: 15px; }
+        #up-input { display:none; }
+        .up-area { text-align:center; padding:40px 20px; border:2px dashed #e2e8f0; border-radius:var(--border-radius-lg); background:#f8fafc; cursor:pointer; transition:var(--transition); }
+        .up-area:hover { border-color:var(--primary-color); background:#f0fdf4; }
+        .up-area i { font-size:3rem; color:var(--text-muted); margin-bottom:15px; display:block; }
+        .up-area p { color:var(--text-muted); margin-bottom:15px; }
     </style>
 </head>
 <body>
     <div class="menu-overlay"></div>
     <aside class="side-menu">
-        <a href="index.html"><i class="fas fa-home"></i> <span class="link-text">Início</span></a>
-        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> <span class="link-text">Estoque</span></a>
-        <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
-        <a href="scanner-documento.html" class="active"><i class="fas fa-file-alt"></i> <span class="link-text">Scanner</span></a>
-        <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
-        <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
-        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span class="link-text">Solicitações</span></a>
-        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span></a>
+        <a href="index.html"><i class="fas fa-home"></i><span class="link-text">Início</span></a>
+        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i><span class="link-text">Estoque</span></a>
+        <a href="camera.html"><i class="fas fa-camera"></i><span class="link-text">Câmera</span></a>
+        <a href="scanner-documento.html" class="active"><i class="fas fa-file-alt"></i><span class="link-text">Scanner</span></a>
+        <a href="materiais.html"><i class="fas fa-book"></i><span class="link-text">Materiais</span></a>
+        <a href="pedido.html"><i class="fas fa-file-invoice"></i><span class="link-text">Sugestão de Pedido</span></a>
+        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i><span class="link-text">Solicitações</span></a>
+        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span class="link-text">Sair</span></a>
     </aside>
-
     <header id="cabecalho-principal">
-        <button class="menu-toggle" aria-label="Abrir Menu">
-            <i class="fas fa-bars"></i><span class="menu-label">Menu</span>
-        </button>
-        <div class="logo-placeholder"><img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas"></div>
+        <button class="menu-toggle" aria-label="Abrir Menu"><i class="fas fa-bars"></i><span class="menu-label">Menu</span></button>
+        <div class="logo-placeholder"><img src="./images/logo-qdelicia.png" alt="Qdelícia Frutas"></div>
         <h1>Qdelícia Frutas</h1>
         <p>Scanner de Documentos</p>
     </header>
-
     <nav>
         <a href="index.html">Início</a>
         <a href="estoque.html">Estoque</a>
@@ -252,31 +172,27 @@
         <a href="materiais.html">Materiais</a>
         <a href="pedido.html">Sugestão</a>
         <a href="solicitacoes.html">Solicitações</a>
-        <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
+        <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Sair</a>
     </nav>
 
     <main class="scanner-container">
         <section class="glass-section">
             <h2><i class="fas fa-info-circle"></i> Dados do Documento</h2>
-            <div id="welcome-message" class="welcome-banner" style="display:none;">
-                <i class="fas fa-user-check"></i><span id="welcome-text"></span>
+            <div id="welcome-banner" class="welcome-banner" style="display:none;">
+                <i class="fas fa-user-check"></i><span id="welcome-txt"></span>
             </div>
             <div class="scanner-form">
                 <div class="input-group">
-                    <label for="rede"><i class="fas fa-store"></i> Rede</label>
-                    <select id="rede" class="report-input">
-                        <option value="" disabled selected>Selecione a Rede</option>
-                    </select>
+                    <label><i class="fas fa-store"></i> Rede</label>
+                    <select id="sel-rede" class="report-input"><option value="" disabled selected>Selecione a Rede</option></select>
                 </div>
                 <div class="input-group">
-                    <label for="loja"><i class="fas fa-shopping-cart"></i> Loja</label>
-                    <select id="loja" class="report-input" disabled>
-                        <option value="" disabled selected>Selecione a Loja</option>
-                    </select>
+                    <label><i class="fas fa-shopping-cart"></i> Loja</label>
+                    <select id="sel-loja" class="report-input" disabled><option value="" disabled selected>Selecione a Loja</option></select>
                 </div>
                 <div class="input-group">
-                    <label for="tipo-documento"><i class="fas fa-tag"></i> Tipo de Documento</label>
-                    <select id="tipo-documento" class="report-input">
+                    <label><i class="fas fa-tag"></i> Tipo de Documento</label>
+                    <select id="sel-tipo" class="report-input">
                         <option value="" disabled selected>Selecione o Tipo</option>
                         <option value="Nota de Falta">Nota de Falta</option>
                         <option value="Nota de Devolução">Nota de Devolução</option>
@@ -286,86 +202,78 @@
         </section>
 
         <section class="glass-section">
-            <h2><i class="fas fa-file-image"></i> Digitalizar Documento</h2>
-
+            <h2><i class="fas fa-file-image"></i> Digitalizar</h2>
             <div class="source-buttons">
-                <button id="btn-source-camera" class="active"><i class="fas fa-camera"></i> Câmera</button>
-                <button id="btn-source-upload"><i class="fas fa-folder-open"></i> Galeria</button>
+                <button id="src-cam" class="active"><i class="fas fa-camera"></i> Câmera</button>
+                <button id="src-up"><i class="fas fa-folder-open"></i> Galeria</button>
             </div>
 
-            <div id="camera-section">
-                <div class="scanner-stage" id="scanner-stage">
+            <div id="cam-sec">
+                <div class="stage" id="stage">
                     <video id="video" autoplay playsinline></video>
-                    <canvas id="capture-canvas"></canvas>
-                    <canvas id="overlay-canvas"></canvas>
-                    <canvas id="corner-canvas"></canvas>
-                    <div class="frame-overlay" id="frame-overlay">
-                        <div class="frame-corner tl"></div>
-                        <div class="frame-corner tr"></div>
-                        <div class="frame-corner bl"></div>
-                        <div class="frame-corner br"></div>
+                    <canvas id="res-canvas" class="result-canvas"></canvas>
+                    <canvas id="ov-canvas" class="overlay"></canvas>
+                    <canvas id="corner-cv" class="corner-cv"></canvas>
+                    <div class="frame-guide" id="frame-guide">
+                        <div class="c tl"></div><div class="c tr"></div>
+                        <div class="c bl"></div><div class="c br"></div>
                     </div>
                 </div>
-
-                <div class="zoom-controls" id="zoom-controls">
+                <div class="zoom-row" id="zoom-row">
                     <button id="zoom-out"><i class="fas fa-minus"></i></button>
-                    <span id="zoom-level">1.0x</span>
+                    <span id="zoom-lbl">1.0x</span>
                     <button id="zoom-in"><i class="fas fa-plus"></i></button>
                 </div>
-
-                <div class="scanner-toolbar" id="scanner-toolbar">
-                    <button id="btn-flash" class="btn-secondary" title="Flash"><i class="fas fa-bolt"></i></button>
-                    <button id="btn-capture" title="Capturar"><i class="fas fa-camera"></i></button>
-                    <button id="btn-retake" class="btn-secondary" title="Refazer" style="display:none;"><i class="fas fa-redo"></i></button>
+                <div class="toolbar" id="cam-toolbar">
+                    <button id="btn-flash" class="sec" title="Flash"><i class="fas fa-bolt"></i></button>
+                    <button id="btn-cap" title="Capturar"><i class="fas fa-camera"></i></button>
+                    <button id="btn-retake" class="sec" title="Refazer" style="display:none"><i class="fas fa-redo"></i></button>
                 </div>
             </div>
 
-            <div id="upload-section" style="display:none;">
-                <div class="upload-area" id="upload-area">
+            <div id="up-sec" style="display:none">
+                <div class="up-area" id="up-area">
                     <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Clique para selecionar uma imagem da galeria</p>
-                    <button class="btn-share" style="display:inline-flex;padding:12px 30px;font-size:0.95rem;pointer-events:none;">
+                    <p>Clique para selecionar uma imagem</p>
+                    <button class="share-btn" style="display:inline-flex;padding:12px 30px;font-size:.95rem;pointer-events:none;">
                         <i class="fas fa-folder-open"></i> Escolher Imagem
                     </button>
                 </div>
             </div>
 
-            <div id="review-section" style="display:none;">
-                <div class="filter-selector">
-                    <button data-filter="color" class="active">Colorido</button>
-                    <button data-filter="enhanced">Realçado</button>
-                    <button data-filter="document">Documento</button>
+            <div id="rev-sec" style="display:none">
+                <div class="filters">
+                    <button data-f="color" class="active">Colorido</button>
+                    <button data-f="enhanced">Realçado</button>
+                    <button data-f="document">Documento</button>
                 </div>
-                <div class="review-actions">
-                    <button id="btn-rotate-left" class="btn-outline"><i class="fas fa-undo"></i> Girar</button>
-                    <button id="btn-adjust-corners" class="btn-corners"><i class="fas fa-vector-square"></i> Ajustar Cantos</button>
-                    <button id="btn-cancel-review" class="btn-cancel"><i class="fas fa-times"></i> Refazer</button>
-                    <button id="btn-confirm-review" class="btn-primary"><i class="fas fa-check"></i> Confirmar</button>
+                <div class="actions">
+                    <button id="btn-rot" class="o"><i class="fas fa-undo"></i> Girar</button>
+                    <button id="btn-corn" class="corn"><i class="fas fa-vector-square"></i> Ajustar Cantos</button>
+                    <button id="btn-cancel" class="x"><i class="fas fa-times"></i> Refazer</button>
+                    <button id="btn-ok" class="p"><i class="fas fa-check"></i> Confirmar</button>
                 </div>
             </div>
         </section>
 
-        <div class="btn-share-wrapper">
-            <button id="btn-share" class="btn-share" disabled>
+        <div class="share-wrap">
+            <button id="btn-share" class="share-btn" disabled>
                 <i class="fab fa-whatsapp"></i> Compartilhar PDF no WhatsApp
             </button>
         </div>
     </main>
 
-    <div id="spinner-overlay" class="spinner-overlay">
+    <div id="spinner" class="spinner-overlay">
         <div class="spinner-box">
-            <div class="spinner"></div>
-            <p id="spinner-text">Processando...</p>
+            <div class="spin"></div>
+            <p id="spinner-txt">Processando...</p>
         </div>
     </div>
 
     <div id="pdf-content">
         <div class="pdf-header">
             <img src="./images/logo-qdelicia.png" alt="Logo" class="pdf-logo">
-            <div>
-                <h1 style="color:#6366f1;margin:0;">Qdelícia Frutas</h1>
-                <p style="margin:0;text-align:right;color:#64748b;">Documento Digitalizado</p>
-            </div>
+            <div><h1 style="color:#6366f1;margin:0;">Qdelícia Frutas</h1><p style="margin:0;text-align:right;color:#64748b;">Documento Digitalizado</p></div>
         </div>
         <div class="pdf-info">
             <p><strong>Data:</strong> <span id="pdf-data"></span></p>
@@ -374,490 +282,435 @@
             <p><strong>Promotor:</strong> <span id="pdf-promotor"></span></p>
             <p><strong>Tipo de Documento:</strong> <span id="pdf-tipo"></span></p>
         </div>
-        <div id="pdf-image-container" style="text-align:center;margin-bottom:20px;"></div>
-        <div style="margin-top:50px;border-top:1px solid #ddd;padding-top:10px;font-size:12px;color:#64748b;text-align:center;">
-            Documento gerado automaticamente pela Área do Promotor Qdelícia Frutas.
-        </div>
+        <div id="pdf-img-wrap" style="text-align:center;margin-bottom:20px;"></div>
+        <div style="margin-top:50px;border-top:1px solid #ddd;padding-top:10px;font-size:12px;color:#64748b;text-align:center;">Documento gerado automaticamente pela Área do Promotor Qdelícia Frutas.</div>
     </div>
 
-    <input type="file" id="upload-input" accept="image/*">
-
+    <input type="file" id="up-input" accept="image/*">
     <footer><p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p></footer>
 
     <script src="notifications.js"></script>
     <script src="script.js"></script>
     <script>
-        const APP_DATA = {
-            "Atacadão": { "Vivian": ["BR - Zona Sul"], "Nilson": ["Parnamirim"], "Inácio": ["Prudente"], "Amarildo": ["Zona Norte"] },
-            "Assaí": { "Reginaldo": ["Zona Sul"], "Erivan": ["Maria Lacerda"], "Miqueias": ["Ponta Negra"], "Cosme": ["Zona Norte"] },
-            "Nordestão": { "J Mauricio": ["Loja 03"], "Mateus": ["Loja 04"], "Amarildo": ["Loja 05"], "Markson": ["Loja 08"], "Cristiane":["Loja 07"] },
-            "Carrefour": { "Mateus": ["Zona Sul"] },
-            "Superfácil": { "Neto": ["Emaús"], "Milagres": ["Nazaré"] },
-            "Mar Vermelho": { "Markson": ["Natal", "Parnamirim"] }
-        };
+        const APP_DATA = {"Atacadão":{"Vivian":["BR - Zona Sul"],"Nilson":["Parnamirim"],"Inácio":["Prudente"],"Amarildo":["Zona Norte"]},"Assaí":{"Reginaldo":["Zona Sul"],"Erivan":["Maria Lacerda"],"Miqueias":["Ponta Negra"],"Cosme":["Zona Norte"]},"Nordestão":{"J Mauricio":["Loja 03"],"Mateus":["Loja 04"],"Amarildo":["Loja 05"],"Markson":["Loja 08"],"Cristiane":["Loja 07"]},"Carrefour":{"Mateus":["Zona Sul"]},"Superfácil":{"Neto":["Emaús"],"Milagres":["Nazaré"]},"Mar Vermelho":{"Markson":["Natal","Parnamirim"]}};
 
         const $ = id => document.getElementById(id);
-        const selRede = $('rede'), selLoja = $('loja'), selTipo = $('tipo-documento');
-        const video = $('video'), capCanvas = $('capture-canvas'), ovCanvas = $('overlay-canvas'), crnCanvas = $('corner-canvas');
-        const stage = $('scanner-stage'), frameOvl = $('frame-overlay');
-        const btnFlash = $('btn-flash'), btnCap = $('btn-capture'), btnRetake = $('btn-retake');
-        const btnCam = $('btn-source-camera'), btnGal = $('btn-source-upload');
-        const btnUp = $('btn-upload') || $('upload-area'), upInput = $('upload-input');
-        const btnShare = $('btn-share'), camSec = $('camera-section'), upSec = $('upload-section'), revSec = $('review-section');
-        const btnCancel = $('btn-cancel-review'), btnConfirm = $('btn-confirm-review');
-        const btnRot = $('btn-rotate-left'), btnCorners = $('btn-adjust-corners');
-        const filterBtns = document.querySelectorAll('[data-filter]');
-        const zi = $('zoom-in'), zo = $('zoom-out'), zl = $('zoom-level');
-        const spOvl = $('spinner-overlay'), spTxt = $('spinner-text');
+        const sR = $('sel-rede'), sL = $('sel-loja'), sT = $('sel-tipo');
+        const vid = $('video'), resC = $('res-canvas'), ovC = $('ov-canvas'), corC = $('corner-cv');
+        const stage = $('stage'), guide = $('frame-guide');
+        const bFlash = $('btn-flash'), bCap = $('btn-cap'), bRetake = $('btn-retake');
+        const bCam = $('src-cam'), bUp = $('src-up');
+        const bCap2 = $('btn-cap'), bShare = $('btn-share');
+        const camSec = $('cam-sec'), upSec = $('up-sec'), revSec = $('rev-sec');
+        const bCancel = $('btn-cancel'), bOk = $('btn-ok');
+        const bRot = $('btn-rot'), bCorn = $('btn-corn');
+        const fBtns = document.querySelectorAll('[data-f]');
+        const zI = $('zoom-in'), zO = $('zoom-out'), zL = $('zoom-lbl');
+        const sp = $('spinner'), spT = $('spinner-txt');
+        const upArea = $('up-area'), upInput = $('up-input');
 
         let stream = null, flash = false, zoom = 1;
-        let promotor = null;
-        let rawData = null, processedUrl = null, processedBlob = null;
-        let imgW = 0, imgH = 0;
+        let promo = null;
+        let rawData = null, procUrl = null, procBlob = null;
+        let iW = 0, iH = 0, angle = 0;
         let filter = 'color';
-        let isVideo = true;
-        let angle = 0;
-        let cornerMode = false, corners = [], dragI = -1;
+        let isCam = true;
+        let cMode = false, cPts = [], dI = -1;
+        let ovW = 0, ovH = 0;
+        let detectTimer = null;
 
-        function findProm(r, l) {
-            if (!APP_DATA[r]) return null;
-            for (const p in APP_DATA[r]) if (APP_DATA[r][p].includes(l)) return p;
-            return null;
-        }
-        function promFull(n) {
-            if (window.APP_CONFIG && window.APP_CONFIG.users)
-                for (const k in window.APP_CONFIG.users)
-                    if (window.APP_CONFIG.users[k].fullName === n || k === n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
-                        return window.APP_CONFIG.users[k].fullName;
-            return n;
-        }
+        function spOn(t) { spT.textContent = t || 'Processando...'; sp.classList.add('on'); }
+        function spOff() { sp.classList.remove('on'); }
 
-        selRede.innerHTML = '<option value="" disabled selected>Selecione a Rede</option>';
-        Object.keys(APP_DATA).forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; selRede.appendChild(o); });
-        selRede.addEventListener('change', () => {
-            const r = selRede.value; selLoja.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
-            $('welcome-message').style.display = 'none'; promotor = null;
+        function findP(r,l) { if(!APP_DATA[r])return null; for(const p in APP_DATA[r])if(APP_DATA[r][p].includes(l))return p; return null; }
+        function pFull(n) { if(window.APP_CONFIG&&window.APP_CONFIG.users)for(const k in window.APP_CONFIG.users)if(window.APP_CONFIG.users[k].fullName===n||k===n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""))return window.APP_CONFIG.users[k].fullName; return n; }
+
+        sR.innerHTML = '<option value="" disabled selected>Selecione a Rede</option>';
+        Object.keys(APP_DATA).forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; sR.appendChild(o); });
+        sR.addEventListener('change', () => {
+            const r = sR.value; sL.innerHTML = '<option value="" disabled selected>Selecione a Loja</option>';
+            $('welcome-banner').style.display = 'none'; promo = null;
             if (r && APP_DATA[r]) {
                 const ls = [];
                 for (const p in APP_DATA[r]) APP_DATA[r][p].forEach(l => { if (!ls.includes(l)) ls.push(l); });
-                ls.forEach(l => { const o = document.createElement('option'); o.value = l; o.textContent = l; selLoja.appendChild(o); });
-                selLoja.disabled = false;
-            } else selLoja.disabled = true;
+                ls.forEach(l => { const o = document.createElement('option'); o.value = l; o.textContent = l; sL.appendChild(o); });
+                sL.disabled = false;
+            } else sL.disabled = true;
         });
-        selLoja.addEventListener('change', () => {
-            const p = findProm(selRede.value, selLoja.value); promotor = p;
-            if (p) { $('welcome-text').textContent = 'Bem-vindo, ' + promFull(p) + '!'; $('welcome-message').style.display = 'flex'; }
+        sL.addEventListener('change', () => {
+            const p = findP(sR.value, sL.value); promo = p;
+            if (p) { $('welcome-txt').textContent = 'Bem-vindo, ' + pFull(p) + '!'; $('welcome-banner').style.display = 'flex'; }
         });
-
-        function spShow(t) { spTxt.textContent = t || 'Processando...'; spOvl.classList.add('active'); }
-        function spHide() { spOvl.classList.remove('active'); }
 
         function loadCV() {
             return new Promise((resolve, reject) => {
                 if (window.cv && cv.Mat) return resolve();
-                const s = document.createElement('script'); s.src = 'https://docs.opencv.org/4.9.0/opencv.js';
+                const s = document.createElement('script');
+                s.src = 'https://docs.opencv.org/4.9.0/opencv.js';
                 s.onload = () => { const c = setInterval(() => { if (cv && cv.Mat) { clearInterval(c); resolve(); } }, 100); };
                 s.onerror = reject; document.head.appendChild(s);
             });
         }
 
-        function orderPts(pts) {
-            let r = [[0,0],[0,0],[0,0],[0,0]];
-            let sm = Infinity, sM = -Infinity, dm = Infinity, dM = -Infinity;
+        function orderP(pts) {
+            let r = [[0,0],[0,0],[0,0],[0,0]], sm = Infinity, sM = -Infinity, dm = Infinity, dM = -Infinity;
             for (const p of pts) { const s = p[0]+p[1], d = p[0]-p[1]; if (s<sm) { sm=s; r[0]=p; } if (s>sM) { sM=s; r[2]=p; } if (d<dm) { dm=d; r[3]=p; } if (d>dM) { dM=d; r[1]=p; } }
             return r;
         }
 
-        function startCam() {
+        async function startCam() {
             if (stream) { stream.getTracks().forEach(t => t.stop()); }
-            navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment', width: { ideal: 4096 }, height: { ideal: 3072 } },
-                audio: false
-            }).then(s => {
-                stream = s; video.srcObject = s; video.play().then(() => {
-                    stage.classList.remove('captured');
-                    frameOvl.style.display = 'block'; ovCanvas.style.display = 'block';
-                    btnCap.style.display = 'inline-flex'; btnRetake.style.display = 'none';
-                    revSec.style.display = 'none'; crnCanvas.style.display = 'none';
-                    btnShare.disabled = true;
-                    startDetect();
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 4096 }, height: { ideal: 3072 } },
+                    audio: false
                 });
-            }).catch(e => alert('Erro câmera: ' + e.message));
+                vid.srcObject = stream;
+                await vid.play();
+                stage.classList.remove('has-result');
+                guide.style.display = 'block'; ovC.style.display = 'block';
+                bCap.style.display = 'inline-flex'; bRetake.style.display = 'none';
+                revSec.style.display = 'none'; corC.style.display = 'none';
+                bShare.disabled = true;
+                startDetect();
+            } catch(e) { alert('Erro câmera: ' + e.message); }
         }
 
         function stopCam() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
 
-        function getMaxZ() {
-            if (!stream) return 1;
-            const t = stream.getVideoTracks()[0]; if (!t) return 1;
-            const c = t.getCapabilities && t.getCapabilities();
-            return (c && c.zoom && c.zoom.max) || 1;
-        }
-
         async function setZ(v) {
             if (!stream) return;
             const t = stream.getVideoTracks()[0]; if (!t) return;
-            const c = t.getCapabilities && t.getCapabilities();
-            if (!c || !c.zoom) return;
-            v = Math.max(c.zoom.min||1, Math.min(c.zoom.max||1, v));
-            try { await t.applyConstraints({ advanced: [{ zoom: v }] }); zoom = v; zl.textContent = v.toFixed(1) + 'x'; } catch (e) {}
+            const cap = t.getCapabilities && t.getCapabilities();
+            if (!cap || !cap.zoom) return;
+            v = Math.max(cap.zoom.min||1, Math.min(cap.zoom.max||1, v));
+            try { await t.applyConstraints({ advanced: [{ zoom: v }] }); zoom = v; zL.textContent = v.toFixed(1) + 'x'; } catch(e) {}
         }
+        zI.addEventListener('click', () => setZ(zoom + .5));
+        zO.addEventListener('click', () => setZ(zoom - .5));
 
-        zi.addEventListener('click', () => setZ(zoom + 0.5));
-        zo.addEventListener('click', () => setZ(zoom - 0.5));
-
-        btnFlash.addEventListener('click', async () => {
+        bFlash.addEventListener('click', async () => {
             if (!stream) return;
             const t = stream.getVideoTracks()[0]; if (!t) return;
-            const c = t.getCapabilities && t.getCapabilities();
-            if (!c || !c.torch) { alert('Flash não disponível.'); return; }
+            const cap = t.getCapabilities && t.getCapabilities();
+            if (!cap || !cap.torch) { alert('Flash não disponível.'); return; }
             flash = !flash;
-            try { await t.applyConstraints({ advanced: [{ torch: flash }] }); btnFlash.classList.toggle('flash-on', flash); } catch (e) {}
+            try { await t.applyConstraints({ advanced: [{ torch: flash }] }); bFlash.classList.toggle('on', flash); } catch(e) {}
         });
 
-        let detTimer = null;
-        function startDetect() { stopDetect(); detTimer = setInterval(detect, 600); }
-        function stopDetect() { if (detTimer) { clearInterval(detTimer); detTimer = null; } }
+        function startDetect() { stopDetect(); detectTimer = setInterval(detect, 500); }
+        function stopDetect() { if (detectTimer) { clearInterval(detectTimer); detectTimer = null; } }
 
-        let lastC = null, stbC = 0;
         function detect() {
-            if (!stream || stage.classList.contains('captured') || !video.videoWidth) return;
-            if (!window.cv || !cv.Mat) return;
-            const vw = video.videoWidth, vh = video.videoHeight;
-            const sc = 400 / Math.max(vw, vh);
+            if (!stream || stage.classList.contains('has-result') || !vid.videoWidth) return;
+            if (!window.cv || !cv.Mat) { guide.classList.remove('detected'); return; }
+            const vw = vid.videoWidth, vh = vid.videoHeight;
+            const sc = Math.min(400 / vw, 400 / vh);
             const sw = Math.round(vw * sc), sh = Math.round(vh * sc);
-            const tc = document.createElement('canvas'); tc.width = sw; tc.height = sh;
-            tc.getContext('2d').drawImage(video, 0, 0, sw, sh);
-            const src = cv.matFromImageData(tc.getContext('2d').getImageData(0, 0, sw, sh));
-            const gray = new cv.Mat(), edges = new cv.Mat(), contours = new cv.MatVector(), hier = new cv.Mat();
+            const tC = document.createElement('canvas'); tC.width = sw; tC.height = sh;
+            tC.getContext('2d').drawImage(vid, 0, 0, sw, sh);
+            const src = cv.matFromImageData(tC.getContext('2d').getImageData(0, 0, sw, sh));
+            const g = new cv.Mat(), e = new cv.Mat(), ct = new cv.MatVector(), h = new cv.Mat();
             try {
-                cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-                cv.GaussianBlur(gray, gray, new cv.Size(5,5), 0);
-                cv.Canny(gray, edges, 50, 150);
-                cv.findContours(edges, contours, hier, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-                let maxA = 0, best = null;
-                for (let i = 0; i < contours.size(); i++) {
-                    const cnt = contours.get(i); const a = cv.contourArea(cnt);
-                    if (a > maxA && a > sw*sh*0.08) {
-                        const peri = cv.arcLength(cnt, true); const approx = new cv.Mat();
-                        cv.approxPolyDP(cnt, approx, 0.02*peri, true);
-                        if (approx.rows === 4) { if (best) best.delete(); maxA = a; best = approx; } else approx.delete();
+                cv.cvtColor(src, g, cv.COLOR_RGBA2GRAY);
+                cv.GaussianBlur(g, g, new cv.Size(5,5), 0);
+                cv.Canny(g, e, 50, 150);
+                cv.findContours(e, ct, h, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+                let mA = 0, best = null;
+                for (let i = 0; i < ct.size(); i++) {
+                    const c = ct.get(i); const a = cv.contourArea(c);
+                    if (a > mA && a > sw*sh*.08) {
+                        const per = cv.arcLength(c, true); const ap = new cv.Mat();
+                        cv.approxPolyDP(c, ap, .02*per, true);
+                        if (ap.rows === 4) { if (best) best.delete(); mA = a; best = ap; } else ap.delete();
                     }
                 }
-                const ox = ovCanvas.width, oy = ovCanvas.height;
-                const ctx = ovCanvas.getContext('2d'); ctx.clearRect(0, 0, ox, oy);
-                const sx = ox/sw, sy = oy/sh;
+                const st = stage.getBoundingClientRect();
+                ovC.width = st.width; ovC.height = st.height;
+                const ctx = ovC.getContext('2d'); ctx.clearRect(0, 0, ovC.width, ovC.height);
+                const sx = ovC.width/sw, sy = ovC.height/sh;
                 if (best) {
                     const pts = [];
                     for (let i = 0; i < 4; i++) pts.push([best.data32S[i*2]*sx, best.data32S[i*2+1]*sy]);
-                    const ord = orderPts(pts);
+                    const ord = orderP(pts);
                     ctx.strokeStyle = '#10b981'; ctx.lineWidth = 3;
                     ctx.beginPath(); ctx.moveTo(ord[0][0], ord[0][1]);
                     for (let i = 1; i < 4; i++) ctx.lineTo(ord[i][0], ord[i][1]); ctx.closePath(); ctx.stroke();
-                    ctx.fillStyle = 'rgba(16,185,129,0.12)'; ctx.fill();
-                    for (const p of ord) { ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(p[0], p[1], 5, 0, Math.PI*2); ctx.fill(); }
-                    frameOvl.classList.add('detected');
+                    ctx.fillStyle = 'rgba(16,185,129,.1)'; ctx.fill();
+                    for (const p of ord) {
+                        ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(p[0], p[1], 5, 0, Math.PI*2); ctx.fill();
+                        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+                    }
+                    guide.classList.add('detected');
                     best.delete();
-                } else { frameOvl.classList.remove('detected'); lastC = null; stbC = 0; }
-            } finally { src.delete(); gray.delete(); edges.delete(); contours.delete(); hier.delete(); }
+                } else { guide.classList.remove('detected'); }
+            } finally { src.delete(); g.delete(); e.delete(); ct.delete(); h.delete(); }
         }
 
-        function doCapture() {
+        function doCap() {
             if (!stream) return;
             const tr = stream.getVideoTracks()[0]; if (!tr) return;
             const s = tr.getSettings();
             const w = s.width || 1920, h = s.height || 1080;
-            capCanvas.width = w; capCanvas.height = h;
-            capCanvas.getContext('2d').drawImage(video, 0, 0, w, h);
-            rawData = capCanvas.getContext('2d').getImageData(0, 0, w, h);
-            imgW = w; imgH = h;
+            resC.width = w; resC.height = h;
+            resC.getContext('2d').drawImage(vid, 0, 0, w, h);
+            rawData = resC.getContext('2d').getImageData(0, 0, w, h);
+            iW = w; iH = h;
             stopDetect(); stopCam();
-            stage.classList.add('captured'); frameOvl.style.display = 'none'; ovCanvas.style.display = 'none';
-            btnCap.style.display = 'none'; btnRetake.style.display = 'inline-flex';
-            revSec.style.display = 'block'; angle = 0; cornerMode = false; crnCanvas.style.display = 'none';
-            applyFil('color');
+            stage.classList.add('has-result'); guide.style.display = 'none'; ovC.style.display = 'none';
+            bCap.style.display = 'none'; bRetake.style.display = 'inline-flex';
+            revSec.style.display = 'block'; angle = 0; cMode = false; corC.style.display = 'none';
+            bCorn.classList.remove('on');
+            procDoc();
         }
 
-        btnCap.addEventListener('click', doCapture);
+        bCap.addEventListener('click', doCap);
 
-        btnRetake.addEventListener('click', () => {
-            stage.classList.remove('captured'); frameOvl.style.display = 'block'; ovCanvas.style.display = 'block';
-            btnCap.style.display = 'inline-flex'; btnRetake.style.display = 'none';
-            revSec.style.display = 'none'; cornerMode = false; crnCanvas.style.display = 'none';
-            btnShare.disabled = true; processedUrl = null; processedBlob = null; rawData = null; angle = 0;
-            lastC = null; stbC = 0;
+        function procDoc() {
+            if (!rawData) return;
+            spOn('Processando...');
+            setTimeout(() => {
+                try {
+                    if (!window.cv || !cv.Mat) { spOff(); return; }
+                    const src = cv.matFromImageData(rawData);
+                    const w = rawData.width, h = rawData.height;
+                    const g = new cv.Mat(), e = new cv.Mat(), ct = new cv.MatVector(), hier = new cv.Mat();
+                    try {
+                        cv.cvtColor(src, g, cv.COLOR_RGBA2GRAY);
+                        cv.GaussianBlur(g, g, new cv.Size(5,5), 0);
+                        cv.Canny(g, e, 50, 150);
+                        cv.findContours(e, ct, hier, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+                        let mA = 0, doc = null;
+                        for (let i = 0; i < ct.size(); i++) {
+                            const c = ct.get(i); const a = cv.contourArea(c);
+                            if (a > mA && a > w*h*.08) {
+                                const per = cv.arcLength(c, true); const ap = new cv.Mat();
+                                cv.approxPolyDP(c, ap, .02*per, true);
+                                if (ap.rows === 4 && cv.isContourConvex(ap)) { mA = a; if (doc) doc.delete(); doc = ap; } else ap.delete();
+                            }
+                        }
+                        if (doc) {
+                            const pts = [];
+                            for (let i = 0; i < 4; i++) pts.push([doc.data32S[i*2], doc.data32S[i*2+1]]);
+                            const ord = orderP(pts);
+                            const dw = Math.max(Math.hypot(ord[1][0]-ord[0][0], ord[1][1]-ord[0][1]), Math.hypot(ord[2][0]-ord[3][0], ord[2][1]-ord[3][1]));
+                            const dh = Math.max(Math.hypot(ord[3][0]-ord[0][0], ord[3][1]-ord[0][1]), Math.hypot(ord[2][0]-ord[1][0], ord[2][1]-ord[1][1]));
+                            const sM = cv.matFromArray(4,1,cv.CV_32FC2,[ord[0][0],ord[0][1],ord[1][0],ord[1][1],ord[2][0],ord[2][1],ord[3][0],ord[3][1]]);
+                            const dM = cv.matFromArray(4,1,cv.CV_32FC2,[0,0,dw-1,0,dw-1,dh-1,0,dh-1]);
+                            const M = cv.getPerspectiveTransform(sM, dM);
+                            const warp = new cv.Mat();
+                            cv.warpPerspective(src, warp, M, new cv.Size(dw, dh));
+                            resC.width = dw; resC.height = dh;
+                            cv.imshow(resC, warp);
+                            rawData = resC.getContext('2d').getImageData(0, 0, dw, dh);
+                            iW = dw; iH = dh;
+                            sM.delete(); dM.delete(); M.delete(); warp.delete(); doc.delete();
+                        } else {
+                            cv.imshow(resC, src);
+                            rawData = resC.getContext('2d').getImageData(0, 0, w, h);
+                        }
+                    } finally { g.delete(); e.delete(); ct.delete(); hier.delete(); src.delete(); }
+                    applyFil(filter);
+                    spOff();
+                } catch(e) { spOff(); console.error(e); }
+            }, 50);
+        }
+
+        bRetake.addEventListener('click', () => {
+            stage.classList.remove('has-result'); guide.style.display = 'block'; ovC.style.display = 'block';
+            bCap.style.display = 'inline-flex'; bRetake.style.display = 'none';
+            revSec.style.display = 'none'; cMode = false; corC.style.display = 'none';
+            bShare.disabled = true; procUrl = null; procBlob = null; rawData = null; angle = 0;
             startCam();
         });
 
-        filterBtns.forEach(b => b.addEventListener('click', () => {
-            cornerMode = false; crnCanvas.style.display = 'none';
-            filterBtns.forEach(x => x.classList.remove('active')); b.classList.add('active');
-            applyFil(b.dataset.filter);
+        fBtns.forEach(b => b.addEventListener('click', () => {
+            if (!rawData) return;
+            cMode = false; corC.style.display = 'none'; bCorn.classList.remove('on');
+            fBtns.forEach(x => x.classList.remove('active')); b.classList.add('active');
+            filter = b.dataset.f;
+            applyFil(filter);
         }));
 
         function applyFil(f) {
-            filter = f;
-            if (!rawData || !window.cv || !cv.Mat) { if (rawData) { capCanvas.getContext('2d').putImageData(rawData, 0, 0); } return; }
+            if (!rawData || !window.cv || !cv.Mat) { if (rawData) resC.getContext('2d').putImageData(rawData, 0, 0); return; }
             const src = cv.matFromImageData(rawData);
-            const gray = new cv.Mat(); const res = new cv.Mat();
+            const g = new cv.Mat(), r = new cv.Mat();
             try {
-                cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+                cv.cvtColor(src, g, cv.COLOR_RGBA2GRAY);
                 if (f === 'document') {
-                    const clahe = new cv.CLAHE(2.0, new cv.Size(8,8)); const cl = new cv.Mat();
-                    clahe.apply(gray, cl);
-                    cv.adaptiveThreshold(cl, res, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, 6);
+                    const clahe = new cv.CLAHE(2, new cv.Size(8,8)); const cl = new cv.Mat();
+                    clahe.apply(g, cl);
+                    cv.adaptiveThreshold(cl, r, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, 6);
                     cl.delete(); clahe.delete();
                 } else if (f === 'enhanced') {
-                    const clahe = new cv.CLAHE(3.0, new cv.Size(8,8));
-                    clahe.apply(gray, res); clahe.delete();
-                } else {
-                    gray.copyTo(res);
-                }
-                const out = new cv.Mat(); cv.cvtColor(res, out, cv.COLOR_GRAY2RGBA);
-                cv.imshow(capCanvas, out); out.delete();
-            } finally { src.delete(); gray.delete(); res.delete(); }
-        }
-
-        btnConfirm.addEventListener('click', () => {
-            if (!rawData) return;
-            cornerMode = false; crnCanvas.style.display = 'none';
-            spShow('Processando...');
-            setTimeout(() => {
-                try {
-                    if (!window.cv || !cv.Mat) { saveRes(); spHide(); return; }
-                    procPersp(); spHide();
-                } catch (e) { spHide(); alert('Erro: ' + e.message); }
-            }, 100);
-        });
-
-        btnCancel.addEventListener('click', () => { if (isVideo) btnRetake.click(); else resetUp(); });
-
-        btnRot.addEventListener('click', () => {
-            if (!rawData) return;
-            angle = (angle - 90) % 360;
-            const tmp = document.createElement('canvas');
-            const ctx = capCanvas.getContext('2d');
-            const w = capCanvas.width, h = capCanvas.height;
-            tmp.width = w; tmp.height = h;
-            tmp.getContext('2d').drawImage(capCanvas, 0, 0);
-            ctx.clearRect(0, 0, w, h);
-            capCanvas.width = h; capCanvas.height = w;
-            ctx.save(); ctx.translate(h/2, w/2); ctx.rotate(-90 * Math.PI / 180); ctx.drawImage(tmp, -w/2, -h/2); ctx.restore();
-            rawData = ctx.getImageData(0, 0, h, w);
-            imgW = h; imgH = w;
+                    const clahe = new cv.CLAHE(3, new cv.Size(8,8));
+                    clahe.apply(g, r); clahe.delete();
+                } else { g.copyTo(r); }
+                const out = new cv.Mat(); cv.cvtColor(r, out, cv.COLOR_GRAY2RGBA);
+                cv.imshow(resC, out);
+                rawData = resC.getContext('2d').getImageData(0, 0, resC.width, resC.height);
+                iW = resC.width; iH = resC.height;
+                out.delete();
+            } finally { src.delete(); g.delete(); r.delete(); }
             saveRes();
-        });
-
-        function procPersp(custom) {
-            if (!rawData) return;
-            const src = cv.matFromImageData(rawData);
-            const w = rawData.width, h = rawData.height;
-            const gray = new cv.Mat(), edges = new cv.Mat(), contours = new cv.MatVector(), hier = new cv.Mat();
-            try {
-                cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-                cv.GaussianBlur(gray, gray, new cv.Size(5,5), 0);
-                cv.Canny(gray, edges, 50, 150);
-                cv.findContours(edges, contours, hier, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-                let maxA = 0, doc = null;
-                for (let i = 0; i < contours.size(); i++) {
-                    const cnt = contours.get(i); const a = cv.contourArea(cnt);
-                    if (a > maxA && a > w*h*0.08) {
-                        const peri = cv.arcLength(cnt, true); const approx = new cv.Mat();
-                        cv.approxPolyDP(cnt, approx, 0.02*peri, true);
-                        if (approx.rows === 4 && cv.isContourConvex(approx)) { maxA = a; if (doc) doc.delete(); doc = approx; }
-                        else approx.delete();
-                    }
-                }
-
-                const grayF = new cv.Mat();
-                if (filter === 'color' || filter === 'enhanced') {
-                    const clahe = new cv.CLAHE(3.0, new cv.Size(8,8)); const enh = new cv.Mat();
-                    cv.cvtColor(src, grayF, cv.COLOR_RGBA2GRAY);
-                    clahe.apply(grayF, enh);
-                    if (filter === 'enhanced') {
-                        const out = new cv.Mat(); cv.cvtColor(enh, out, cv.COLOR_GRAY2RGBA);
-                        finProc(out, doc, w, h, grayF, src, gray, edges, contours, hier, enh); return;
-                    }
-                    enh.delete(); clahe.delete();
-                } else {
-                    cv.cvtColor(src, grayF, cv.COLOR_RGBA2GRAY);
-                }
-                const bin = new cv.Mat();
-                cv.adaptiveThreshold(grayF, bin, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, 6);
-                const out = new cv.Mat(); cv.cvtColor(bin, out, cv.COLOR_GRAY2RGBA);
-                finProc(out, doc, w, h, grayF, src, gray, edges, contours, hier, bin);
-            } catch (e) { src.delete(); gray.delete(); edges.delete(); contours.delete(); hier.delete(); throw e; }
-        }
-
-        function finProc(outM, doc, w, h, ...toDel) {
-            try {
-                if (!doc) { cv.imshow(capCanvas, outM); saveRes(); return; }
-                const pts = [];
-                for (let i = 0; i < 4; i++) pts.push([doc.data32S[i*2], doc.data32S[i*2+1]]);
-                const ord = orderPts(pts);
-                const cw = Math.max(Math.hypot(ord[1][0]-ord[0][0], ord[1][1]-ord[0][1]), Math.hypot(ord[2][0]-ord[3][0], ord[2][1]-ord[3][1]));
-                const ch = Math.max(Math.hypot(ord[3][0]-ord[0][0], ord[3][1]-ord[0][1]), Math.hypot(ord[2][0]-ord[1][0], ord[2][1]-ord[1][1]));
-                const sM = cv.matFromArray(4, 1, cv.CV_32FC2, [ord[0][0],ord[0][1], ord[1][0],ord[1][1], ord[2][0],ord[2][1], ord[3][0],ord[3][1]]);
-                const dM = cv.matFromArray(4, 1, cv.CV_32FC2, [0,0, cw-1,0, cw-1,ch-1, 0,ch-1]);
-                const M = cv.getPerspectiveTransform(sM, dM);
-                const warped = new cv.Mat();
-                cv.warpPerspective(outM, warped, M, new cv.Size(cw, ch));
-                cv.imshow(capCanvas, warped);
-                sM.delete(); dM.delete(); M.delete(); warped.delete(); if (doc) doc.delete();
-                saveRes();
-            } finally { outM.delete(); toDel.forEach(m => { try { m.delete(); } catch(e) {} }); }
         }
 
         function saveRes() {
-            processedUrl = capCanvas.toDataURL('image/jpeg', 0.95);
-            capCanvas.toBlob(b => { processedBlob = b; }, 'image/jpeg', 0.95);
-            btnShare.disabled = false;
+            procUrl = resC.toDataURL('image/jpeg', 0.95);
+            resC.toBlob(b => { procBlob = b; }, 'image/jpeg', 0.95);
+            bShare.disabled = false;
         }
 
-        btnCorners.addEventListener('click', () => {
-            if (!rawData || !window.cv || !cv.Mat) { return; }
-            cornerMode = !cornerMode;
-            crnCanvas.style.display = cornerMode ? 'block' : 'none';
-            btnCorners.classList.toggle('active', cornerMode);
-            if (cornerMode) initCorners();
+        bOk.addEventListener('click', () => {
+            cMode = false; corC.style.display = 'none'; bCorn.classList.remove('on');
+            saveRes();
         });
 
-        function initCorners() {
-            const rect = stage.getBoundingClientRect();
-            crnCanvas.width = rect.width; crnCanvas.height = rect.height;
+        bCancel.addEventListener('click', () => { if (isCam) bRetake.click(); else resetUp(); });
+
+        bRot.addEventListener('click', () => {
+            if (!rawData) return;
+            angle = (angle - 90) % 360;
+            const c = document.createElement('canvas');
+            const w = resC.width, h = resC.height;
+            c.width = h; c.height = w;
+            const ctx = c.getContext('2d');
+            ctx.translate(h/2, w/2); ctx.rotate(-90 * Math.PI / 180);
+            ctx.drawImage(resC, -w/2, -h/2);
+            resC.width = h; resC.height = w;
+            resC.getContext('2d').drawImage(c, 0, 0);
+            rawData = resC.getContext('2d').getImageData(0, 0, h, w);
+            iW = h; iH = w;
+            saveRes();
+        });
+
+        // === Corners ===
+        bCorn.addEventListener('click', () => {
+            if (!rawData) return;
+            cMode = !cMode;
+            corC.style.display = cMode ? 'block' : 'none';
+            bCorn.classList.toggle('on', cMode);
+            if (cMode) initCorn();
+        });
+
+        function initCorn() {
+            const r = stage.getBoundingClientRect();
+            corC.width = r.width; corC.height = r.height;
             const m = 20;
-            corners = [[m,m], [rect.width-m,m], [rect.width-m,rect.height-m], [m,rect.height-m]];
-            drawCrn();
-            setupCrnDrag();
+            cPts = [[m,m],[r.width-m,m],[r.width-m,r.height-m],[m,r.height-m]];
+            drawCorn(); setupDrag();
         }
 
-        function drawCrn() {
-            const ctx = crnCanvas.getContext('2d');
-            ctx.clearRect(0, 0, crnCanvas.width, crnCanvas.height);
-            if (corners.length === 4) {
-                ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.moveTo(corners[0][0], corners[0][1]);
-                for (let i = 1; i < 4; i++) ctx.lineTo(corners[i][0], corners[i][1]); ctx.closePath(); ctx.stroke();
-                ctx.fillStyle = 'rgba(99,102,241,0.08)'; ctx.fill();
+        function drawCorn() {
+            const ctx = corC.getContext('2d');
+            ctx.clearRect(0,0,corC.width,corC.height);
+            if (cPts.length===4) {
+                ctx.strokeStyle='#6366f1'; ctx.lineWidth=3;
+                ctx.beginPath(); ctx.moveTo(cPts[0][0],cPts[0][1]);
+                for(let i=1;i<4;i++) ctx.lineTo(cPts[i][0],cPts[i][1]); ctx.closePath(); ctx.stroke();
+                ctx.fillStyle='rgba(99,102,241,.08)'; ctx.fill();
             }
-            for (let i = 0; i < corners.length; i++) {
-                ctx.fillStyle = '#6366f1'; ctx.beginPath(); ctx.arc(corners[i][0], corners[i][1], 12, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
-                ctx.fillStyle = '#fff'; ctx.font = 'bold 13px Inter'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(i+1, corners[i][0], corners[i][1]);
+            for(let i=0;i<cPts.length;i++) {
+                ctx.fillStyle='#6366f1'; ctx.beginPath(); ctx.arc(cPts[i][0],cPts[i][1],12,0,Math.PI*2); ctx.fill();
+                ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
+                ctx.fillStyle='#fff'; ctx.font='bold 13px Inter'; ctx.textAlign='center'; ctx.textBaseline='middle';
+                ctx.fillText(i+1,cPts[i][0],cPts[i][1]);
             }
         }
 
-        function setupCrnDrag() {
-            const getPos = e => {
-                const r = crnCanvas.getBoundingClientRect();
-                return [ (e.clientX || (e.touches && e.touches[0].clientX)) - r.left, (e.clientY || (e.touches && e.touches[0].clientY)) - r.top ];
-            };
-            crnCanvas.onmousedown = crnCanvas.ontouchstart = e => {
-                e.preventDefault(); const [mx, my] = getPos(e);
-                for (let i = 0; i < corners.length; i++) { if (Math.hypot(mx-corners[i][0], my-corners[i][1]) < 24) { dragI = i; return; } }
-            };
-            const mv = e => { if (dragI < 0) return; e.preventDefault(); const [mx, my] = getPos(e); corners[dragI] = [mx, my]; drawCrn(); };
-            const up = () => { if (dragI >= 0) { dragI = -1; applyCorner(); } };
-            crnCanvas.onmousemove = mv; crnCanvas.ontouchmove = mv;
-            crnCanvas.onmouseup = up; crnCanvas.ontouchend = up; crnCanvas.onmouseleave = up;
+        function setupDrag() {
+            const gp = e => { const r = corC.getBoundingClientRect(); return [(e.clientX||(e.touches&&e.touches[0].clientX))-r.left,(e.clientY||(e.touches&&e.touches[0].clientY))-r.top]; };
+            corC.onmousedown = corC.ontouchstart = e => { e.preventDefault(); const [x,y]=gp(e); for(let i=0;i<cPts.length;i++){if(Math.hypot(x-cPts[i][0],y-cPts[i][1])<24){dI=i;return;}} };
+            const mv = e => { if(dI<0)return; e.preventDefault(); const [x,y]=gp(e); cPts[dI]=[x,y]; drawCorn(); };
+            const up = () => { if(dI>=0){dI=-1;applyCornPersp();} };
+            corC.onmousemove=mv; corC.ontouchmove=mv; corC.onmouseup=up; corC.ontouchend=up; corC.onmouseleave=up;
         }
 
-        function applyCorner() {
-            if (!rawData || !window.cv || !cv.Mat) return;
+        function applyCornPersp() {
+            if (!rawData||!window.cv||!cv.Mat) return;
             const src = cv.matFromImageData(rawData);
             const rw = rawData.width, rh = rawData.height;
-            const cRect = crnCanvas.getBoundingClientRect();
-            const sx = rw / cRect.width, sy = rh / cRect.height;
-            const pts = corners.map(p => [p[0] * sx, p[1] * sy]);
-            const ord = orderPts(pts);
-            const dw = Math.max(Math.hypot(ord[1][0]-ord[0][0], ord[1][1]-ord[0][1]), Math.hypot(ord[2][0]-ord[3][0], ord[2][1]-ord[3][1]));
-            const dh = Math.max(Math.hypot(ord[3][0]-ord[0][0], ord[3][1]-ord[0][1]), Math.hypot(ord[2][0]-ord[1][0], ord[2][1]-ord[1][1]));
-            const sM = cv.matFromArray(4, 1, cv.CV_32FC2, [ord[0][0],ord[0][1], ord[1][0],ord[1][1], ord[2][0],ord[2][1], ord[3][0],ord[3][1]]);
-            const dM = cv.matFromArray(4, 1, cv.CV_32FC2, [0,0, dw-1,0, dw-1,dh-1, 0,dh-1]);
+            const cR = stage.getBoundingClientRect();
+            const sx = rw/cR.width, sy = rh/cR.height;
+            const pts = cPts.map(p => [p[0]*sx, p[1]*sy]);
+            const ord = orderP(pts);
+            const dw = Math.max(Math.hypot(ord[1][0]-ord[0][0],ord[1][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[3][0],ord[2][1]-ord[3][1]));
+            const dh = Math.max(Math.hypot(ord[3][0]-ord[0][0],ord[3][1]-ord[0][1]),Math.hypot(ord[2][0]-ord[1][0],ord[2][1]-ord[1][1]));
+            const sM = cv.matFromArray(4,1,cv.CV_32FC2,[ord[0][0],ord[0][1],ord[1][0],ord[1][1],ord[2][0],ord[2][1],ord[3][0],ord[3][1]]);
+            const dM = cv.matFromArray(4,1,cv.CV_32FC2,[0,0,dw-1,0,dw-1,dh-1,0,dh-1]);
             const M = cv.getPerspectiveTransform(sM, dM);
-            const gray = new cv.Mat(), result = new cv.Mat();
+            const g = new cv.Mat(), r = new cv.Mat();
             try {
-                cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+                cv.cvtColor(src, g, cv.COLOR_RGBA2GRAY);
                 if (filter === 'document') {
-                    const clahe = new cv.CLAHE(2.0, new cv.Size(8,8)); const cl = new cv.Mat();
-                    clahe.apply(gray, cl);
-                    cv.adaptiveThreshold(cl, result, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, 6);
+                    const clahe = new cv.CLAHE(2, new cv.Size(8,8)); const cl = new cv.Mat();
+                    clahe.apply(g, cl); cv.adaptiveThreshold(cl, r, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, 6);
                     cl.delete(); clahe.delete();
                 } else if (filter === 'enhanced') {
-                    const clahe = new cv.CLAHE(3.0, new cv.Size(8,8));
-                    clahe.apply(gray, result); clahe.delete();
-                } else { gray.copyTo(result); }
-                const out = new cv.Mat(); cv.cvtColor(result, out, cv.COLOR_GRAY2RGBA);
-                const warped = new cv.Mat();
-                cv.warpPerspective(out, warped, M, new cv.Size(dw, dh));
-                cv.imshow(capCanvas, warped);
-                sM.delete(); dM.delete(); M.delete(); warped.delete(); out.delete();
+                    const clahe = new cv.CLAHE(3, new cv.Size(8,8));
+                    clahe.apply(g, r); clahe.delete();
+                } else { g.copyTo(r); }
+                const out = new cv.Mat(); cv.cvtColor(r, out, cv.COLOR_GRAY2RGBA);
+                const warp = new cv.Mat();
+                cv.warpPerspective(out, warp, M, new cv.Size(dw, dh));
+                cv.imshow(resC, warp);
+                rawData = resC.getContext('2d').getImageData(0,0,dw,dh);
+                iW = dw; iH = dh;
+                sM.delete(); dM.delete(); M.delete(); warp.delete(); out.delete();
                 saveRes();
-            } finally { src.delete(); gray.delete(); result.delete(); }
+            } finally { src.delete(); g.delete(); r.delete(); }
         }
 
-        btnCam.addEventListener('click', () => {
-            btnCam.classList.add('active'); btnGal.classList.remove('active');
-            isVideo = true; upSec.style.display = 'none'; camSec.style.display = 'block';
+        // === Source switching ===
+        bCam.addEventListener('click', () => {
+            bCam.classList.add('active'); bUp.classList.remove('active');
+            isCam = true; upSec.style.display = 'none'; camSec.style.display = 'block';
+            revSec.style.display = 'none'; bShare.disabled = true;
             startCam();
         });
-        btnGal.addEventListener('click', () => {
-            btnCam.classList.remove('active'); btnGal.classList.add('active');
-            isVideo = false; stopDetect(); stopCam();
+        bUp.addEventListener('click', () => {
+            bCam.classList.remove('active'); bUp.classList.add('active');
+            isCam = false; stopDetect(); stopCam();
             camSec.style.display = 'none'; upSec.style.display = 'block';
-            revSec.style.display = 'none'; btnShare.disabled = true;
+            revSec.style.display = 'none'; bShare.disabled = true;
         });
 
+        upArea.addEventListener('click', () => upInput.click());
         upInput.addEventListener('change', e => {
             const f = e.target.files[0]; if (!f) return;
             const r = new FileReader();
             r.onload = ev => {
                 const img = new Image();
                 img.onload = () => {
-                    capCanvas.width = img.width; capCanvas.height = img.height;
-                    capCanvas.getContext('2d').drawImage(img, 0, 0);
-                    rawData = capCanvas.getContext('2d').getImageData(0, 0, img.width, img.height);
-                    imgW = img.width; imgH = img.height; angle = 0;
-                    stage.classList.add('captured'); frameOvl.style.display = 'none';
-                    btnRetake.style.display = 'inline-flex'; revSec.style.display = 'block'; upSec.style.display = 'none';
-                    cornerMode = false; crnCanvas.style.display = 'none';
-                    spShow('Processando...');
-                    setTimeout(() => {
-                        try { if (window.cv && cv.Mat) procPersp(); else saveRes(); spHide(); }
-                        catch(e) { spHide(); saveRes(); }
-                    }, 100);
+                    resC.width = img.width; resC.height = img.height;
+                    resC.getContext('2d').drawImage(img, 0, 0);
+                    rawData = resC.getContext('2d').getImageData(0, 0, img.width, img.height);
+                    iW = img.width; iH = img.height; angle = 0;
+                    stage.classList.add('has-result'); guide.style.display = 'none';
+                    bRetake.style.display = 'inline-flex'; revSec.style.display = 'block'; upSec.style.display = 'none';
+                    cMode = false; corC.style.display = 'none';
+                    procDoc();
                 };
                 img.src = ev.target.result;
             };
             r.readAsDataURL(f);
         });
 
-        (btnUp || document.getElementById('upload-area')).addEventListener('click', () => upInput.click());
-
         function resetUp() {
-            stage.classList.remove('captured'); frameOvl.style.display = 'block';
-            btnCap.style.display = 'inline-flex'; btnRetake.style.display = 'none';
-            revSec.style.display = 'none'; crnCanvas.style.display = 'none';
-            btnShare.disabled = true; processedUrl = null; processedBlob = null; rawData = null;
-            btnGal.click();
+            stage.classList.remove('has-result'); guide.style.display = 'block';
+            bCap.style.display = 'inline-flex'; bRetake.style.display = 'none';
+            revSec.style.display = 'none'; corC.style.display = 'none';
+            bShare.disabled = true; procUrl = null; procBlob = null; rawData = null;
+            bUp.click();
         }
 
-        function getData() {
-            return { rede: selRede.value, loja: selLoja.value, promotor: promotor || '', tipo: selTipo.value, date: new Date().toLocaleDateString('pt-BR') };
-        }
+        // === Share ===
+        function getData() { return { rede:sR.value, loja:sL.value, promotor:promo||'', tipo:sT.value, date:new Date().toLocaleDateString('pt-BR') }; }
 
-        btnShare.addEventListener('click', async () => {
-            if (!selLoja.value || !selTipo.value) { alert('Preencha todos os dados.'); return; }
-            if (!processedUrl && !processedBlob) {
-                if (rawData) {
-                    spShow('Processando...');
-                    try {
-                        if (window.cv && cv.Mat) procPersp(); else saveRes();
-                        await new Promise(r => setTimeout(r, 500)); spHide();
-                    } catch(e) { spHide(); alert('Erro ao processar.'); return; }
-                } else { alert('Capture um documento primeiro.'); return; }
-            }
+        bShare.addEventListener('click', async () => {
+            if (!sL.value || !sT.value) { alert('Preencha todos os dados.'); return; }
+            if (!procUrl) { if (rawData) { saveRes(); await new Promise(r => setTimeout(r, 300)); } else { alert('Capture um documento.'); return; } }
             const data = getData();
             const pdf = $('pdf-content'); pdf.style.display = 'block';
             $('pdf-data').textContent = data.date;
@@ -865,25 +718,24 @@
             $('pdf-loja').textContent = data.loja;
             $('pdf-promotor').textContent = data.promotor;
             $('pdf-tipo').textContent = data.tipo;
-            const ic = $('pdf-image-container'); ic.innerHTML = '';
-            const im = document.createElement('img'); im.src = processedUrl || capCanvas.toDataURL('image/jpeg', 0.95);
-            im.className = 'pdf-doc-image'; im.style.maxWidth = '100%'; im.style.maxHeight = '700px'; ic.appendChild(im);
+            const ic = $('pdf-img-wrap'); ic.innerHTML = '';
+            const im = document.createElement('img'); im.src = procUrl;
+            im.className = 'pdf-img'; im.style.maxWidth = '100%'; im.style.maxHeight = '700px'; ic.appendChild(im);
             const fn = `${data.tipo.replace(/\s+/g, '_')}_${data.loja}.pdf`;
             try {
-                spShow('Gerando PDF...');
-                const blob = await html2pdf().set({ margin: 10, filename: fn, image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true, logging: false }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(pdf).output('blob');
-                spHide(); pdf.style.display = 'none';
-                const file = new File([blob], fn, { type: 'application/pdf' });
+                spOn('Gerando PDF...');
+                const blob = await html2pdf().set({ margin:10, filename:fn, image:{type:'jpeg',quality:.95}, html2canvas:{scale:2,useCORS:true,logging:false}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} }).from(pdf).output('blob');
+                spOff(); pdf.style.display = 'none';
+                const file = new File([blob], fn, { type:'application/pdf' });
                 if (navigator.share) {
                     try {
-                        if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: data.tipo + ' - ' + data.loja });
-                        else await navigator.share({ title: data.tipo + ' - ' + data.loja, text: data.tipo + '\nRede: ' + data.rede + '\nLoja: ' + data.loja + '\nPromotor: ' + data.promotor + '\nData: ' + data.date });
+                        if (navigator.canShare && navigator.canShare({ files:[file] })) await navigator.share({ files:[file], title:data.tipo+' - '+data.loja });
+                        else await navigator.share({ title:data.tipo+' - '+data.loja, text:data.tipo+'\nRede: '+data.rede+'\nLoja: '+data.loja });
                     } catch(e) { if (e.name !== 'AbortError') throw e; }
                 } else {
                     const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = fn; link.click();
-                    setTimeout(() => URL.revokeObjectURL(link.href), 10000);
                 }
-            } catch(err) { spHide(); if (err.name !== 'AbortError') { console.error(err); alert('Erro ao gerar PDF.'); } pdf.style.display = 'none'; }
+            } catch(err) { spOff(); if (err.name !== 'AbortError') { console.error(err); alert('Erro ao gerar PDF.'); } pdf.style.display = 'none'; }
         });
 
         loadCV().then(startCam).catch(() => { console.warn('OpenCV fallback'); startCam(); });
