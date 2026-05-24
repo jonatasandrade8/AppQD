@@ -370,11 +370,17 @@
 
         async function abrirCameraScanner() {
             try {
-                const constraints = {
-                    video: { facingMode: "environment", width: { ideal: 3840 }, height: { ideal: 2160 } },
-                    audio: false
-                };
-                scannerStream = await navigator.mediaDevices.getUserMedia(constraints);
+                try {
+                    scannerStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: { exact: "environment" }, width: { ideal: 3840 }, height: { ideal: 2160 } },
+                        audio: false
+                    });
+                } catch (e) {
+                    scannerStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: "environment", width: { ideal: 3840 }, height: { ideal: 2160 } },
+                        audio: false
+                    });
+                }
                 const video = $('scanner-video');
                 video.srcObject = scannerStream;
                 $('scanner-cam-overlay').classList.add('active');
