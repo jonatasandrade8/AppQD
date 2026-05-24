@@ -738,15 +738,17 @@
                 const blob = await gerarPDFcomJsPDF(data, procUrl);
                 spOff();
                 const file = new File([blob], fn, { type:'application/pdf' });
-                if (navigator.share) {
+                const podeShare = navigator.canShare && navigator.canShare({ files:[file] });
+                if (navigator.share && podeShare) {
                     spOn('Compartilhando...');
                     try {
-                        if (navigator.canShare && navigator.canShare({ files:[file] })) await navigator.share({ files:[file], title:data.tipo+' - '+data.loja });
-                        else await navigator.share({ title:data.tipo+' - '+data.loja, text:data.tipo+'\nRede: '+data.rede+'\nLoja: '+data.loja });
+                        await navigator.share({ files:[file], title:data.tipo+' - '+data.loja });
                         mostrarToast('PDF enviado com sucesso!', 'success');
                     } catch(e) {
-                        if (e.name !== 'AbortError') throw e;
-                        else { spOff(); bShare.disabled = false; return; }
+                        if (e.name !== 'AbortError') {
+                            const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = fn; link.click();
+                            mostrarToast('PDF baixado com sucesso!', 'success');
+                        } else { spOff(); bShare.disabled = false; return; }
                     }
                 } else {
                     const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = fn; link.click();
