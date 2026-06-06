@@ -72,6 +72,11 @@ const NOTIFICATIONS_CONFIG = {
             enabled: true,
             filename: "scanner-documento.html",
             mensagem: "O scanner de documentos está temporariamente desativado."
+        },
+        feriados: {
+            enabled: true,
+            filename: "feriados.html",
+            mensagem: "A página de feriados está temporariamente desativada."
         }
     }
 };

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="3600">
+    <meta name="description" content="Feriados Trabalhados - Qdelícia Frutas">
+    <title>Feriados - Qdelícia Frutas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: var(--bg-light);
+        }
+        .tab-btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px 15px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: var(--white);
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        .tab-btn.active {
+            background: var(--gradient);
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+        }
+        .iframe-container {
+            padding: 15px;
+            background: #f4f4f4;
+        }
+        .iframe-wrapper {
+            position: relative;
+            border: 3px solid #1e1b4b;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background: white;
+        }
+        .iframe-wrapper::after {
+            content: '↕ Arraste dentro da borda para rolar o formulário';
+            display: block;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            padding: 5px;
+            background: #eee;
+            border-top: 1px solid #ddd;
+        }
+        iframe {
+            display: block;
+            width: 100%;
+            height: 85vh;
+            border: none;
+        }
+        @media (max-width: 600px) {
+            .tab-buttons { padding: 10px; gap: 8px; }
+            .tab-btn { font-size: 0.85rem; padding: 10px; min-width: 140px; }
+            .iframe-container { padding: 10px 5px; }
+            iframe { height: 75vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-overlay"></div>
+    <aside class="side-menu">
+        <a href="index.html"><i class="fas fa-home"></i> <span class="link-text">Início</span></a>
+        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> <span class="link-text">Estoque</span></a>
+        <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
+        <a href="scanner-documento.html"><i class="fas fa-file-alt"></i> <span class="link-text">Scanner</span></a>
+        <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
+        <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
+        <a href="feriados.html" class="active"><i class="fas fa-calendar-alt"></i> <span class="link-text">Feriados</span></a>
+        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span class="link-text">Solicitações</span></a>
+        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span></a>
+    </aside>
+
+    <header id="cabecalho-principal">
+        <button class="menu-toggle" aria-label="Abrir Menu">
+            <i class="fas fa-bars"></i>
+            <span class="menu-label">Menu</span>
+        </button>
+        <div class="logo-placeholder">
+            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+        </div>
+        <h1 id="welcome-message">Feriados</h1>
+        <p>Feriados Trabalhados</p>
+
+        <button onclick="recarregarPagina()" class="btn-refresh">
+            <i class="fas fa-sync-alt"></i> Atualizar Página
+        </button>
+    </header>
+
+    <nav class="desktop-nav">
+        <a href="index.html">Início</a>
+        <a href="estoque.html">Estoque</a>
+        <a href="camera.html">Câmera</a>
+        <a href="scanner-documento.html">Scanner</a>
+        <a href="materiais.html">Materiais</a>
+        <a href="pedido.html">Sugestão</a>
+        <a href="feriados.html" class="active">Feriados</a>
+        <a href="solicitacoes.html">Solicitações</a>
+        <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
+    </nav>
+
+    <div class="tab-buttons" style="padding-top: 4px;">
+        <button class="tab-btn active" id="btn-colaborador" onclick="mostrarVisao('colaborador')">
+            <i class="fas fa-user"></i> Colaborador
+        </button>
+        <button class="tab-btn" id="btn-gestor" onclick="mostrarVisao('gestor')">
+            <i class="fas fa-user-tie"></i> Gestor
+        </button>
+    </div>
+
+    <main class="iframe-container">
+        <div class="iframe-wrapper" id="wrapper-feriados">
+            <iframe id="iframe-feriados"
+                src="https://script.google.com/macros/s/AKfycbxmi0Txx1dMEUOjoFHIsbmnr2jKtJZj9PynAt5cJL6b0hew1E3OiAZV16YPA2u_fxLCOQ/exec"
+                frameborder="0" marginheight="0" marginwidth="0">
+                Carregando formulário...
+            </iframe>
+        </div>
+    </main>
+
+    <nav class="bottom-tabs">
+        <a href="index.html" class="tab-item"><i class="fas fa-home"></i><span>Início</span></a>
+        <a href="estoque.html" class="tab-item"><i class="fas fa-boxes-stacked"></i><span>Estoque</span></a>
+        <a href="camera.html" class="tab-item"><i class="fas fa-camera"></i><span>Câmera</span></a>
+        <a href="scanner-documento.html" class="tab-item"><i class="fas fa-file-alt"></i><span>Scanner</span></a>
+        <a href="pedido.html" class="tab-item"><i class="fas fa-file-invoice"></i><span>Pedido</span></a>
+    </nav>
+
+    <footer>
+        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
+    </footer>
+
+    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script src="notifications.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mostrarVisao('colaborador');
+            var iframe = document.getElementById('iframe-feriados');
+            var btnColab = document.getElementById('btn-colaborador');
+            var btnGestor = document.getElementById('btn-gestor');
+
+            iframe.onload = function() {
+                btnColab.disabled = false;
+                btnGestor.disabled = false;
+                btnColab.innerHTML = '<i class="fas fa-user"></i> Colaborador';
+                btnGestor.innerHTML = '<i class="fas fa-user-tie"></i> Gestor';
+            };
+        });
+
+        function mostrarVisao(tipo) {
+            var iframe = document.getElementById('iframe-feriados');
+            var btnColab = document.getElementById('btn-colaborador');
+            var btnGestor = document.getElementById('btn-gestor');
+            var BASE_URL = 'https://script.google.com/macros/s/AKfycbyFXCASO7k4Eb34bOGedzVe-x68QsbfaKbSQMPodRivJ9iH_vxuyAe7yekooJQR0c1wng/exec';
+
+            btnColab.classList.remove('active');
+            btnGestor.classList.remove('active');
+
+            if (tipo === 'colaborador') {
+                btnColab.classList.add('active');
+                iframe.src = BASE_URL + '?page=Colaborador';
+            } else {
+                btnGestor.classList.add('active');
+                iframe.src = BASE_URL + '?page=Gestor';
+            }
+
+            // Desabilitar botões durante carregamento
+            btnColab.disabled = true;
+            btnGestor.disabled = true;
+            btnColab.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+            btnGestor.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+        }
+
+        function recarregarPagina() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>

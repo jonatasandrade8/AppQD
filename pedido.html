@@ -367,6 +367,7 @@
         <a href="scanner-documento.html"><i class="fas fa-file-alt"></i> <span class="link-text">Scanner</span></a>
         <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
         <a href="pedido.html" class="active"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
+        <a href="feriados.html"><i class="fas fa-calendar-alt"></i> <span class="link-text">Feriados</span></a>
         <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span class="link-text">Solicitações</span></a>
         <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span></a>
     </aside>
@@ -379,17 +380,18 @@
         <div class="logo-placeholder">
             <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelicia Frutas">
         </div>
-        <h1>Qdelícia Frutas</h1>
+        <h1>Sugestão de Pedido</h1>
         <p>Sugestão de Pedido</p>
     </header>
 
-    <nav>
+    <nav class="desktop-nav">
         <a href="index.html">Início</a>
         <a href="estoque.html">Estoque</a>
         <a href="camera.html">Câmera</a>
         <a href="scanner-documento.html">Scanner</a>
         <a href="materiais.html">Materiais</a>
         <a href="pedido.html" class="active">Sugestão</a>
+        <a href="feriados.html">Feriados</a>
         <a href="solicitacoes.html">Solicitações</a>
         <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </nav>
@@ -542,11 +544,20 @@
         </div>
     </div>
 
+    <nav class="bottom-tabs">
+        <a href="index.html" class="tab-item"><i class="fas fa-home"></i><span>Início</span></a>
+        <a href="estoque.html" class="tab-item"><i class="fas fa-boxes-stacked"></i><span>Estoque</span></a>
+        <a href="camera.html" class="tab-item"><i class="fas fa-camera"></i><span>Câmera</span></a>
+        <a href="scanner-documento.html" class="tab-item"><i class="fas fa-file-alt"></i><span>Scanner</span></a>
+        <a href="pedido.html" class="tab-item active"><i class="fas fa-file-invoice"></i><span>Pedido</span></a>
+    </nav>
+
     <footer>
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
     </footer>
 
     <script src="notifications.js"></script>
+    <script src="config.js"></script>
     <script src="script.js"></script>
     <script src="pedido.js"></script>
 </body>

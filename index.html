@@ -32,43 +32,33 @@
         <a href="scanner-documento.html"><i class="fas fa-file-alt"></i> <span class="link-text">Scanner</span></a>
         <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
         <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
+        <a href="feriados.html"><i class="fas fa-calendar-alt"></i> <span class="link-text">Feriados</span></a>
         <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span class="link-text">Solicitações</span></a>
         <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span></a>
     </aside>
 
     <header id="cabecalho-principal">
-
         <button class="menu-toggle" aria-label="Abrir Menu">
-
             <i class="fas fa-bars"></i>
             <span class="menu-label">Menu</span>
-
         </button>
-
         <div class="logo-placeholder">
-
             <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
-
         </div>
-
-        <h1>Qdelícia Frutas</h1>
-
+        <h1>Início</h1>
         <p>Página Inicial</p>
-
-
-    </header>
-
     </header>
 
 
 
-    <nav>
+    <nav class="desktop-nav">
         <a href="index.html" class="active">Início</a>
         <a href="estoque.html">Estoque</a>
         <a href="camera.html">Câmera</a>
         <a href="scanner-documento.html">Scanner</a>
         <a href="materiais.html">Materiais</a>
         <a href="pedido.html">Sugestão</a>
+        <a href="feriados.html">Feriados</a>
         <a href="solicitacoes.html">Solicitações</a>
         <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </nav>
@@ -181,6 +171,14 @@
 
 
 
+    <nav class="bottom-tabs">
+        <a href="index.html" class="tab-item active"><i class="fas fa-home"></i><span>Início</span></a>
+        <a href="estoque.html" class="tab-item"><i class="fas fa-boxes-stacked"></i><span>Estoque</span></a>
+        <a href="camera.html" class="tab-item"><i class="fas fa-camera"></i><span>Câmera</span></a>
+        <a href="scanner-documento.html" class="tab-item"><i class="fas fa-file-alt"></i><span>Scanner</span></a>
+        <a href="pedido.html" class="tab-item"><i class="fas fa-file-invoice"></i><span>Pedido</span></a>
+    </nav>
+
     <footer>
 
         <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
@@ -207,163 +205,51 @@
     <script>
 
         // Função global (usada pelo alert.js) para atualizar a UI com base na permissão
-
         window.updateAlertUI = function (permission) {
-
-            const statusElement = document.getElementById('alert-status');
-
-            const toggle = document.getElementById('alert-toggle-switch');
-
-            const testBtn = document.getElementById('test-audio-btn');
-
-
-
+            var toggle = document.getElementById('alert-toggle-switch');
+            var testBtn = document.getElementById('test-audio-btn');
+            var statusElement = document.getElementById('alert-status');
+            if (!toggle || !statusElement) return;
             permission = permission || Notification.permission;
-
-
-
             if (permission === 'granted') {
-
-                const alertsEnabled = localStorage.getItem('alertsEnabled') === 'true';
-
-                toggle.checked = alertsEnabled;
-
+                var enabled = localStorage.getItem('alertsEnabled') === 'true';
+                toggle.checked = enabled;
                 toggle.disabled = false;
-
-                testBtn.style.display = 'inline-block'; // Mostra o botão de teste
-
-
-
-                if (alertsEnabled) {
-
-                    statusElement.innerHTML = '✅ **Alertas Ativos!** Clique em "Testar" se o áudio não funcionar nos lembretes.';
-
-                    document.getElementById('toggle-label-on').style.display = 'inline';
-
-                    document.getElementById('toggle-label-off').style.display = 'none';
-
-                } else {
-
-                    statusElement.innerHTML = 'Alertas pausados. Ligue o interruptor para reativar.';
-
-                    document.getElementById('toggle-label-on').style.display = 'none';
-
-                    document.getElementById('toggle-label-off').style.display = 'inline';
-
-                }
-
-
-
+                if (testBtn) testBtn.style.display = 'inline-block';
+                statusElement.innerHTML = enabled ? 'Alertas ativos!' : 'Alertas pausados.';
+                var onLabel = document.getElementById('toggle-label-on');
+                var offLabel = document.getElementById('toggle-label-off');
+                if (onLabel) onLabel.style.display = enabled ? 'inline' : 'none';
+                if (offLabel) offLabel.style.display = enabled ? 'none' : 'inline';
             } else if (permission === 'denied') {
-
-                statusElement.innerHTML = '❌ Alertas bloqueados permanentemente nas configurações do navegador.';
-
+                statusElement.innerHTML = 'Alertas bloqueados.';
                 toggle.checked = false;
-
-                toggle.disabled = true; // Desativa o toggle
-
-                testBtn.style.display = 'none';
-
-                document.getElementById('toggle-label-on').style.display = 'none';
-
-                document.getElementById('toggle-label-off').style.display = 'inline';
-
-
-
-            } else { // 'default'
-
-                statusElement.innerHTML = 'Ligue o interruptor para ativar os lembretes de voz e notificações.';
-
+                toggle.disabled = true;
+                if (testBtn) testBtn.style.display = 'none';
+            } else {
+                statusElement.innerHTML = 'Ligue o interruptor para ativar os alertas.';
                 toggle.checked = false;
-
                 toggle.disabled = false;
-
-                testBtn.style.display = 'none';
-
-                document.getElementById('toggle-label-on').style.display = 'none';
-
-                document.getElementById('toggle-label-off').style.display = 'inline';
-
+                if (testBtn) testBtn.style.display = 'none';
             }
-
         }
 
-
-
-        document.addEventListener('DOMContentLoaded', () => {
-
-            const toggle = document.getElementById('alert-toggle-switch');
-
-            const testBtn = document.getElementById('test-audio-btn');
-
-
-
-            // Listener para o Toggle Switch
-
-            toggle.addEventListener('change', () => {
-
-                if (toggle.checked) {
-
-                    // O usuário está LIGANDO
-
-                    console.log('Usuário ativou o toggle.');
-
-                    // Chama a função de permissão/ativação do alert.js
-
-                    // Ela cuidará de pedir permissão e iniciar o sistema
-
-                    if (typeof window.enableAlerts === 'function') {
-
-                        window.enableAlerts();
-
-                    }
-
-                } else {
-
-                    // O usuário está DESLIGANDO
-
-                    console.log('Usuário desativou o toggle.');
-
-                    if (typeof window.disableAlerts === 'function') {
-
-                        window.disableAlerts();
-
-                    }
-
-                }
-
-            });
-
-
-
-            // Listener para o Botão de Teste
-
-            testBtn.addEventListener('click', () => {
-
-                console.log('Botão de teste clicado. Desbloqueando áudio...');
-
-                // Chama a função de teste do alert.js
-
-                // Este clique é VITAL para smartphones
-
-                if (typeof window.unlockAndTestAudio === 'function') {
-
-                    window.unlockAndTestAudio();
-
-                }
-
-            });
-
-
-
-            // Atualiza a UI no carregamento da página
-
-            // O alert.js chamará isso de novo após verificar as permissões
-
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggle = document.getElementById('alert-toggle-switch');
+            var testBtn = document.getElementById('test-audio-btn');
+            if (toggle) {
+                toggle.addEventListener('change', function() {
+                    if (toggle.checked && typeof window.enableAlerts === 'function') window.enableAlerts();
+                    else if (!toggle.checked && typeof window.disableAlerts === 'function') window.disableAlerts();
+                });
+            }
+            if (testBtn) {
+                testBtn.addEventListener('click', function() {
+                    if (typeof window.unlockAndTestAudio === 'function') window.unlockAndTestAudio();
+                });
+            }
             window.updateAlertUI(Notification.permission);
-
         });
-
     </script>
 
     <script src="notifications.js"></script>

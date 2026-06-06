@@ -39,115 +39,163 @@ body {
     color: var(--text-dark);
     line-height: 1.6;
     font-size: 15px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    overscroll-behavior: none;
 }
 
 /* ===================== MOBILE FIRST - LAYOUT GERAL (APP LOOK) ===================== */
 
-/* O Menu Horizontal é escondido no mobile e substituído pelo Hamburger/Side Menu */
-nav {
+/* O nav horizontal padrão some no mobile */
+.desktop-nav {
     display: none;
 }
 
-/* Header */
+/* ===== HEADER COMPACTO (TOOLBAR) ===== */
 header {
     background: var(--gradient);
     color: var(--white);
-    text-align: center;
-    padding: 10px 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    min-height: 52px;
+    padding: 6px 48px;
+    padding-top: max(6px, env(safe-area-inset-top, 6px));
     position: relative;
-    box-shadow: 0 2px 10px var(--shadow);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.18);
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .logo-placeholder {
-    margin-bottom: 4px;
+    position: absolute;
+    left: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 0;
 }
 
 .logo-placeholder img {
-    max-width: 70px;
+    max-width: 28px;
     height: auto;
     border-radius: 50%;
 }
 
 header h1 {
-    font-size: 1.4rem;
+    font-size: 1rem;
     margin: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-weight: 600;
     line-height: 1.2;
+    letter-spacing: 0.3px;
 }
 
 header p {
-    font-size: 0.8rem;
-    margin-top: 2px;
-    opacity: 0.9;
+    width: 100%;
+    text-align: center;
+    font-size: 0.65rem;
+    margin: 0;
+    opacity: 0.85;
+    line-height: 1;
+    order: 10;
 }
 
-/* Menu Hamburger (Toggle Button) - Estilo Moderno */
+/* ===== BOTÃO HAMBURGER (ÍCONE PURO) ===== */
 .menu-toggle {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 15px;
-    left: 15px;
-    width: 55px;
-    /* Mais largo para o layout */
-    height: 55px;
-    /* Mais alto para caber o texto */
-    background: rgba(255, 255, 255, 0.15);
-    /* Glass effect */
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.12);
+    border: none;
     color: var(--white);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     cursor: pointer;
     z-index: 1001;
-    /* Acima da sidebar */
-    border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transition: background 0.2s;
 }
 
 .menu-toggle:active {
-    transform: scale(0.95);
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-50%) scale(0.92);
 }
 
-/* Ícone animado (opcional - simples por enquanto) */
 .menu-toggle i {
     transition: transform 0.3s ease;
 }
 
-/* Quando o menu está aberto, o botão pode mudar de estilo se quisermons via JS, 
-   mas aqui focamos no visual base */
-
 .menu-label {
-    display: block;
-    /* Traz de volta o texto */
-    font-size: 0.65rem;
-    margin-top: 2px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    display: none;
 }
 
-/* Menu Lateral (Side Menu - Mobile Refined) */
+/* ===== BOTTOM TAB BAR (NAVEGAÇÃO INFERIOR) ===== */
+.bottom-tabs {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-top: 1px solid #e2e8f0;
+    z-index: 999;
+    padding: 4px 0;
+    padding-bottom: max(4px, env(safe-area-inset-bottom, 4px));
+    justify-content: space-around;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+}
+
+.bottom-tabs .tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #94a3b8;
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    gap: 1px;
+}
+
+.bottom-tabs .tab-item i {
+    font-size: 1.25rem;
+    transition: color 0.2s;
+}
+
+.bottom-tabs .tab-item span {
+    line-height: 1;
+}
+
+.bottom-tabs .tab-item.active,
+.bottom-tabs .tab-item:active {
+    color: var(--primary-color);
+}
+
+/* Espaço para o conteúdo não ficar atrás da tab bar */
+body {
+    padding-bottom: 56px;
+}
+
+/* ===== MENU LATERAL (SIDE MENU) ===== */
 .side-menu {
     position: fixed;
     top: 0;
     left: 0;
-    /* Fixado na esquerda */
     width: 300px;
     height: 100%;
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
     z-index: 1000;
     transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    /* Animação suave no transform */
     transform: translateX(-100%);
-    /* Escondido totalmente para a esquerda */
-    padding-top: 90px;
+    padding-top: 70px;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -237,10 +285,8 @@ header p {
     height: 100%;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
-    /* Efeito Blur no fundo */
     -webkit-backdrop-filter: blur(4px);
-    z-index: 999;
-    /* Abaixo da sidebar */
+    z-index: 998;
     display: none;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -382,7 +428,7 @@ footer {
 /* ===================== BOTÕES FLUTUANTES ===================== */
 .whatsapp-btn {
     position: fixed;
-    bottom: 15px;
+    bottom: 70px;
     right: 15px;
     background-color: #25d366;
     color: white;
@@ -394,14 +440,18 @@ footer {
     justify-content: center;
     font-size: 1.5rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    z-index: 100;
     transition: transform 0.3s;
     text-decoration: none;
 }
 
+@media (min-width: 768px) {
+    .whatsapp-btn { bottom: 15px; }
+}
+
 .back-to-top {
     position: fixed;
-    bottom: 75px;
+    bottom: 130px;
     right: 15px;
     background: var(--primary-color);
     color: var(--white);
@@ -417,6 +467,10 @@ footer {
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
     z-index: 99;
+}
+
+@media (min-width: 768px) {
+    .back-to-top { bottom: 75px; }
 }
 
 .back-to-top.show {
@@ -700,7 +754,7 @@ hr {
 /* ===================== ESTILOS DA CÂMERA (Mobile/Fullscreen) ===================== */
 
 .camera-page {
-    padding: 0;
+    padding: 0 0 56px;
     background: var(--bg-light);
 }
 
@@ -1345,7 +1399,7 @@ hr {
     }
 
     /* Nav horizontal RESTAURADA */
-    nav {
+    .desktop-nav {
         display: flex !important;
         justify-content: center;
         gap: 20px;
@@ -1357,7 +1411,7 @@ hr {
         max-width: 1000px;
     }
 
-    nav a {
+    .desktop-nav a {
         text-decoration: none;
         color: var(--text-dark);
         font-weight: 600;
@@ -1367,65 +1421,55 @@ hr {
         font-size: 1rem;
     }
 
-    nav a:hover,
-    nav a.active {
+    .desktop-nav a:hover,
+    .desktop-nav a.active {
         background: var(--primary-color);
         color: var(--white);
     }
 
-    /* ===================== RESPONSIVIDADE - TABLET (768px+) ===================== */
-    @media (min-width: 601px) and (max-width: 767px) {
-        .notification-board {
-            flex-direction: row;
-            max-width: 100%;
-            gap: 12px;
-            padding: 0 12px;
-            margin-top: 12px;
-            justify-content: center;
-        }
-
-        .notification-item {
-            flex: 1;
-            padding: 12px 14px;
-            margin-bottom: 0;
-            min-height: 65px;
-        }
-
-        .notification-divider {
-            display: none;
-        }
-
-        .notification-label {
-            font-size: 0.7rem;
-        }
-
-        .dia-rotulo {
-            font-size: 0.85rem;
-        }
-
-        .timer-label {
-            font-size: 0.65rem;
-        }
-
-        .timer {
-            font-size: 1rem;
-        }
+    /* Header desktop - centralizado com logo maior */
+    header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: auto;
+        padding: 16px 20px 12px;
     }
 
-    /* Remove estilos da nav horizontal antiga de tablets */
+    .logo-placeholder {
+        position: static;
+        transform: none;
+        margin-bottom: 6px;
+    }
 
-
-    /* Centraliza o header em desktop */
-    header {
-        padding: 30px 20px 20px;
+    .logo-placeholder img {
+        max-width: 56px;
+        border-radius: 50%;
     }
 
     header h1 {
-        font-size: 2.2rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.3;
     }
 
     header p {
-        font-size: 1.1rem;
+        display: block;
+        position: static;
+        width: auto;
+        font-size: 0.85rem;
+        margin-top: 4px;
+        opacity: 0.9;
+        order: 0;
+    }
+
+    .bottom-tabs {
+        display: none;
+    }
+
+    body {
+        padding-bottom: 0;
     }
 
     /* Notification Board em Tablet/Desktop */
@@ -1473,19 +1517,19 @@ hr {
     }
 
     header {
-        padding: 40px 20px 25px;
-    }
-
-    header h1 {
-        font-size: 2.5rem;
-    }
-
-    header p {
-        font-size: 1.2rem;
+        padding: 24px 20px 18px;
     }
 
     .logo-placeholder img {
-        max-width: 120px;
+        max-width: 64px;
+    }
+
+    header h1 {
+        font-size: 1.6rem;
+    }
+
+    header p {
+        font-size: 0.9rem;
     }
 
     main {
@@ -1540,8 +1584,6 @@ hr {
 /* Garante que o header seja a referência de posição */
 #cabecalho-principal {
     position: relative;
-    padding-top: 8px;
-    padding-bottom: 8px;
 }
 
 /* Quadro de Avisos Moderno - Base para Mobile */
@@ -1615,33 +1657,40 @@ hr {
     letter-spacing: 1px;
 }
 
-/* Ajuste para celulares */
+/* Ajuste para celulares pequenos */
 @media (max-width: 600px) {
     header {
-        padding: 8px 0 6px;
-    }
-
-    .logo-placeholder {
-        margin-bottom: 2px;
-    }
-
-    .logo-placeholder img {
-        max-width: 60px;
+        height: 44px;
+        padding: 0 44px;
     }
 
     header h1 {
-        font-size: 1.2rem;
-        line-height: 1.1;
+        font-size: 0.85rem;
     }
 
-    header p {
-        font-size: 0.7rem;
-        margin-top: 1px;
+    .menu-toggle {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        left: 4px;
+    }
+
+    .bottom-tabs {
+        padding: 2px 0;
+        padding-bottom: max(2px, env(safe-area-inset-bottom, 2px));
+    }
+
+    .bottom-tabs .tab-item i {
+        font-size: 1.1rem;
+    }
+
+    .bottom-tabs .tab-item span {
+        font-size: 0.55rem;
     }
 
     #cabecalho-principal {
-        padding-top: 6px;
-        padding-bottom: 6px;
+        padding-top: 0;
+        padding-bottom: 0;
     }
 
     .notification-board {
@@ -1710,21 +1759,97 @@ hr {
     }
 }
 
+/* ===================== TABLET (601px - 767px) ===================== */
+@media (min-width: 601px) and (max-width: 767px) {
+    header {
+        min-height: 56px;
+        padding: 8px 52px;
+    }
+
+    .logo-placeholder img {
+        max-width: 32px;
+    }
+
+    header h1 {
+        font-size: 1.1rem;
+    }
+
+    header p {
+        font-size: 0.7rem;
+    }
+
+    .bottom-tabs .tab-item i {
+        font-size: 1.3rem;
+    }
+
+    .bottom-tabs .tab-item span {
+        font-size: 0.65rem;
+    }
+
+    .notification-board {
+        flex-direction: row;
+        max-width: 100%;
+        gap: 12px;
+        padding: 0 12px;
+        margin-top: 12px;
+        justify-content: center;
+    }
+
+    .notification-item {
+        flex: 1;
+        padding: 12px 14px;
+        margin-bottom: 0;
+        min-height: 60px;
+    }
+
+    .notification-label {
+        font-size: 0.7rem;
+    }
+
+    .dia-rotulo {
+        font-size: 0.85rem;
+    }
+
+    .timer-label {
+        font-size: 0.65rem;
+    }
+
+    .timer {
+        font-size: 1rem;
+    }
+}
+
 /* Botão de Atualizar */
 .btn-refresh {
     background: #ffcc00;
     color: #333;
     border: none;
-    padding: 6px 12px;
+    padding: 4px 10px;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 5px;
     transition: transform 0.2s;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+#cabecalho-principal .btn-refresh {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    #cabecalho-principal .btn-refresh {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+        right: 6px;
+    }
 }
 
 .btn-refresh:active {
@@ -1759,7 +1884,6 @@ hr {
 /* Ajuste no Header para acomodar o botão */
 #cabecalho-principal {
     position: relative;
-    padding-bottom: 15px;
 }
 
 /* NOVO: Estilo para Aviso Sério (Urgente) */

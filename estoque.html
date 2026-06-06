@@ -142,6 +142,7 @@
         <a href="scanner-documento.html"><i class="fas fa-file-alt"></i> <span class="link-text">Scanner</span></a>
         <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
         <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
+        <a href="feriados.html"><i class="fas fa-calendar-alt"></i> <span class="link-text">Feriados</span></a>
         <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span class="link-text">Solicitações</span></a>
         <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span></a>
     </aside>
@@ -154,7 +155,7 @@
         <div class="logo-placeholder">
             <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas" onerror="this.src='https://via.placeholder.com/150?text=QDelicia'">
         </div>
-        <h1>Qdelícia Frutas</h1>
+        <h1>Estoque</h1>
         <p id="subtitulo-header">Registro de estoque diário</p>
 
         <button onclick="recarregarPagina()" class="btn-refresh">
@@ -162,13 +163,14 @@
         </button>
     </header>
 
-    <nav>
+    <nav class="desktop-nav">
         <a href="index.html">Início</a>
         <a href="estoque.html" class="active">Estoque</a>
         <a href="camera.html">Câmera</a>
         <a href="scanner-documento.html">Scanner</a>
         <a href="materiais.html">Materiais</a>
         <a href="pedido.html">Sugestão</a>
+        <a href="feriados.html">Feriados</a>
         <a href="solicitacoes.html">Solicitações</a>
         <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </nav>
@@ -214,6 +216,14 @@
             </iframe>
         </div>
     </main>
+
+    <nav class="bottom-tabs">
+        <a href="index.html" class="tab-item"><i class="fas fa-home"></i><span>Início</span></a>
+        <a href="estoque.html" class="tab-item active"><i class="fas fa-boxes-stacked"></i><span>Estoque</span></a>
+        <a href="camera.html" class="tab-item"><i class="fas fa-camera"></i><span>Câmera</span></a>
+        <a href="scanner-documento.html" class="tab-item"><i class="fas fa-file-alt"></i><span>Scanner</span></a>
+        <a href="pedido.html" class="tab-item"><i class="fas fa-file-invoice"></i><span>Pedido</span></a>
+    </nav>
 
     <footer>
         <p>&copy; 2026 Qdelícia Frutas. Todos os direitos reservados.</p>
