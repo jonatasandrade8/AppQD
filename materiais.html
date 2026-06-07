@@ -16,42 +16,25 @@
 </head>
 
 <body>
-    <div class="menu-overlay"></div>
-
-    <aside class="side-menu">
-        <a href="index.html"><i class="fas fa-home"></i> <span class="link-text">Início</span></a>
-        <a href="estoque.html"><i class="fas fa-boxes-stacked"></i> <span class="link-text">Estoque</span></a>
-        <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
-        <a href="scanner-documento.html"><i class="fas fa-file-alt"></i> <span class="link-text">Scanner</span></a>
-        <a href="materiais.html" class="active"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
-        <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
-        <a href="feriados.html"><i class="fas fa-calendar-alt"></i> <span class="link-text">Feriados</span></a>
-        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span class="link-text">Solicitações</span></a>
-        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span></a>
-    </aside>
-
     <header id="cabecalho-principal">
-        <button class="menu-toggle" aria-label="Abrir Menu">
-            <i class="fas fa-bars"></i>
-            <span class="menu-label">Menu</span>
-        </button>
+        <a href="materiais.html" class="header-materiais-btn active" aria-label="Materiais">
+            <i class="fas fa-book"></i>
+        </a>
         <div class="logo-placeholder">
-            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas">
+            <img src="./images/logo-qdelicia.png" alt="Qdelícia Frutas">
         </div>
         <h1>Materiais</h1>
-        <p>Materiais e Manuais</p>
+
     </header>
 
     <nav class="desktop-nav">
         <a href="index.html">Início</a>
         <a href="estoque.html">Estoque</a>
         <a href="camera.html">Câmera</a>
-        <a href="scanner-documento.html">Scanner</a>
         <a href="materiais.html" class="active">Materiais</a>
         <a href="pedido.html">Sugestão</a>
         <a href="feriados.html">Feriados</a>
         <a href="solicitacoes.html">Solicitações</a>
-        <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </nav>
 
     <style>
@@ -215,14 +198,10 @@
     <nav class="bottom-tabs">
         <a href="index.html" class="tab-item"><i class="fas fa-home"></i><span>Início</span></a>
         <a href="estoque.html" class="tab-item"><i class="fas fa-boxes-stacked"></i><span>Estoque</span></a>
-        <a href="camera.html" class="tab-item"><i class="fas fa-camera"></i><span>Câmera</span></a>
-        <a href="scanner-documento.html" class="tab-item"><i class="fas fa-file-alt"></i><span>Scanner</span></a>
-        <a href="pedido.html" class="tab-item"><i class="fas fa-file-invoice"></i><span>Pedido</span></a>
+        <a href="camera.html" class="tab-item tab-camera"><span class="cam-wrap"><i class="fas fa-camera"></i></span><span>Câmera</span></a>
+        <a href="pedido.html" class="tab-item"><i class="fas fa-file-invoice"></i><span>Sugestão</span></a>
+        <a href="feriados.html" class="tab-item"><i class="fas fa-calendar-alt"></i><span>Feriados</span></a>
     </nav>
-
-    <footer>
-        <p>&copy; 2025 Qdelícia Frutas. Todos os direitos reservados.</p>
-    </footer>
 
     <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
         <i class="fab fa-whatsapp"></i>

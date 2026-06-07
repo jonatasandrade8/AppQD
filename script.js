@@ -28,28 +28,29 @@
     };
 
     // ... restante do código (atualizarRelogio, etc)
-    // 1. Lógica do Menu Hambúrguer (Lateral)
-    const menuToggle = document.querySelector('.menu-toggle');
-    const sideMenu = document.querySelector('.side-menu');
-    const menuOverlay = document.querySelector('.menu-overlay');
-
-    if (menuToggle && sideMenu && menuOverlay) {
-        menuToggle.addEventListener('click', () => {
-            sideMenu.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
-        });
-
-        menuOverlay.addEventListener('click', () => {
-            sideMenu.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
-
-        // Fechar menu ao clicar em um link
-        sideMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                sideMenu.classList.remove('active');
-                menuOverlay.classList.remove('active');
-            });
+    // 1. Header Compact on Scroll (2 níveis)
+    const header = document.getElementById('cabecalho-principal');
+    if (header) {
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.scrollY;
+            
+            // Nível 1: compact (36px)
+            if (currentScroll > 50) {
+                header.classList.add('compact');
+            } else {
+                header.classList.remove('compact');
+                header.classList.remove('compact-max');
+            }
+            
+            // Nível 2: ultra-compact (30px)
+            if (currentScroll > 200) {
+                header.classList.add('compact-max');
+            } else {
+                header.classList.remove('compact-max');
+            }
+            
+            lastScroll = currentScroll;
         });
     }
 

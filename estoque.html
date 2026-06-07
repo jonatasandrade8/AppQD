@@ -18,55 +18,84 @@
             overflow-x: hidden;
         }
 
+        /* ── Menu de seleção de formulário ────────────────────── */
         .tab-buttons {
-            display: flex;
-            gap: 10px;
-            padding: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            background: var(--bg-light);
+            /* Mobile: painel fixo acima da bottom-bar, slide-up */
+            position: fixed;
+            bottom: 62px; /* altura da bottom-bar */
+            left: 0;
+            right: 0;
+            z-index: 240;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 14px 14px 16px;
+            background: #ffffff;
+            border-top: 2px solid rgba(99, 102, 241, 0.18);
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -6px 28px rgba(67, 56, 202, 0.14);
+            transform: translateY(0);
+            opacity: 1;
+            transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.28s ease;
+        }
+
+        /* Classe hidden = slide para baixo em vez de display:none */
+        .tab-buttons.hidden {
+            transform: translateY(110%);
+            opacity: 0;
+            pointer-events: none;
+            display: grid !important; /* sobrescreve o display:none global */
         }
 
         .tab-btn {
-            flex: 1;
-            min-width: 160px;
-            padding: 12px 15px;
-            font-size: 0.95rem;
+            padding: 13px 8px;
+            font-size: 0.8rem;
             font-weight: 600;
-            border: none;
-            border-radius: var(--border-radius);
-            background-color: var(--white);
-            color: var(--primary-color);
+            border: 1.5px solid transparent;
+            border-radius: 14px;
+            background-color: #f1f5f9;
+            color: #6366f1;
             cursor: pointer;
-            transition: var(--transition);
+            transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            box-shadow: var(--shadow);
+            gap: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+            min-height: 50px;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .tab-btn:nth-last-child(1):nth-child(odd) {
+            grid-column: 1 / -1;
         }
 
         .tab-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            background-color: var(--primary-color);
-            color: var(--white);
+            background-color: #ede9fe;
+            border-color: #a5b4fc;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(99,102,241,0.15);
         }
 
         .tab-btn.active {
-            background: var(--gradient);
-            color: var(--white);
-            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(99,102,241,0.4);
         }
 
         .tab-btn:disabled {
-            opacity: 0.7;
+            opacity: 0.55;
             cursor: not-allowed;
             background-color: #f0f0f0;
-            color: #888;
+            color: #aaa;
             box-shadow: none;
+            transform: none;
         }
 
+        /* ── Área do iframe ───────────────────────────────────── */
         .iframe-container {
             padding: 0;
             flex: 1;
@@ -74,6 +103,8 @@
             flex-direction: column;
             width: 100%;
             background-color: var(--white);
+            /* Espaço para o painel de seleção fixo na base */
+            padding-bottom: 130px;
         }
 
         .iframe-wrapper {
@@ -113,20 +144,40 @@
             padding: 15px;
         }
 
-        @media (max-width: 600px) {
+        /* ── Desktop: menu estático acima do conteúdo ─────────── */
+        @media (min-width: 768px) {
             .tab-buttons {
-                padding: 10px;
-                gap: 8px;
+                position: static;
+                transform: none !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                display: grid !important;
+                border-radius: 0;
+                border-top: none;
+                border-bottom: 1px solid rgba(99,102,241,0.12);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                padding: 12px 20px;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 10px;
+                background: #ffffff;
+            }
+
+            .tab-buttons.hidden {
+                display: none !important;
             }
 
             .tab-btn {
                 font-size: 0.85rem;
-                padding: 10px;
-                min-width: 140px;
+                padding: 12px 10px;
+                min-height: 52px;
+            }
+
+            .tab-btn:nth-last-child(1):nth-child(odd) {
+                grid-column: unset;
             }
 
             .iframe-container {
-                padding: 0;
+                padding-bottom: 0;
             }
         }
     </style>
@@ -134,45 +185,27 @@
 
 <body>
 
-    <div class="menu-overlay"></div>
-    <aside class="side-menu">
-        <a href="index.html"><i class="fas fa-home"></i> <span class="link-text">Início</span></a>
-        <a href="estoque.html" class="active"><i class="fas fa-boxes-stacked"></i> <span class="link-text">Estoque</span></a>
-        <a href="camera.html"><i class="fas fa-camera"></i> <span class="link-text">Câmera</span></a>
-        <a href="scanner-documento.html"><i class="fas fa-file-alt"></i> <span class="link-text">Scanner</span></a>
-        <a href="materiais.html"><i class="fas fa-book"></i> <span class="link-text">Materiais</span></a>
-        <a href="pedido.html"><i class="fas fa-file-invoice"></i> <span class="link-text">Sugestão de Pedido</span></a>
-        <a href="feriados.html"><i class="fas fa-calendar-alt"></i> <span class="link-text">Feriados</span></a>
-        <a href="solicitacoes.html"><i class="fas fa-clipboard-list"></i> <span class="link-text">Solicitações</span></a>
-        <a href="#" class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span></a>
-    </aside>
-
     <header id="cabecalho-principal">
-        <button class="menu-toggle" aria-label="Abrir Menu">
-            <i class="fas fa-bars"></i>
-            <span class="menu-label">Menu</span>
-        </button>
+        <a href="materiais.html" class="header-materiais-btn" aria-label="Materiais">
+            <i class="fas fa-book"></i>
+        </a>
         <div class="logo-placeholder">
-            <img src="./images/logo-qdelicia.png" alt="Logomarca Qdelícia Frutas" onerror="this.src='https://via.placeholder.com/150?text=QDelicia'">
+            <img src="./images/logo-qdelicia.png" alt="Qdelícia Frutas">
         </div>
         <h1>Estoque</h1>
-        <p id="subtitulo-header">Registro de estoque diário</p>
 
-        <button onclick="recarregarPagina()" class="btn-refresh">
-            <i class="fas fa-sync-alt"></i> Atualizar
-        </button>
+        <p id="subtitulo-header" style="display: none;">Registro de estoque diário</p>
+        <button onclick="recarregarPagina()" class="btn-refresh"><i class="fas fa-sync-alt"></i> Atualizar</button>
     </header>
 
     <nav class="desktop-nav">
         <a href="index.html">Início</a>
         <a href="estoque.html" class="active">Estoque</a>
         <a href="camera.html">Câmera</a>
-        <a href="scanner-documento.html">Scanner</a>
         <a href="materiais.html">Materiais</a>
         <a href="pedido.html">Sugestão</a>
         <a href="feriados.html">Feriados</a>
         <a href="solicitacoes.html">Solicitações</a>
-        <a href="#" class="logout-link-desktop" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
     </nav>
 
     <div class="tab-buttons">
@@ -220,18 +253,18 @@
     <nav class="bottom-tabs">
         <a href="index.html" class="tab-item"><i class="fas fa-home"></i><span>Início</span></a>
         <a href="estoque.html" class="tab-item active"><i class="fas fa-boxes-stacked"></i><span>Estoque</span></a>
-        <a href="camera.html" class="tab-item"><i class="fas fa-camera"></i><span>Câmera</span></a>
-        <a href="scanner-documento.html" class="tab-item"><i class="fas fa-file-alt"></i><span>Scanner</span></a>
-        <a href="pedido.html" class="tab-item"><i class="fas fa-file-invoice"></i><span>Pedido</span></a>
+        <a href="camera.html" class="tab-item tab-camera"><span class="cam-wrap"><i class="fas fa-camera"></i></span><span>Câmera</span></a>
+        <a href="pedido.html" class="tab-item"><i class="fas fa-file-invoice"></i><span>Sugestão</span></a>
+        <a href="feriados.html" class="tab-item"><i class="fas fa-calendar-alt"></i><span>Feriados</span></a>
     </nav>
 
-    <footer>
-        <p>&copy; 2026 Qdelícia Frutas. Todos os direitos reservados.</p>
-    </footer>
+    <div class="tab-indicator" id="tab-indicator">
+        <span class="tab-indicator-label" id="tab-indicator-label">
+            <i class="fas fa-file"></i> <span id="tab-indicator-text">Estoque Inicial</span>
+        </span>
+        <button class="btn-change-tab" onclick="mostrarTabs()"><i class="fas fa-chevron-up"></i> Trocar</button>
+    </div>
 
-    <a href="https://wa.me/5581997250086" class="whatsapp-btn" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
 
     <div class="back-to-top">
         <i class="fas fa-arrow-up"></i>
@@ -325,11 +358,29 @@
                     break;
             }
 
+            // Esconder abas e mostrar indicador fixo
+            document.querySelector('.tab-buttons').classList.add('hidden');
+            const indicator = document.getElementById('tab-indicator');
+            indicator.classList.add('active');
+            const labelMap = {
+                'inicial': 'Estoque Inicial',
+                'final': 'Estoque Final',
+                'caixas': 'Balanço de Caixas',
+                'devolucoes': 'Devoluções',
+                'caixas-secas': 'Caixas Secas'
+            };
+            document.getElementById('tab-indicator-text').textContent = labelMap[tipo] || tipo;
+
             // Scroll suave para o container
             window.scrollTo({
                 top: document.getElementById('container-estoque').offsetTop - 20,
                 behavior: 'smooth'
             });
+        }
+
+        function mostrarTabs() {
+            document.querySelector('.tab-buttons').classList.remove('hidden');
+            document.getElementById('tab-indicator').classList.remove('active');
         }
 
         function recarregarPagina() {
