@@ -15,7 +15,7 @@ const APP_DATA = {
         "Amarildo": ["Zona Norte"]
     },
     "Assaí": {
-        "Reginaldo": ["Ponta Negra"],
+        "Francinaldo": ["Ponta Negra"],
         "Erivan": ["Maria Lacerda"],
         "Miqueias": ["Zona Sul"],
         "Cosme": ["Zona Norte"]
