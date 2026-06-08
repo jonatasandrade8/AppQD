@@ -6,7 +6,7 @@ const APP_DATA = {
         "Amarildo": ["Zona Norte"]
     },
     "Assaí": {
-        "Reginaldo": ["Zona Sul"],
+        "Francinaldo": ["Zona Sul"],
         "Erivan": ["Maria Lacerda"],
         "Miqueias": ["Ponta Negra"],
         "Cosme": ["Zona Norte"]
