@@ -47,7 +47,7 @@ const NOTIFICATIONS_CONFIG = {
     // O modal exige clique em "Ciente" para prosseguir.
     // É exibido uma vez por sessão (sessionStorage).
     avisoSerio: {
-        enabled: true,
+        enabled: false,
         timer: 'off',           // 'on' para mostrar contagem regressiva no modal, 'off' para ocultar
         titulo: "Atenção",
         mensagem: "O Balanço de Caixas foi agendado para o dia 08/06/2026 (segunda-feira). Anote a data para não esquecer.",
