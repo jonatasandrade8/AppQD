@@ -48,9 +48,9 @@ const NOTIFICATIONS_CONFIG = {
     // É exibido uma vez por sessão (sessionStorage).
     avisoSerio: {
         enabled: false,
-        timer: 'off',           // 'on' para mostrar contagem regressiva no modal, 'off' para ocultar
+        timer: 'on',           // 'on' para mostrar contagem regressiva no modal, 'off' para ocultar
         titulo: "Atenção",
-        mensagem: "O Balanço de Caixas foi agendado para o dia 08/06/2026 (segunda-feira). Anote a data para não esquecer.",
+        mensagem: "O Balanço de Caixas foi agendado para o dia 15/06/2026 (segunda-feira). Anote a data para não esquecer.",
         dataAlvo: "2026-06-18T08:00:00",
         labels: {
             next: "Faltam %d dias"
