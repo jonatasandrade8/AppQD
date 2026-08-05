@@ -9,14 +9,14 @@ const PHOTO_TYPES = {
 
 const APP_DATA = {
     "Atacadão": {
-        "Vivian": ["BR - Zona Sul"],
-        "Nilson": ["Parnamirim"],
+        "Erivan": ["BR -SUL"],
+        "Vivian": ["Parnamirim"],
         "Inácio": ["Prudente"],
         "Amarildo": ["Zona Norte"]
     },
     "Assaí": {
         "Francinaldo": ["Ponta Negra"],
-        "Erivan": ["Maria Lacerda"],
+        "Antonio": ["Maria Lacerda"],
         "Miqueias": ["Zona Sul"],
         "Cosme": ["Zona Norte"]
     },
